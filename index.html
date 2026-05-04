@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Simulação de Sopro - v8.1</title>
+<title>Simulação de Sopro - v8.4</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap');
 :root{--azul:#2E75B6;--azul-escuro:#1A4B8C;--laranja:#E87722;--verde:#2E8B57;--vermelho:#C0392B;--bg:#1F3A5A;--panel:#264668;--border:#305678}
@@ -29,10 +29,32 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:#E8ECF1;min-hei
 .zone-toggle.on{background:var(--azul)}
 .zone-toggle.off{background:#444}
 
-.main-row{display:flex;gap:20px;padding:16px 20px 24px;max-width:1120px;width:100%;align-items:flex-start}
+.main-row{display:flex;flex-direction:column;align-items:center;gap:12px;padding:12px 20px 20px;max-width:900px;width:100%;margin:0 auto}
+.left-panel{display:none!important}
+.canvas-col{display:flex;justify-content:center}
+.right-panel{width:100%;max-width:860px;display:flex;flex-direction:column;gap:10px}
 
-/* Left panel */
-.left-panel{width:260px;min-width:260px;display:flex;flex-direction:column;gap:12px}
+@media(min-width:701px){
+  .right-panel{flex-direction:row;gap:12px}
+  .right-panel>.panel-card{flex:1}
+  .mob-scroll-wrap{display:block!important;width:100%;max-width:860px;margin-top:6px}
+  .mob-tabs{justify-content:center;border-radius:10px 10px 0 0}
+  .mob-tab{flex:0 1 auto;padding:12px 22px;font-size:12px}
+  .mob-panel{padding:18px 30px;display:flex;flex-direction:column;align-items:center}
+  .mob-panel .slider-group{max-width:480px;width:100%}
+  .mob-panel input[type=range]{height:auto}
+  .mob-panel .slider-hdr span{font-size:13px}
+  .mob-panel .slider-val{font-size:17px!important}
+  .mob-panel .slider-hints{font-size:10px}
+  .mob-panel .timing-badge{font-size:11px;padding:4px 14px}
+  .mob-panel .presets{gap:6px;margin-top:8px;justify-content:center}
+  .mob-panel .preset,.mob-panel .preset-v,.mob-panel .preset-f,.mob-panel .preset-p{padding:7px 14px;font-size:11px}
+  .mob-panel .phase-btns{max-width:480px;width:100%;grid-template-columns:repeat(4,1fr)}
+  .mob-panel .btn-row{justify-content:center;margin-top:8px}
+  .mob-panel .btn{padding:10px 22px;font-size:12px}
+}
+
+/* Left panel controls */
 .panel-card{background:var(--panel);border-radius:12px;padding:16px;box-shadow:0 4px 16px rgba(0,0,0,.25)}
 .panel-title{font-size:12px;font-weight:700;color:#fff;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:6px}
 .panel-title .icon{font-size:16px}
@@ -73,7 +95,6 @@ input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;bac
 canvas{border-radius:12px;background:var(--panel);box-shadow:0 4px 20px rgba(0,0,0,.35)}
 
 /* Right panel */
-.right-panel{width:260px;min-width:260px;display:flex;flex-direction:column;gap:12px}
 
 .phase-indicator{display:flex;align-items:center;gap:8px;margin-bottom:8px}
 .phase-dot{width:11px;height:11px;border-radius:50%;flex-shrink:0}
@@ -94,20 +115,15 @@ canvas{border-radius:12px;background:var(--panel);box-shadow:0 4px 20px rgba(0,0
 .timeline-step.done{background:var(--verde)}
 
 /* Distribution bars */
-.bar-row{display:flex;align-items:center;gap:6px;margin-bottom:5px}
-.bar-label{font-size:9px;color:#6A8CA8;width:45px;text-align:right;flex-shrink:0}
-.bar-track{flex:1;height:14px;background:#162D44;border-radius:3px;overflow:hidden}
-.bar-fill{height:100%;border-radius:3px;transition:width .4s}
-.bar-pct{font-size:10px;font-weight:700;color:#fff;width:32px;flex-shrink:0}
-.result-note{margin-top:8px;font-size:11px;color:#8899AA;line-height:1.5;padding:8px;border-radius:6px;border-left:3px solid var(--azul)}
+.bar-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.bar-label{font-size:11px;color:#6A8CA8;width:55px;text-align:right;flex-shrink:0;font-weight:600}
+.bar-track{flex:1;height:22px;background:#162D44;border-radius:4px;overflow:hidden}
+.bar-fill{height:100%;border-radius:4px;transition:width .4s}
+.bar-pct{font-size:13px;font-weight:700;color:#fff;width:40px;flex-shrink:0}
+.result-note{margin-top:10px;font-size:12px;color:#8899AA;line-height:1.6;padding:10px 12px;border-radius:6px;border-left:3px solid var(--azul)}
 .result-note.warn{border-left-color:var(--vermelho);background:rgba(192,57,43,.06)}
 .result-note.good{border-left-color:var(--verde);background:rgba(46,139,87,.06)}
 
-@media(max-width:900px){
-  .main-row{flex-direction:column;align-items:center}
-  .left-panel,.right-panel{width:100%;min-width:unset}
-  .phase-btns{grid-template-columns:1fr 1fr 1fr}
-}
 @media(max-width:700px){
   body{overflow-x:hidden}
   .topbar{flex-wrap:wrap;gap:4px;padding:6px 10px}
@@ -123,7 +139,8 @@ canvas{border-radius:12px;background:var(--panel);box-shadow:0 4px 20px rgba(0,0
   #cv{width:100%;height:auto}
   .left-panel{display:none}
   .right-panel{order:3;width:100%}
-  .mob-scroll-wrap{display:block!important}
+  .mob-scroll-wrap{order:2}
+  .mob-tab{font-size:9px;padding:8px 4px}
   .panel-card{padding:6px;margin-bottom:4px}
   .panel-title{font-size:10px;margin-bottom:4px;padding-bottom:4px}
   .phase-btns{grid-template-columns:1fr 1fr 1fr 1fr}
@@ -140,8 +157,8 @@ canvas{border-radius:12px;background:var(--panel);box-shadow:0 4px 20px rgba(0,0
   .tour-title{font-size:11px}.tour-text{font-size:9px;margin-bottom:8px}
   .tour-btn{padding:5px 10px;font-size:10px}
 }
-@media(min-width:701px){.mob-scroll-wrap{display:none!important}}
-.mob-scroll-wrap{display:none;width:100%}
+@media(min-width:701px){/* desktop overrides in main-row block */}
+.mob-scroll-wrap{display:block;width:100%}
 .mob-tabs{display:flex;gap:0;background:var(--panel);border-radius:8px 8px 0 0;overflow:hidden}
 .mob-tab{flex:1;padding:10px 4px;background:var(--panel);color:#6A8CA8;font-family:'DM Sans',sans-serif;font-size:10px;font-weight:600;border:none;cursor:pointer;text-align:center;border-bottom:2px solid transparent;transition:all .15s;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .mob-tab.active{color:#fff;border-bottom-color:var(--azul);background:rgba(46,117,182,.15)}
@@ -180,7 +197,7 @@ canvas{border-radius:12px;background:var(--panel);box-shadow:0 4px 20px rgba(0,0
 <body>
 
 <div class="topbar">
-  <h1 id="mainTitle">Simulação de Sopro - v8.1</h1>
+  <h1 id="mainTitle">Simulação de Sopro - v8.4</h1>
   <div class="tabs">
     <button class="tab active" data-tab="aquecimento" id="tabHeat">🔥 Perfil Térmico</button>
     <button class="tab" data-tab="sopro" id="tabBlow">⚙ Processo de Sopro</button>
@@ -198,7 +215,7 @@ canvas{border-radius:12px;background:var(--panel);box-shadow:0 4px 20px rgba(0,0
 <!-- PAGE 1: Aquecimento -->
 <div class="page" id="page-aquecimento">
   <div style="display:flex;justify-content:center;padding:10px;overflow-x:auto">
-    <canvas id="cvHeat" width="700" height="660"></canvas>
+    <canvas id="cvHeat" width="740" height="720"></canvas>
   </div>
 </div>
 
@@ -797,11 +814,12 @@ function getHeatProfile(){
   const ventNorm=ventHz/60; // 0-1
   const exaNorm=exaustHz/60; // 0-1
   const airflow=(ventNorm*0.6+exaNorm*0.4); // combined air cooling 0-1
-  // Ambient effect: colder ambient = more cooling, hotter = less
-  // at 25°C factor=0.5, at 10°C=1.0, at 40°C=0.0
-  const ambientFactor=Math.max(0,Math.min(1,(35-ambientTemp)/25));
-  // Cooling reduction: max 40% reduction at full airflow + cold ambient
-  const coolingPct=1-airflow*ambientFactor*0.4;
+  // Ambient: at 25°C factor=1.0 (reference), at 40°C=0.0, at 10°C=1.3(cap)
+  const ambientFactor=Math.max(0,Math.min(1.3,(40-ambientTemp)/15));
+  // Non-linear airflow: low Hz = less effect, high Hz = strong
+  const airPow=Math.pow(airflow,1.3);
+  // At 60/60/25°C: airPow=1.0 * ambF=1.0 * 0.8 = 80% cooling
+  const coolingPct=Math.max(0.1,1-airPow*ambientFactor*0.8);
   
   const heats=[];
   for(let i=0;i<6;i++){
@@ -1146,8 +1164,8 @@ function drawHeat(){
   ctxH.clearRect(0,0,WH,HH);
   clickR=[];
   const potG=potGeral/100;
-  const pfW=20,pfBot=490,zoneH=48;
-  const pfTop=pfBot-6*zoneH; // =202
+  const pfW=22,pfBot=530,zoneH=52;
+  const pfTop=pfBot-6*zoneH; // =218
   const pfH=pfBot-pfTop;
 
   const lampW=10;
@@ -1498,7 +1516,7 @@ function drawHeat(){
 // ═══ TRANSLATIONS ═══
 let lang='pt';
 const TR={
-  pt:{title:'Simulação de Sopro - v8.1',tabHeat:'🔥 Perfil Térmico',tabBlow:'⚙ Processo de Sopro',
+  pt:{title:'Simulação de Sopro - v8.4',tabHeat:'🔥 Perfil Térmico',tabBlow:'⚙ Processo de Sopro',
     badge:'Especialista - Wesley Uelber',zona:'Zona',preForno:'Pré-Forno',forno:'Forno',perfil:'Perfil',
     mold:'MOLDE',start:'▶ Iniciar',pause:'⏸ Pausar',resume:'▶ Continuar',reset:'↺ Reiniciar',done:'✓ Completo',
     phases:['Posicionamento','Fechamento','Vedação do Bocal','Estiramento + Pré-Sopro','Sopro Final','Residência','Alívio de Sopro','Extração'],
@@ -1522,7 +1540,7 @@ const TR={
       'A pressão interna é aliviada gradualmente. A haste de estiramento sobe de volta.',
       'A vedação sobe, o molde abre e a garrafa é extraída com seu formato final.'
     ]},
-  en:{title:'Blow Molding Simulation - v8.1',tabHeat:'🔥 Thermal Profile',tabBlow:'⚙ Blow Process',
+  en:{title:'Blow Molding Simulation - v8.4',tabHeat:'🔥 Thermal Profile',tabBlow:'⚙ Blow Process',
     badge:'Specialist - Wesley Uelber',zona:'Zone',preForno:'Pre-Oven',forno:'Oven',perfil:'Profile',
     mold:'MOLD',start:'▶ Start',pause:'⏸ Pause',resume:'▶ Resume',reset:'↺ Reset',done:'✓ Done',
     phases:['Positioning','Mold Closing','Nozzle Seal','Stretching + Pre-Blow','Final Blow','Holding','Blow Relief','Extraction'],
@@ -1546,7 +1564,7 @@ const TR={
       'Internal pressure is gradually relieved. The stretch rod rises back.',
       'The seal rises, the mold opens and the bottle is extracted in its final shape.'
     ]},
-  es:{title:'Simulación de Soplado - v8.1',tabHeat:'🔥 Perfil Térmico',tabBlow:'⚙ Proceso de Soplado',
+  es:{title:'Simulación de Soplado - v8.4',tabHeat:'🔥 Perfil Térmico',tabBlow:'⚙ Proceso de Soplado',
     badge:'Especialista - Wesley Uelber',zona:'Zona',preForno:'Pre-Horno',forno:'Horno',perfil:'Perfil',
     mold:'MOLDE',start:'▶ Iniciar',pause:'⏸ Pausar',resume:'▶ Continuar',reset:'↺ Reiniciar',done:'✓ Completo',
     phases:['Posicionamiento','Cierre del Molde','Sellado de Boquilla','Estirado + Pre-Soplado','Soplado Final','Residencia','Alivio de Soplado','Extracción'],
@@ -1727,56 +1745,68 @@ const tourSteps={
   pt:[
     {el:null,title:'Bem-vindo ao Simulador de Sopro!',text:'Este tour vai te mostrar todas as funcionalidades do simulador. Vamos lá?',pos:'center'},
     {el:'#tabHeat',title:'Abas de Navegação',text:'Alterne entre o Perfil Térmico (aquecimento das zonas) e o Processo de Sopro (simulação das etapas).',pos:'bottom'},
-    {el:'#cvHeat',title:'Pré-forma Girando',text:'A pré-forma gira continuamente, mostrando a absorção de calor de cada zona. Vermelho = quente, azul = frio.',pos:'bottom',page:'aquecimento'},
-    {el:'#cvHeat',title:'Zonas de Aquecimento (1-9)',text:'Clique nos valores numéricos ao lado das lâmpadas para editar a intensidade de cada zona (0-100). Cada lado (Pré-Forno e Forno) é independente.',pos:'bottom',page:'aquecimento'},
-    {el:'#cvHeat',title:'Ligar/Desligar Lâmpadas',text:'Clique diretamente nas lâmpadas (cápsulas arredondadas) para ligar ou desligar cada zona individualmente.',pos:'bottom',page:'aquecimento'},
-    {el:'#cvHeat',title:'Aproximação das Zonas ◀▶',text:'As setas ◀▶ atrás dos nomes das zonas controlam a distância da lâmpada. 3 níveis: perto, médio e longe. Mais perto = mais calor na pré-forma.',pos:'bottom',page:'aquecimento'},
-    {el:'#cvHeat',title:'Perfil (Potência Geral)',text:'Clique no valor "Perfil" no centro da pré-forma para ajustar a potência geral (0-200). Multiplica todas as zonas, mas nenhuma ultrapassa 100.',pos:'bottom',page:'aquecimento'},
-    {el:'#tabBlow',title:'Processo de Sopro',text:'Agora vamos ver a aba de Processo de Sopro. Clique aqui ou aguarde...',pos:'bottom',switchTo:'sopro'},
-    {el:'#btnPlay',title:'Controles de Animação',text:'Clique em Iniciar para ver a animação completa das 8 etapas do processo de sopro PET. Pause e reinicie a qualquer momento.',pos:'bottom',page:'sopro'},
-    {el:'#tSlider',title:'Início de Pré-Sopro',text:'Ajuste o momento em que o ar de pré-sopro começa (60-300ms). Antecipado = mais material no ombro. Atrasado = mais na base.',pos:'bottom',page:'sopro'},
-    {el:'#vSlider',title:'Tempo de Estiramento',text:'Controla o tempo de descida da haste (250-500ms). Rápida = material no fundo. Lenta = material no ombro.',pos:'bottom',page:'sopro'},
-    {el:'#fSlider',title:'Vazão de Pré-Sopro',text:'Regula o fluxo de ar (0-10). Fechada = material no fundo. Aberta = material no ombro.',pos:'bottom',page:'sopro'},
-    {el:'#pPSlider',title:'Pressão de Pré-Sopro',text:'Ajuste a pressão do ar (0-8 bar). Os 4 controles trabalham juntos e se compensam mutuamente.',pos:'bottom',page:'sopro'},
-    {el:'#rNote',title:'Resultado da Distribuição',text:'Aqui você vê o impacto dos ajustes: distribuição de material (Ombro/Centro/Base) e diagnóstico do processo.',pos:'top',page:'sopro'},
-    {el:'.flags',title:'Idiomas 🇧🇷 🇺🇸 🇪🇸',text:'Clique nas bandeiras para trocar o idioma. Todo o simulador é traduzido para Português, Inglês e Espanhol.',pos:'bottom'},
-    {el:null,title:'Tour Completo!',text:'Agora você conhece todas as funcionalidades. Clique no botão ? a qualquer momento para rever este tour. Bom trabalho!',pos:'center'}
+    {el:'#cvHeat',title:'Pré-forma Girando',text:'A pré-forma gira continuamente mostrando a absorção de calor. Vermelho = quente, azul = frio. As cores variam por zona.',pos:'bottom',page:'aquecimento'},
+    {el:'#cvHeat',title:'Zonas de Aquecimento (1-9)',text:'Clique nos valores ao lado das lâmpadas para editar (0-100). Cada lado é independente: Pré-Forno (esquerda) e Forno (direita).',pos:'bottom',page:'aquecimento'},
+    {el:'#cvHeat',title:'Potência das Lâmpadas',text:'Z1 = 3000W (máxima intensidade), Z2 e Z9 = 2000W, Z3 a Z8 = 800W. A mesma % gera mais calor nas lâmpadas de maior potência.',pos:'bottom',page:'aquecimento'},
+    {el:'#cvHeat',title:'Ligar/Desligar Lâmpadas',text:'Clique nas lâmpadas (cápsulas arredondadas) para ligar ou desligar cada zona individualmente.',pos:'bottom',page:'aquecimento'},
+    {el:'#cvHeat',title:'Aproximação ◀▶',text:'Setas atrás dos nomes controlam distância da lâmpada. 3 níveis: perto (100), médio (50), longe (0). Mais perto = mais calor absorvido.',pos:'bottom',page:'aquecimento'},
+    {el:'#cvHeat',title:'Perfil (Potência Geral)',text:'Clique no valor "Perfil" no centro (0-200). Multiplica todas as zonas, mas nenhuma ultrapassa 100 de intensidade real.',pos:'bottom',page:'aquecimento'},
+    {el:'#cvHeat',title:'Ventilação e Exaustão',text:'Abaixo da pré-forma: Ventilação (0-60 Hz), Exaustão (0-60 Hz) e Temp. Ambiente (5-45°C). Controlam o resfriamento do ar entre as lâmpadas.',pos:'bottom',page:'aquecimento'},
+    {el:'#cvHeat',title:'Efeito do Resfriamento',text:'Vent. 60Hz + Exaust. 60Hz a 25°C = -80% de calor. Dia quente (40°C) = ar não esfria. Dia frio (10°C) = resfriamento máximo (-90%).',pos:'bottom',page:'aquecimento'},
+    {el:'#cvHeat',title:'Régua de Refrigeração',text:'A régua metálica protege a rosca do bocal do calor das lâmpadas. O ar azul entre a régua e o bocal representa a refrigeração.',pos:'bottom',page:'aquecimento'},
+    {el:'#tabBlow',title:'Processo de Sopro',text:'Vamos para a simulação do processo. O perfil térmico influencia a distribuição de material!',pos:'bottom',switchTo:'sopro'},
+    {el:'#btnPlay',title:'8 Etapas do Processo',text:'1.Posicionamento 2.Fechamento 3.Vedação 4.Estiramento+Pré-Sopro 5.Sopro Final 6.Residência 7.Alívio 8.Extração',pos:'bottom',page:'sopro'},
+    {el:'#tSlider',title:'Início de Pré-Sopro',text:'Momento do ar de pré-sopro (60-300ms). Antecipado = material no ombro. Atrasado = material na base. Os 4 ajustes se compensam.',pos:'bottom',page:'sopro'},
+    {el:'#vSlider',title:'Tempo de Estiramento',text:'Tempo de descida da haste (250-500ms). Rápido = material no fundo. Lento = material no ombro.',pos:'bottom',page:'sopro'},
+    {el:'#fSlider',title:'Vazão de Pré-Sopro',text:'Fluxo de ar (0-10). Fechada (0) = sem expansão, material no fundo. Aberta (10) = expansão forte, material no ombro.',pos:'bottom',page:'sopro'},
+    {el:'#pPSlider',title:'Pressão de Pré-Sopro',text:'Pressão do ar (0-8 bar). Baixa = material no fundo. Alta = material no ombro. Pressão setada aparece nos parâmetros ativos.',pos:'bottom',page:'sopro'},
+    {el:'#rNote',title:'Resultado e Distribuição',text:'Barras mostram Ombro/Centro/Base (%). Diagnóstico inclui perfil térmico: zonas mais quentes = menos material naquela região.',pos:'top',page:'sopro'},
+    {el:'.flags',title:'Idiomas 🇧🇷 🇺🇸 🇪🇸',text:'Clique nas bandeiras para trocar o idioma. Todo o simulador traduz automaticamente.',pos:'bottom'},
+    {el:null,title:'Tour Completo!',text:'O perfil térmico e o processo de sopro trabalham juntos: zonas mais quentes = material estica mais = menos concentração. Bom trabalho!',pos:'center'}
   ],
   en:[
     {el:null,title:'Welcome to the Blow Molding Simulator!',text:'This tour will show you all the simulator features. Let\'s go?',pos:'center'},
     {el:'#tabHeat',title:'Navigation Tabs',text:'Switch between Thermal Profile (zone heating) and Blow Process (step simulation).',pos:'bottom'},
-    {el:'#cvHeat',title:'Rotating Preform',text:'The preform rotates continuously, showing heat absorption per zone. Red = hot, blue = cold.',pos:'bottom',page:'aquecimento'},
-    {el:'#cvHeat',title:'Heating Zones (1-9)',text:'Click the numeric values next to the lamps to edit each zone\'s intensity (0-100). Each side (Pre-Oven and Oven) is independent.',pos:'bottom',page:'aquecimento'},
-    {el:'#cvHeat',title:'Toggle Lamps On/Off',text:'Click directly on the lamps (rounded capsules) to turn each zone on or off individually.',pos:'bottom',page:'aquecimento'},
-    {el:'#cvHeat',title:'Zone Proximity ◀▶',text:'The ◀▶ arrows behind zone names control lamp distance. 3 levels: close, medium, far. Closer = more heat on preform.',pos:'bottom',page:'aquecimento'},
-    {el:'#cvHeat',title:'Profile (General Power)',text:'Click the "Profile" value in the preform center to adjust general power (0-200). Multiplies all zones, but none exceeds 100.',pos:'bottom',page:'aquecimento'},
-    {el:'#tabBlow',title:'Blow Process',text:'Now let\'s see the Blow Process tab. Click here or wait...',pos:'bottom',switchTo:'sopro'},
-    {el:'#btnPlay',title:'Animation Controls',text:'Click Start to see the complete animation of the 8 PET blow molding steps. Pause and restart anytime.',pos:'bottom',page:'sopro'},
-    {el:'#tSlider',title:'Pre-Blow Start',text:'Adjust when the pre-blow air starts (60-300ms). Early = more material on shoulder. Late = more on base.',pos:'bottom',page:'sopro'},
-    {el:'#vSlider',title:'Stretch Time',text:'Controls rod descent time (250-500ms). Fast = material on base. Slow = material on shoulder.',pos:'bottom',page:'sopro'},
-    {el:'#fSlider',title:'Pre-Blow Flow',text:'Regulates air flow (0-10). Closed = material on base. Open = material on shoulder.',pos:'bottom',page:'sopro'},
-    {el:'#pPSlider',title:'Pre-Blow Pressure',text:'Adjust air pressure (0-8 bar). All 4 controls work together and compensate each other.',pos:'bottom',page:'sopro'},
-    {el:'#rNote',title:'Distribution Result',text:'Here you see the impact of adjustments: material distribution (Shoulder/Center/Base) and process diagnosis.',pos:'top',page:'sopro'},
-    {el:'.flags',title:'Languages 🇧🇷 🇺🇸 🇪🇸',text:'Click the flags to change language. The entire simulator is translated to Portuguese, English and Spanish.',pos:'bottom'},
-    {el:null,title:'Tour Complete!',text:'Now you know all the features. Click the ? button anytime to review this tour. Great work!',pos:'center'}
+    {el:'#cvHeat',title:'Rotating Preform',text:'The preform rotates continuously showing heat absorption. Red = hot, blue = cold. Colors vary per zone.',pos:'bottom',page:'aquecimento'},
+    {el:'#cvHeat',title:'Heating Zones (1-9)',text:'Click values next to lamps to edit (0-100). Each side is independent: Pre-Oven (left) and Oven (right).',pos:'bottom',page:'aquecimento'},
+    {el:'#cvHeat',title:'Lamp Wattage',text:'Z1 = 3000W (max intensity), Z2 and Z9 = 2000W, Z3-Z8 = 800W. Same % generates more heat on higher wattage lamps.',pos:'bottom',page:'aquecimento'},
+    {el:'#cvHeat',title:'Toggle Lamps On/Off',text:'Click on the lamps (rounded capsules) to turn each zone on or off individually.',pos:'bottom',page:'aquecimento'},
+    {el:'#cvHeat',title:'Proximity ◀▶',text:'Arrows behind zone names control lamp distance. 3 levels: close (100), medium (50), far (0). Closer = more heat absorbed.',pos:'bottom',page:'aquecimento'},
+    {el:'#cvHeat',title:'Profile (General Power)',text:'Click "Profile" value in center (0-200). Multiplies all zones, but none exceeds 100 actual intensity.',pos:'bottom',page:'aquecimento'},
+    {el:'#cvHeat',title:'Ventilation & Exhaust',text:'Below preform: Ventilation (0-60 Hz), Exhaust (0-60 Hz) and Ambient Temp (5-45°C). Control air cooling between lamps.',pos:'bottom',page:'aquecimento'},
+    {el:'#cvHeat',title:'Cooling Effect',text:'Vent 60Hz + Exh 60Hz at 25°C = -80% heat. Hot day (40°C) = air doesn\'t cool. Cold day (10°C) = max cooling (-90%).',pos:'bottom',page:'aquecimento'},
+    {el:'#cvHeat',title:'Cooling Rail',text:'The metallic rail protects the neck threads from lamp heat. Blue air between rail and neck represents refrigeration.',pos:'bottom',page:'aquecimento'},
+    {el:'#tabBlow',title:'Blow Process',text:'Let\'s go to the process simulation. The thermal profile influences material distribution!',pos:'bottom',switchTo:'sopro'},
+    {el:'#btnPlay',title:'8 Process Steps',text:'1.Positioning 2.Closing 3.Seal 4.Stretch+Pre-Blow 5.Final Blow 6.Holding 7.Relief 8.Extraction',pos:'bottom',page:'sopro'},
+    {el:'#tSlider',title:'Pre-Blow Start',text:'Pre-blow air timing (60-300ms). Early = material on shoulder. Late = material on base. All 4 adjustments compensate each other.',pos:'bottom',page:'sopro'},
+    {el:'#vSlider',title:'Stretch Time',text:'Rod descent time (250-500ms). Fast = material on base. Slow = material on shoulder.',pos:'bottom',page:'sopro'},
+    {el:'#fSlider',title:'Pre-Blow Flow',text:'Air flow (0-10). Closed (0) = no expansion, material on base. Open (10) = strong expansion, material on shoulder.',pos:'bottom',page:'sopro'},
+    {el:'#pPSlider',title:'Pre-Blow Pressure',text:'Air pressure (0-8 bar). Low = material on base. High = material on shoulder. Set pressure shows in active parameters.',pos:'bottom',page:'sopro'},
+    {el:'#rNote',title:'Result & Distribution',text:'Bars show Shoulder/Center/Base (%). Diagnosis includes thermal profile: hotter zones = less material in that region.',pos:'top',page:'sopro'},
+    {el:'.flags',title:'Languages 🇧🇷 🇺🇸 🇪🇸',text:'Click flags to change language. The entire simulator translates automatically.',pos:'bottom'},
+    {el:null,title:'Tour Complete!',text:'Thermal profile and blow process work together: hotter zones = material stretches more = less concentration. Great work!',pos:'center'}
   ],
   es:[
-    {el:null,title:'¡Bienvenido al Simulador de Soplado!',text:'Este tour le mostrará todas las funcionalidades del simulador. ¿Vamos?',pos:'center'},
-    {el:'#tabHeat',title:'Pestañas de Navegación',text:'Alterne entre el Perfil Térmico (calentamiento de zonas) y el Proceso de Soplado (simulación de etapas).',pos:'bottom'},
-    {el:'#cvHeat',title:'Preforma Girando',text:'La preforma gira continuamente, mostrando la absorción de calor de cada zona. Rojo = caliente, azul = frío.',pos:'bottom',page:'aquecimento'},
-    {el:'#cvHeat',title:'Zonas de Calentamiento (1-9)',text:'Haga clic en los valores numéricos junto a las lámparas para editar la intensidad de cada zona (0-100). Cada lado (Pre-Horno y Horno) es independiente.',pos:'bottom',page:'aquecimento'},
-    {el:'#cvHeat',title:'Encender/Apagar Lámparas',text:'Haga clic directamente en las lámparas (cápsulas redondeadas) para encender o apagar cada zona individualmente.',pos:'bottom',page:'aquecimento'},
-    {el:'#cvHeat',title:'Aproximación de Zonas ◀▶',text:'Las flechas ◀▶ detrás de los nombres de las zonas controlan la distancia de la lámpara. 3 niveles: cerca, medio y lejos. Más cerca = más calor en la preforma.',pos:'bottom',page:'aquecimento'},
-    {el:'#cvHeat',title:'Perfil (Potencia General)',text:'Haga clic en el valor "Perfil" en el centro de la preforma para ajustar la potencia general (0-200). Multiplica todas las zonas, pero ninguna supera 100.',pos:'bottom',page:'aquecimento'},
-    {el:'#tabBlow',title:'Proceso de Soplado',text:'Ahora veamos la pestaña de Proceso de Soplado. Haga clic aquí o espere...',pos:'bottom',switchTo:'sopro'},
-    {el:'#btnPlay',title:'Controles de Animación',text:'Haga clic en Iniciar para ver la animación completa de las 8 etapas del proceso de soplado PET. Pause y reinicie en cualquier momento.',pos:'bottom',page:'sopro'},
-    {el:'#tSlider',title:'Inicio de Pre-Soplado',text:'Ajuste el momento en que comienza el aire de pre-soplado (60-300ms). Anticipado = más material en hombro. Retrasado = más en base.',pos:'bottom',page:'sopro'},
-    {el:'#vSlider',title:'Tiempo de Estirado',text:'Controla el tiempo de descenso de la varilla (250-500ms). Rápida = material en fondo. Lenta = material en hombro.',pos:'bottom',page:'sopro'},
-    {el:'#fSlider',title:'Caudal de Pre-Soplado',text:'Regula el flujo de aire (0-10). Cerrado = material en fondo. Abierto = material en hombro.',pos:'bottom',page:'sopro'},
-    {el:'#pPSlider',title:'Presión de Pre-Soplado',text:'Ajuste la presión del aire (0-8 bar). Los 4 controles trabajan juntos y se compensan mutuamente.',pos:'bottom',page:'sopro'},
-    {el:'#rNote',title:'Resultado de Distribución',text:'Aquí ve el impacto de los ajustes: distribución de material (Hombro/Centro/Base) y diagnóstico del proceso.',pos:'top',page:'sopro'},
-    {el:'.flags',title:'Idiomas 🇧🇷 🇺🇸 🇪🇸',text:'Haga clic en las banderas para cambiar el idioma. Todo el simulador está traducido al Portugués, Inglés y Español.',pos:'bottom'},
-    {el:null,title:'¡Tour Completo!',text:'Ahora conoce todas las funcionalidades. Haga clic en el botón ? en cualquier momento para revisar este tour. ¡Buen trabajo!',pos:'center'}
+    {el:null,title:'¡Bienvenido al Simulador de Soplado!',text:'Este tour le mostrará todas las funcionalidades. ¿Vamos?',pos:'center'},
+    {el:'#tabHeat',title:'Pestañas de Navegación',text:'Alterne entre Perfil Térmico (calentamiento) y Proceso de Soplado (simulación de etapas).',pos:'bottom'},
+    {el:'#cvHeat',title:'Preforma Girando',text:'La preforma gira mostrando la absorción de calor. Rojo = caliente, azul = frío. Los colores varían por zona.',pos:'bottom',page:'aquecimento'},
+    {el:'#cvHeat',title:'Zonas de Calentamiento (1-9)',text:'Haga clic en los valores junto a las lámparas para editar (0-100). Cada lado es independiente: Pre-Horno y Horno.',pos:'bottom',page:'aquecimento'},
+    {el:'#cvHeat',title:'Potencia de Lámparas',text:'Z1 = 3000W (máxima), Z2 y Z9 = 2000W, Z3-Z8 = 800W. El mismo % genera más calor en lámparas de mayor potencia.',pos:'bottom',page:'aquecimento'},
+    {el:'#cvHeat',title:'Encender/Apagar Lámparas',text:'Haga clic en las lámparas para encender o apagar cada zona individualmente.',pos:'bottom',page:'aquecimento'},
+    {el:'#cvHeat',title:'Aproximación ◀▶',text:'Flechas detrás de los nombres controlan la distancia. 3 niveles: cerca (100), medio (50), lejos (0). Más cerca = más calor.',pos:'bottom',page:'aquecimento'},
+    {el:'#cvHeat',title:'Perfil (Potencia General)',text:'Haga clic en "Perfil" en el centro (0-200). Multiplica todas las zonas, pero ninguna supera 100.',pos:'bottom',page:'aquecimento'},
+    {el:'#cvHeat',title:'Ventilación y Extracción',text:'Debajo: Ventilación (0-60 Hz), Extracción (0-60 Hz) y Temp. Ambiente (5-45°C). Controlan el enfriamiento del aire.',pos:'bottom',page:'aquecimento'},
+    {el:'#cvHeat',title:'Efecto de Enfriamiento',text:'Vent 60Hz + Ext 60Hz a 25°C = -80% calor. Día caluroso (40°C) = aire no enfría. Día frío (10°C) = enfriamiento máximo (-90%).',pos:'bottom',page:'aquecimento'},
+    {el:'#cvHeat',title:'Regla de Refrigeración',text:'La regla metálica protege la rosca de la boquilla del calor. El aire azul representa la refrigeración.',pos:'bottom',page:'aquecimento'},
+    {el:'#tabBlow',title:'Proceso de Soplado',text:'Vamos a la simulación. ¡El perfil térmico influye en la distribución de material!',pos:'bottom',switchTo:'sopro'},
+    {el:'#btnPlay',title:'8 Etapas del Proceso',text:'1.Posicionamiento 2.Cierre 3.Sellado 4.Estirado+Pre-Soplado 5.Soplado Final 6.Residencia 7.Alivio 8.Extracción',pos:'bottom',page:'sopro'},
+    {el:'#tSlider',title:'Inicio de Pre-Soplado',text:'Momento del aire (60-300ms). Anticipado = material en hombro. Retrasado = material en base. Los 4 ajustes se compensan.',pos:'bottom',page:'sopro'},
+    {el:'#vSlider',title:'Tiempo de Estirado',text:'Tiempo de descenso de la varilla (250-500ms). Rápido = material en fondo. Lento = material en hombro.',pos:'bottom',page:'sopro'},
+    {el:'#fSlider',title:'Caudal de Pre-Soplado',text:'Flujo de aire (0-10). Cerrado (0) = sin expansión. Abierto (10) = expansión fuerte, material en hombro.',pos:'bottom',page:'sopro'},
+    {el:'#pPSlider',title:'Presión de Pre-Soplado',text:'Presión del aire (0-8 bar). Baja = material en fondo. Alta = material en hombro.',pos:'bottom',page:'sopro'},
+    {el:'#rNote',title:'Resultado y Distribución',text:'Barras muestran Hombro/Centro/Base (%). El diagnóstico incluye perfil térmico: zonas más calientes = menos material.',pos:'top',page:'sopro'},
+    {el:'.flags',title:'Idiomas 🇧🇷 🇺🇸 🇪🇸',text:'Haga clic en las banderas para cambiar idioma. Todo se traduce automáticamente.',pos:'bottom'},
+    {el:null,title:'¡Tour Completo!',text:'Perfil térmico y proceso trabajan juntos: zonas más calientes = material se estira más = menos concentración. ¡Buen trabajo!',pos:'center'}
   ]
 };
 
