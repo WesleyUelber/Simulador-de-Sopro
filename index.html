@@ -3,17 +3,17 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Simulação de Sopro - v8.4</title>
+<title>Simulação de Sopro - v9.7</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap');
-:root{--azul:#2E75B6;--azul-escuro:#1A4B8C;--laranja:#E87722;--verde:#2E8B57;--vermelho:#C0392B;--bg:#1F3A5A;--panel:#264668;--border:#305678}
+:root{--azul:#2E75B6;--azul-escuro:#1A4B8C;--laranja:#E87722;--verde:#2E8B57;--vermelho:#C0392B;--bg:#2A4D6E;--panel:#335A7A;--border:#3E6D8E}
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:'DM Sans',sans-serif;background:var(--bg);color:#E8ECF1;min-height:100vh;display:flex;flex-direction:column;align-items:center}
 .topbar{width:100%;background:var(--azul-escuro);padding:10px 24px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 2px 8px rgba(0,0,0,.2)}
-.topbar h1{color:#fff;font-size:17px;font-weight:700}
+.topbar h1{color:#fff;font-size:19px;font-weight:700}
 .topbar .badge{color:#6A8CA8;font-size:10px;padding:3px 8px;font-weight:500}
 .tabs{display:flex;gap:4px}
-.tab{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);color:#8AB;font-size:11px;font-weight:600;padding:6px 14px;border-radius:6px;cursor:pointer;transition:all .2s}
+.tab{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);color:#8AB;font-size:13px;font-weight:600;padding:8px 18px;border-radius:6px;cursor:pointer;transition:all .2s}
 .tab:hover{background:rgba(255,255,255,.15)}
 .tab.active{background:var(--azul);color:#fff;border-color:var(--azul)}
 .flags{display:flex;gap:4px;align-items:center}
@@ -22,73 +22,77 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:#E8ECF1;min-hei
 .page{width:100%}
 .zone-row{display:flex;align-items:center;gap:6px;margin-bottom:6px}
 .zone-label{font-size:10px;font-weight:600;color:#8AB;width:30px;text-align:right}
-.zone-input{width:52px;background:#0B1929;border:1px solid var(--border);color:#fff;font-size:12px;font-weight:700;text-align:center;padding:4px 2px;border-radius:4px;font-family:'DM Sans'}
+.zone-input{width:52px;background:#274A68;border:1px solid var(--border);color:#fff;font-size:12px;font-weight:700;text-align:center;padding:4px 2px;border-radius:4px;font-family:'DM Sans'}
 .zone-input:focus{border-color:var(--azul);outline:none}
 .zone-unit{font-size:10px;color:#6A8CA8;font-weight:500}
 .zone-toggle{width:28px;height:16px;border-radius:8px;border:none;cursor:pointer;transition:all .2s;position:relative;padding:0}
 .zone-toggle.on{background:var(--azul)}
 .zone-toggle.off{background:#444}
 
-.main-row{display:flex;flex-direction:column;align-items:center;gap:12px;padding:12px 20px 20px;max-width:900px;width:100%;margin:0 auto}
-.left-panel{display:none!important}
-.canvas-col{display:flex;justify-content:center}
-.right-panel{width:100%;max-width:860px;display:flex;flex-direction:column;gap:10px}
-
-@media(min-width:701px){
-  .right-panel{flex-direction:row;gap:12px}
-  .right-panel>.panel-card{flex:1}
-  .mob-scroll-wrap{display:block!important;width:100%;max-width:860px;margin-top:6px}
-  .mob-tabs{justify-content:center;border-radius:10px 10px 0 0}
-  .mob-tab{flex:0 1 auto;padding:12px 22px;font-size:12px}
-  .mob-panel{padding:18px 30px;display:flex;flex-direction:column;align-items:center}
-  .mob-panel .slider-group{max-width:480px;width:100%}
-  .mob-panel input[type=range]{height:auto}
-  .mob-panel .slider-hdr span{font-size:13px}
-  .mob-panel .slider-val{font-size:17px!important}
-  .mob-panel .slider-hints{font-size:10px}
-  .mob-panel .timing-badge{font-size:11px;padding:4px 14px}
-  .mob-panel .presets{gap:6px;margin-top:8px;justify-content:center}
-  .mob-panel .preset,.mob-panel .preset-v,.mob-panel .preset-f,.mob-panel .preset-p{padding:7px 14px;font-size:11px}
-  .mob-panel .phase-btns{max-width:480px;width:100%;grid-template-columns:repeat(4,1fr)}
-  .mob-panel .btn-row{justify-content:center;margin-top:8px}
-  .mob-panel .btn{padding:10px 22px;font-size:12px}
-}
+/* Blow page layout */
+.blow-row{display:flex;gap:14px;padding:14px 20px;width:100%;margin:0 auto;align-items:stretch;box-sizing:border-box}
+.blow-left{flex:1;min-width:260px;display:flex;flex-direction:column}
+.blow-center{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;gap:10px}
+.blow-right{flex:1;min-width:280px;display:flex;flex-direction:column}
+.blow-panel-full{display:flex;flex-direction:column;height:100%;box-sizing:border-box}
+.info-section{margin-bottom:8px}
+.phase-btns-compact{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:10px}
+.phase-btns-compact .phase-btn{font-size:12px;padding:14px 6px;border-radius:8px;text-align:center;min-width:0;line-height:1.3}
+.phase-btns-compact .phase-btn .num{font-size:20px;display:block;margin-bottom:2px}
+.phase-btns-compact .phase-btn.active{background:var(--azul);color:#fff}
+/* Unified scroll control - tabs + panel in one card */
+.mob-scroll-wrap{display:block;width:100%;margin:0 auto;box-sizing:border-box}
+.mob-card{background:var(--panel);border-radius:10px;overflow:hidden;box-shadow:0 4px 16px rgba(0,0,0,.25)}
+.mob-tabs{display:flex;gap:0;border-bottom:1px solid var(--border);padding:0}
+.mob-tab{flex:1;padding:12px 10px;background:transparent;color:#6A8CA8;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;border:none;cursor:pointer;text-align:center;border-bottom:3px solid transparent;transition:all .15s;white-space:nowrap}
+.mob-tab.active{color:#fff;border-bottom-color:var(--azul);background:rgba(46,117,182,.1)}
+.mob-scroll{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.mob-scroll::-webkit-scrollbar{display:none}
+.mob-panel{min-width:100%;scroll-snap-align:start;padding:16px 20px;box-sizing:border-box;display:flex;flex-direction:column;align-items:center}
+.mob-panel .slider-group{max-width:340px;width:100%;margin-bottom:6px}
+.mob-panel .slider-hdr span{font-size:13px}
+.mob-panel .slider-val{font-size:17px!important}
+.mob-panel .slider-hints{font-size:10px}
+.mob-panel .timing-badge{font-size:11px;padding:3px 12px}
+.mob-panel .presets{gap:5px;margin-top:6px;display:flex;flex-wrap:wrap;justify-content:center}
+.mob-panel .preset,.mob-panel .preset-v,.mob-panel .preset-f,.mob-panel .preset-p{padding:6px 12px;font-size:11px}
+.mob-panel input[type=range]{width:100%}
 
 /* Left panel controls */
-.panel-card{background:var(--panel);border-radius:12px;padding:16px;box-shadow:0 4px 16px rgba(0,0,0,.25)}
-.panel-title{font-size:12px;font-weight:700;color:#fff;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:6px}
-.panel-title .icon{font-size:16px}
+.panel-card{background:var(--panel);border-radius:12px;padding:18px;box-shadow:0 4px 16px rgba(0,0,0,.25)}
+.panel-title{font-size:15px;font-weight:700;color:#fff;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px}
+.panel-title .icon{font-size:18px}
 
 /* Phase selector */
-.phase-btns{display:grid;grid-template-columns:1fr 1fr;gap:4px}
-.phase-btn{padding:7px 5px;border:2px solid var(--border);border-radius:6px;background:var(--panel);color:#7A9AB5;font-family:'DM Sans',sans-serif;font-size:10px;font-weight:600;cursor:pointer;transition:all .15s;text-align:center;line-height:1.2}
-.phase-btn:hover{border-color:var(--azul);color:#C8D8E8;background:#162D44}
+.phase-btns{display:grid;grid-template-columns:1fr 1fr;gap:5px}
+.phase-btn{padding:8px 6px;border:2px solid var(--border);border-radius:8px;background:var(--panel);color:#7A9AB5;font-family:'DM Sans',sans-serif;font-size:11px;font-weight:600;cursor:pointer;transition:all .15s;text-align:center;line-height:1.2}
+.phase-btn:hover{border-color:var(--azul);color:#C8D8E8;background:#234058}
 .phase-btn.active{border-color:var(--azul);background:var(--azul);color:#fff}
-.phase-btn .num{display:block;font-size:14px;font-weight:700;margin-bottom:1px}
+.phase-btn .num{display:block;font-size:16px;font-weight:700;margin-bottom:1px}
 
-.btn{padding:9px 16px;border:none;border-radius:7px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;transition:all .15s}
+.btn{padding:11px 20px;border:none;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:all .15s}
 .btn-play{background:var(--azul);color:#fff;flex:1}.btn-play:hover{background:var(--azul-escuro)}
 .btn-reset{background:var(--border);color:#AAC0D4;flex:1}.btn-reset:hover{background:#264A68;color:#fff}
-.btn-row{display:flex;gap:6px;margin-top:10px}
+.btn-row{display:flex;gap:8px;margin-top:12px}
 
 /* Pre-blow slider */
 .slider-group{margin-bottom:4px}
-.slider-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px}
-.slider-hdr span{font-size:10px;font-weight:600;color:#6A8CA8;text-transform:uppercase;letter-spacing:.06em}
-.slider-val{font-size:16px;font-weight:700;min-width:35px;text-align:right}
+.slider-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.slider-hdr span{font-size:12px;font-weight:600;color:#6A8CA8;text-transform:uppercase;letter-spacing:.06em}
+.slider-val{font-size:18px;font-weight:700;min-width:40px;text-align:right}
 .slider-val.early{color:var(--verde)}.slider-val.late{color:var(--vermelho)}.slider-val.normal{color:var(--azul)}
-input[type=range]{-webkit-appearance:none;width:100%;height:7px;border-radius:4px;background:linear-gradient(to right,var(--verde),var(--azul),var(--vermelho));outline:none;cursor:pointer}
-input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:#fff;box-shadow:0 2px 6px rgba(0,0,0,.4);cursor:pointer}
-input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;background:#fff;box-shadow:0 2px 6px rgba(0,0,0,.4);cursor:pointer;border:none}
-.slider-hints{display:flex;justify-content:space-between;font-size:9px;color:#5A7A94;margin-top:2px}
-.timing-badge{display:inline-block;padding:3px 9px;border-radius:16px;font-size:10px;font-weight:700;margin-top:5px}
+input[type=range]{-webkit-appearance:none;width:100%;height:8px;border-radius:4px;background:linear-gradient(to right,var(--verde),var(--azul),var(--vermelho));outline:none;cursor:pointer}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 2px 6px rgba(0,0,0,.4);cursor:pointer}
+input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 2px 6px rgba(0,0,0,.4);cursor:pointer;border:none}
+.slider-hints{display:flex;justify-content:space-between;font-size:10px;color:#5A7A94;margin-top:3px}
+.timing-badge{display:inline-block;padding:4px 12px;border-radius:16px;font-size:12px;font-weight:700;margin-top:5px}
 .timing-badge.early{background:rgba(46,139,87,.2);color:var(--verde);border:1px solid var(--verde)}
 .timing-badge.normal{background:rgba(46,117,182,.2);color:var(--azul);border:1px solid var(--azul)}
 .timing-badge.late{background:rgba(192,57,43,.2);color:var(--vermelho);border:1px solid var(--vermelho)}
 
-.presets{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px}
-.preset,.preset-v,.preset-f,.preset-p{padding:5px 9px;border:1px solid var(--border);border-radius:5px;background:var(--panel);color:#6A8CA8;font-size:10px;font-weight:600;cursor:pointer;transition:all .15s}
-.preset:hover,.preset-v:hover,.preset-f:hover,.preset-p:hover{border-color:var(--azul);color:#fff;background:#162D44}
+.presets{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
+.preset,.preset-v,.preset-f,.preset-p{padding:6px 12px;border:1px solid var(--border);border-radius:6px;background:var(--panel);color:#6A8CA8;font-size:11px;font-weight:600;cursor:pointer;transition:all .15s}
+.preset:hover,.preset-v:hover,.preset-f:hover,.preset-p:hover{border-color:var(--azul);color:#fff;background:#234058}
 
 /* Canvas */
 .canvas-col{flex:1;display:flex;flex-direction:column;align-items:center}
@@ -96,17 +100,17 @@ canvas{border-radius:12px;background:var(--panel);box-shadow:0 4px 20px rgba(0,0
 
 /* Right panel */
 
-.phase-indicator{display:flex;align-items:center;gap:8px;margin-bottom:8px}
-.phase-dot{width:11px;height:11px;border-radius:50%;flex-shrink:0}
-.phase-name{font-size:14px;font-weight:700;color:#fff}
-.phase-step{font-size:9px;color:#6A8CA8;text-transform:uppercase;letter-spacing:.08em}
-.info-label{font-size:10px;font-weight:600;color:#6A8CA8;text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;margin-top:8px}
-.info-value{font-size:12px;color:#C8D8E8;line-height:1.6}
+.phase-indicator{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.phase-dot{width:13px;height:13px;border-radius:50%;flex-shrink:0}
+.phase-name{font-size:17px;font-weight:700;color:#fff}
+.phase-step{font-size:10px;color:#6A8CA8;text-transform:uppercase;letter-spacing:.08em}
+.info-label{font-size:11px;font-weight:600;color:#6A8CA8;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;margin-top:10px}
+.info-value{font-size:14px;color:#C8D8E8;line-height:1.6}
 
-.params-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-top:5px}
-.param-box{background:#162D44;border-radius:6px;padding:6px 7px;text-align:center}
-.param-val{font-size:15px;font-weight:700;color:var(--azul)}
-.param-unit{font-size:8px;color:#6A8CA8}
+.params-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:6px}
+.param-box{background:#234058;border-radius:8px;padding:8px 8px;text-align:center}
+.param-val{font-size:18px;font-weight:700;color:var(--azul)}
+.param-unit{font-size:9px;color:#6A8CA8}
 
 .timeline{display:flex;gap:3px;margin-top:10px;padding-top:10px;border-top:1px solid var(--border)}
 .timeline-step{flex:1;height:5px;border-radius:3px;background:var(--border);transition:background .3s;cursor:pointer}
@@ -115,13 +119,14 @@ canvas{border-radius:12px;background:var(--panel);box-shadow:0 4px 20px rgba(0,0
 .timeline-step.done{background:var(--verde)}
 
 /* Distribution bars */
-.bar-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
-.bar-label{font-size:11px;color:#6A8CA8;width:55px;text-align:right;flex-shrink:0;font-weight:600}
-.bar-track{flex:1;height:22px;background:#162D44;border-radius:4px;overflow:hidden}
-.bar-fill{height:100%;border-radius:4px;transition:width .4s}
-.bar-pct{font-size:13px;font-weight:700;color:#fff;width:40px;flex-shrink:0}
-.result-note{margin-top:10px;font-size:12px;color:#8899AA;line-height:1.6;padding:10px 12px;border-radius:6px;border-left:3px solid var(--azul)}
-.result-note.warn{border-left-color:var(--vermelho);background:rgba(192,57,43,.06)}
+.bar-row{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.bar-label{font-size:14px;color:#6A8CA8;width:65px;text-align:right;flex-shrink:0;font-weight:600}
+.bar-track{flex:1;height:26px;background:#234058;border-radius:5px;overflow:hidden}
+.bar-fill{height:100%;border-radius:5px;transition:width .4s}
+.bar-pct{font-size:16px;font-weight:700;color:#fff;width:48px;flex-shrink:0}
+.result-note{margin-top:12px;font-size:14px;color:#C0D0E0;line-height:1.8;padding:14px 16px;border-radius:8px;border-left:4px solid var(--azul);background:rgba(46,117,182,.08)}
+.result-note.warn{border-left-color:var(--vermelho);background:rgba(192,57,43,.08)}
+.result-note.good{border-left-color:var(--verde);background:rgba(46,139,87,.08)}
 .result-note.good{border-left-color:var(--verde);background:rgba(46,139,87,.06)}
 
 @media(max-width:700px){
@@ -134,12 +139,15 @@ canvas{border-radius:12px;background:var(--panel);box-shadow:0 4px 20px rgba(0,0
   .badge{font-size:8px;padding:2px 6px;order:2}
   #page-aquecimento>div{padding:0!important;overflow-x:hidden}
   #cvHeat{width:100%;height:auto;display:block}
-  .main-row{flex-direction:column;align-items:stretch;padding:4px!important;gap:4px!important}
-  .canvas-col{order:1;width:100%}
+  .blow-row{flex-direction:column;align-items:stretch;padding:4px!important;gap:6px}
+  .blow-left,.blow-right{width:100%;min-width:unset;max-width:unset;flex:unset}
+  .blow-center{width:100%}
+  .blow-panel-full{height:auto}
+  .phase-btns-compact{grid-template-columns:repeat(4,1fr);gap:2px}
+  .phase-btns-compact .phase-btn{font-size:8px;padding:5px 2px}
+  .phase-btns-compact .phase-btn .num{font-size:12px}
   #cv{width:100%;height:auto}
-  .left-panel{display:none}
-  .right-panel{order:3;width:100%}
-  .mob-scroll-wrap{order:2}
+  .mob-scroll-wrap{padding:0 4px}
   .mob-tab{font-size:9px;padding:8px 4px}
   .panel-card{padding:6px;margin-bottom:4px}
   .panel-title{font-size:10px;margin-bottom:4px;padding-bottom:4px}
@@ -157,14 +165,7 @@ canvas{border-radius:12px;background:var(--panel);box-shadow:0 4px 20px rgba(0,0
   .tour-title{font-size:11px}.tour-text{font-size:9px;margin-bottom:8px}
   .tour-btn{padding:5px 10px;font-size:10px}
 }
-@media(min-width:701px){/* desktop overrides in main-row block */}
-.mob-scroll-wrap{display:block;width:100%}
-.mob-tabs{display:flex;gap:0;background:var(--panel);border-radius:8px 8px 0 0;overflow:hidden}
-.mob-tab{flex:1;padding:10px 4px;background:var(--panel);color:#6A8CA8;font-family:'DM Sans',sans-serif;font-size:10px;font-weight:600;border:none;cursor:pointer;text-align:center;border-bottom:2px solid transparent;transition:all .15s;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.mob-tab.active{color:#fff;border-bottom-color:var(--azul);background:rgba(46,117,182,.15)}
-.mob-scroll{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none}
-.mob-scroll::-webkit-scrollbar{display:none}
-.mob-panel{min-width:100%;scroll-snap-align:start;padding:10px;box-sizing:border-box;background:var(--panel);border-radius:0 0 8px 8px}
+
 .mob-panel .slider-group{margin-bottom:10px}
 .mob-panel .slider-hdr span{font-size:11px}
 .mob-panel .slider-val{font-size:15px!important}
@@ -177,8 +178,8 @@ canvas{border-radius:12px;background:var(--panel);box-shadow:0 4px 20px rgba(0,0
 .tour-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;z-index:9998;pointer-events:all}
 .tour-bg{position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.65)}
 .tour-highlight{position:absolute;border-radius:8px;box-shadow:0 0 0 9999px rgba(0,0,0,.65),0 0 20px rgba(46,117,182,.5);z-index:9999;pointer-events:none;transition:all .4s ease}
-.tour-tooltip{position:absolute;z-index:10000;background:#1A3050;border:1px solid #2E75B6;border-radius:12px;padding:16px 18px;max-width:320px;min-width:220px;box-shadow:0 8px 30px rgba(0,0,0,.5);pointer-events:all}
-.tour-tooltip::before{content:'';position:absolute;width:12px;height:12px;background:#1A3050;border:1px solid #2E75B6;transform:rotate(45deg)}
+.tour-tooltip{position:absolute;z-index:10000;background:#274A68;border:1px solid #2E75B6;border-radius:12px;padding:16px 18px;max-width:320px;min-width:220px;box-shadow:0 8px 30px rgba(0,0,0,.5);pointer-events:all}
+.tour-tooltip::before{content:'';position:absolute;width:12px;height:12px;background:#274A68;border:1px solid #2E75B6;transform:rotate(45deg)}
 .tour-tooltip.top::before{bottom:-7px;left:30px;border-top:none;border-left:none}
 .tour-tooltip.bottom::before{top:-7px;left:30px;border-bottom:none;border-right:none}
 .tour-tooltip.left::before{right:-7px;top:20px;border-bottom:none;border-left:none}
@@ -197,7 +198,7 @@ canvas{border-radius:12px;background:var(--panel);box-shadow:0 4px 20px rgba(0,0
 <body>
 
 <div class="topbar">
-  <h1 id="mainTitle">Simulação de Sopro - v8.4</h1>
+  <h1 id="mainTitle">Simulação de Sopro - v9.7</h1>
   <div class="tabs">
     <button class="tab active" data-tab="aquecimento" id="tabHeat">🔥 Perfil Térmico</button>
     <button class="tab" data-tab="sopro" id="tabBlow">⚙ Processo de Sopro</button>
@@ -215,121 +216,43 @@ canvas{border-radius:12px;background:var(--panel);box-shadow:0 4px 20px rgba(0,0
 <!-- PAGE 1: Aquecimento -->
 <div class="page" id="page-aquecimento">
   <div style="display:flex;justify-content:center;padding:10px;overflow-x:auto">
-    <canvas id="cvHeat" width="740" height="720"></canvas>
+    <canvas id="cvHeat" width="740" height="740"></canvas>
   </div>
 </div>
 
-<!-- PAGE 2: Sopro (existing) -->
+<!-- PAGE 2: Sopro -->
 <div class="page" id="page-sopro" style="display:none">
-<div class="main-row">
 
-  <!-- LEFT: Controls -->
-  <div class="left-panel">
-    <div class="panel-card">
-      <div class="panel-title" id="ptPhases"><span class="icon">⚙</span> Etapas do Processo</div>
-      <div class="phase-btns">
-        <button class="phase-btn" data-phase="0"><span class="num">1</span>Posicionamento</button>
-        <button class="phase-btn" data-phase="1"><span class="num">2</span>Fechamento</button>
-        <button class="phase-btn" data-phase="2"><span class="num">3</span>Vedação do Bocal</button>
-        <button class="phase-btn" data-phase="3"><span class="num">4</span>Estiramento + Pré-Sopro</button>
-        <button class="phase-btn" data-phase="4"><span class="num">5</span>Sopro Final</button>
-        <button class="phase-btn" data-phase="5"><span class="num">6</span>Residência</button>
-        <button class="phase-btn" data-phase="6"><span class="num">7</span>Alívio de Sopro</button>
-        <button class="phase-btn" data-phase="7"><span class="num">8</span>Extração</button>
-      </div>
-      <div class="btn-row">
-        <button class="btn btn-play" id="btnPlay">▶ Iniciar</button>
-        <button class="btn btn-reset" id="btnReset">↺ Reiniciar</button>
-      </div>
-    </div>
+  <!-- 3-COLUMN: Info+Etapas | Canvas+Controls | Distribuição -->
+  <div class="blow-row">
+    <div class="blow-left">
+      <div class="panel-card blow-panel-full">
+        <!-- Phase indicator -->
+        <div class="phase-indicator">
+          <div class="phase-dot" id="pDot" style="background:#2E75B6"></div>
+          <div><div class="phase-step" id="pStep">—</div><div class="phase-name" id="pName">Aguardando...</div></div>
+        </div>
 
-    <div class="panel-card">
-      <div class="panel-title" id="ptTiming"><span class="icon">🎛</span> Início de Pré-Sopro</div>
-      <div class="slider-group">
-        <div class="slider-hdr"><span class="slbl" data-k="time">Tempo</span><span class="slider-val normal" id="tVal">180 ms</span></div>
-        <input type="range" id="tSlider" min="60" max="300" step="10" value="180">
-        <div class="slider-hints"><span id="hTL">60 ms (antecipado)</span><span id="hTR">300 ms (atrasado)</span></div>
-        <div style="text-align:center;margin-top:4px"><span class="timing-badge normal" id="tBadge">Normal</span></div>
-      </div>
-      <div class="presets">
-        <button class="preset" data-t="60">60ms</button>
-        <button class="preset" data-t="120">120ms</button>
-        <button class="preset" data-t="180">180ms</button>
-        <button class="preset" data-t="240">240ms</button>
-        <button class="preset" data-t="300">300ms</button>
-      </div>
-    </div>
+        <!-- What's happening -->
+        <div class="info-section">
+          <div class="info-label" id="ilWhat">O que está acontecendo</div>
+          <div class="info-value" id="pDesc">Selecione uma etapa ou clique em "Iniciar".</div>
+        </div>
 
-    <div class="panel-card">
-      <div class="panel-title" id="ptSpeed"><span class="icon">⚡</span> Tempo de Estiramento</div>
-      <div class="slider-group">
-        <div class="slider-hdr"><span class="slbl" data-k="time">Tempo</span><span class="slider-val normal" id="vVal">375 ms</span></div>
-        <input type="range" id="vSlider" min="250" max="500" step="10" value="375">
-        <div class="slider-hints"><span id="hVL">250 ms (rápida)</span><span id="hVR">500 ms (lenta)</span></div>
-        <div style="text-align:center;margin-top:4px"><span class="timing-badge normal" id="vBadge">Normal</span></div>
-      </div>
-      <div class="presets">
-        <button class="preset-v" data-v="250">250ms</button>
-        <button class="preset-v" data-v="310">310ms</button>
-        <button class="preset-v" data-v="375">375ms</button>
-        <button class="preset-v" data-v="440">440ms</button>
-        <button class="preset-v" data-v="500">500ms</button>
-      </div>
-    </div>
+        <!-- Parameters -->
+        <div class="info-label" id="ilParams">Parâmetros ativos</div>
+        <div class="params-grid">
+          <div class="param-box"><div class="param-val" id="pPressao">0</div><div class="param-unit">bar (<span id="puPres">pressão</span>)</div></div>
+          <div class="param-box"><div class="param-val" id="pHaste">0%</div><div class="param-unit"><span id="puRod">haste</span> (<span id="puStroke">curso</span>)</div></div>
+          <div class="param-box"><div class="param-val" id="pTemp">~105</div><div class="param-unit">°C (<span id="puPf">pré-forma</span>)</div></div>
+          <div class="param-box"><div class="param-val" id="pMolde">8</div><div class="param-unit">°C (<span id="puMold">molde</span>)</div></div>
+        </div>
 
-    <div class="panel-card">
-      <div class="panel-title" id="ptFlow"><span class="icon">💨</span> Vazão de Pré-Sopro</div>
-      <div class="slider-group">
-        <div class="slider-hdr"><span class="slbl" data-k="flow">Vazão</span><span class="slider-val normal" id="fVal">5</span></div>
-        <input type="range" id="fSlider" min="0" max="10" step="1" value="5">
-        <div class="slider-hints"><span id="hFL">0 (fechada)</span><span>5</span><span id="hFR">10 (aberta)</span></div>
-        <div style="text-align:center;margin-top:4px"><span class="timing-badge normal" id="fBadge">Normal</span></div>
-      </div>
-      <div class="presets">
-        <button class="preset-f" data-f="0">0</button>
-        <button class="preset-f" data-f="3">3</button>
-        <button class="preset-f" data-f="5">5</button>
-        <button class="preset-f" data-f="7">7</button>
-        <button class="preset-f" data-f="10">10</button>
-      </div>
-    </div>
+        <!-- Divider -->
+        <div style="border-top:1px solid var(--border);margin:8px 0"></div>
 
-    <div class="panel-card">
-      <div class="panel-title" id="ptPressure"><span class="icon">🔵</span> Pressão de Pré-Sopro</div>
-      <div class="slider-group">
-        <div class="slider-hdr"><span class="slbl" data-k="pressure">Pressão</span><span class="slider-val normal" id="pPVal">4 bar</span></div>
-        <input type="range" id="pPSlider" min="0" max="8" step="1" value="4">
-        <div class="slider-hints"><span>0 bar</span><span>4 bar</span><span>8 bar</span></div>
-        <div style="text-align:center;margin-top:4px"><span class="timing-badge normal" id="pPBadge">Normal</span></div>
-      </div>
-      <div class="presets">
-        <button class="preset-p" data-p="0">0</button>
-        <button class="preset-p" data-p="2">2</button>
-        <button class="preset-p" data-p="4">4</button>
-        <button class="preset-p" data-p="6">6</button>
-        <button class="preset-p" data-p="8">8</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- CENTER: Canvas -->
-  <div class="canvas-col">
-    <canvas id="cv" width="440" height="490"></canvas>
-  </div>
-
-  <!-- MOBILE: Horizontal scroll adjustments -->
-  <div class="mob-scroll-wrap" id="mobWrap">
-    <div class="mob-tabs">
-      <button class="mob-tab active" data-mi="0">⚙ Etapas</button>
-      <button class="mob-tab" data-mi="1">🎛 Pré-Sopro</button>
-      <button class="mob-tab" data-mi="2">⚡ Estir.</button>
-      <button class="mob-tab" data-mi="3">💨 Vazão</button>
-      <button class="mob-tab" data-mi="4">🔵 Pressão</button>
-    </div>
-    <div class="mob-scroll" id="mobScroll">
-      <!-- Panel 0: Etapas -->
-      <div class="mob-panel">
-        <div class="phase-btns" style="margin-bottom:8px">
+        <!-- Etapas grid -->
+        <div class="phase-btns-compact">
           <button class="phase-btn mob-ph" data-phase="0"><span class="num">1</span>Posic.</button>
           <button class="phase-btn mob-ph" data-phase="1"><span class="num">2</span>Fecha.</button>
           <button class="phase-btn mob-ph" data-phase="2"><span class="num">3</span>Vedação</button>
@@ -339,114 +262,87 @@ canvas{border-radius:12px;background:var(--panel);box-shadow:0 4px 20px rgba(0,0
           <button class="phase-btn mob-ph" data-phase="6"><span class="num">7</span>Alívio</button>
           <button class="phase-btn mob-ph" data-phase="7"><span class="num">8</span>Extração</button>
         </div>
-        <div class="btn-row">
-          <button class="btn btn-play" id="mobPlay">▶ Iniciar</button>
-          <button class="btn btn-reset" id="mobReset">↺ Reiniciar</button>
+
+        <!-- Buttons -->
+        <div class="btn-row" style="margin-top:auto;padding-top:8px">
+          <button class="btn btn-play" id="btnPlay">▶ Iniciar</button>
+          <button class="btn btn-reset" id="btnReset">↺ Reiniciar</button>
         </div>
       </div>
-      <!-- Panel 1: Pré-Sopro -->
-      <div class="mob-panel">
-        <div class="slider-group">
-          <div class="slider-hdr"><span>Tempo</span><span class="slider-val normal" id="mtVal">180 ms</span></div>
-          <input type="range" id="mtSlider" min="60" max="300" step="10" value="180">
-          <div class="slider-hints"><span>60ms (antecipado)</span><span>300ms (atrasado)</span></div>
-          <div style="text-align:center;margin-top:4px"><span class="timing-badge normal" id="mtBadge">Normal</span></div>
-        </div>
-        <div class="presets">
-          <button class="preset" data-t="60">60</button>
-          <button class="preset" data-t="120">120</button>
-          <button class="preset" data-t="180">180</button>
-          <button class="preset" data-t="240">240</button>
-          <button class="preset" data-t="300">300</button>
+    </div>
+
+    <div class="blow-center">
+      <canvas id="cv" width="540" height="580"></canvas>
+      <!-- Unified scroll control under canvas -->
+      <div class="mob-scroll-wrap" id="mobWrap">
+        <div class="mob-card">
+          <div class="mob-tabs">
+            <button class="mob-tab active" data-mi="0">🎛 Pré-Sopro</button>
+            <button class="mob-tab" data-mi="1">⚡ Estir.</button>
+            <button class="mob-tab" data-mi="2">💨 Vazão</button>
+            <button class="mob-tab" data-mi="3">🔵 Pressão</button>
+          </div>
+          <div class="mob-scroll" id="mobScroll">
+            <div class="mob-panel">
+              <div class="slider-group">
+                <div class="slider-hdr"><span class="slbl" data-k="time">Tempo</span><span class="slider-val normal" id="mtVal">180 ms</span></div>
+                <input type="range" id="mtSlider" min="60" max="300" step="10" value="180">
+                <div class="slider-hints"><span id="hTL">60 ms (antecipado)</span><span id="hTR">300 ms (atrasado)</span></div>
+                <div style="text-align:center;margin-top:4px"><span class="timing-badge normal" id="mtBadge">Normal</span></div>
+              </div>
+              <div class="presets"><button class="preset" data-t="60">60</button><button class="preset" data-t="120">120</button><button class="preset" data-t="180">180</button><button class="preset" data-t="240">240</button><button class="preset" data-t="300">300</button></div>
+            </div>
+            <div class="mob-panel">
+              <div class="slider-group">
+                <div class="slider-hdr"><span class="slbl" data-k="speed">Estiramento</span><span class="slider-val normal" id="mvVal">375 ms</span></div>
+                <input type="range" id="mvSlider" min="250" max="500" step="10" value="375">
+                <div class="slider-hints"><span id="hVL">250 ms (rápida)</span><span id="hVR">500 ms (lenta)</span></div>
+                <div style="text-align:center;margin-top:4px"><span class="timing-badge normal" id="mvBadge">Normal</span></div>
+              </div>
+              <div class="presets"><button class="preset-v" data-v="250">250</button><button class="preset-v" data-v="310">310</button><button class="preset-v" data-v="375">375</button><button class="preset-v" data-v="440">440</button><button class="preset-v" data-v="500">500</button></div>
+            </div>
+            <div class="mob-panel">
+              <div class="slider-group">
+                <div class="slider-hdr"><span class="slbl" data-k="flow">Vazão</span><span class="slider-val normal" id="mfVal">5</span></div>
+                <input type="range" id="mfSlider" min="0" max="10" step="1" value="5">
+                <div class="slider-hints"><span id="hFL">0 (fechada)</span><span>5</span><span id="hFR">10 (aberta)</span></div>
+                <div style="text-align:center;margin-top:4px"><span class="timing-badge normal" id="mfBadge">Normal</span></div>
+              </div>
+              <div class="presets"><button class="preset-f" data-f="0">0</button><button class="preset-f" data-f="3">3</button><button class="preset-f" data-f="5">5</button><button class="preset-f" data-f="7">7</button><button class="preset-f" data-f="10">10</button></div>
+            </div>
+            <div class="mob-panel">
+              <div class="slider-group">
+                <div class="slider-hdr"><span class="slbl" data-k="pressure">Pressão</span><span class="slider-val normal" id="mpVal">4 bar</span></div>
+                <input type="range" id="mpSlider" min="0" max="8" step="1" value="4">
+                <div class="slider-hints"><span>0 bar</span><span>4 bar</span><span>8 bar</span></div>
+                <div style="text-align:center;margin-top:4px"><span class="timing-badge normal" id="mpBadge">Normal</span></div>
+              </div>
+              <div class="presets"><button class="preset-p" data-p="0">0</button><button class="preset-p" data-p="2">2</button><button class="preset-p" data-p="4">4</button><button class="preset-p" data-p="6">6</button><button class="preset-p" data-p="8">8</button></div>
+            </div>
+          </div>
         </div>
       </div>
-      <!-- Panel 2: Tempo -->
-      <div class="mob-panel">
-        <div class="slider-group">
-          <div class="slider-hdr"><span>Tempo</span><span class="slider-val normal" id="mvVal">375 ms</span></div>
-          <input type="range" id="mvSlider" min="250" max="500" step="10" value="375">
-          <div class="slider-hints"><span>250ms (rápida)</span><span>500ms (lenta)</span></div>
-          <div style="text-align:center;margin-top:4px"><span class="timing-badge normal" id="mvBadge">Normal</span></div>
+    </div>
+
+    <div class="blow-right">
+      <div class="panel-card blow-panel-full">
+        <div class="panel-title" id="ptDist"><span class="icon">📊</span> Distribuição de Material</div>
+        <div style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:12px">
+          <div class="bar-row"><span class="bar-label" id="blOmbro">Ombro</span><div class="bar-track"><div class="bar-fill" id="barO" style="width:33%;background:var(--laranja)"></div></div><span class="bar-pct" id="pctO">33%</span></div>
+          <div class="bar-row"><span class="bar-label" id="blCentro">Centro</span><div class="bar-track"><div class="bar-fill" id="barC" style="width:34%;background:var(--azul)"></div></div><span class="bar-pct" id="pctC">34%</span></div>
+          <div class="bar-row"><span class="bar-label" id="blBase">Base</span><div class="bar-track"><div class="bar-fill" id="barB" style="width:33%;background:var(--verde)"></div></div><span class="bar-pct" id="pctB">33%</span></div>
         </div>
-        <div class="presets">
-          <button class="preset-v" data-v="250">250</button>
-          <button class="preset-v" data-v="310">310</button>
-          <button class="preset-v" data-v="375">375</button>
-          <button class="preset-v" data-v="440">440</button>
-          <button class="preset-v" data-v="500">500</button>
-        </div>
-      </div>
-      <!-- Panel 3: Vazão -->
-      <div class="mob-panel">
-        <div class="slider-group">
-          <div class="slider-hdr"><span>Vazão</span><span class="slider-val normal" id="mfVal">5</span></div>
-          <input type="range" id="mfSlider" min="0" max="10" step="1" value="5">
-          <div class="slider-hints"><span>0 (fechada)</span><span>5</span><span>10 (aberta)</span></div>
-          <div style="text-align:center;margin-top:4px"><span class="timing-badge normal" id="mfBadge">Normal</span></div>
-        </div>
-        <div class="presets">
-          <button class="preset-f" data-f="0">0</button>
-          <button class="preset-f" data-f="3">3</button>
-          <button class="preset-f" data-f="5">5</button>
-          <button class="preset-f" data-f="7">7</button>
-          <button class="preset-f" data-f="10">10</button>
-        </div>
-      </div>
-      <!-- Panel 4: Pressão -->
-      <div class="mob-panel">
-        <div class="slider-group">
-          <div class="slider-hdr"><span>Pressão</span><span class="slider-val normal" id="mpVal">4 bar</span></div>
-          <input type="range" id="mpSlider" min="0" max="8" step="1" value="4">
-          <div class="slider-hints"><span>0 bar</span><span>4 bar</span><span>8 bar</span></div>
-          <div style="text-align:center;margin-top:4px"><span class="timing-badge normal" id="mpBadge">Normal</span></div>
-        </div>
-        <div class="presets">
-          <button class="preset-p" data-p="0">0</button>
-          <button class="preset-p" data-p="2">2</button>
-          <button class="preset-p" data-p="4">4</button>
-          <button class="preset-p" data-p="6">6</button>
-          <button class="preset-p" data-p="8">8</button>
-        </div>
+        <div class="result-note good" id="rNote"><strong>Resultado:</strong><br>Distribuição equilibrada — todos os parâmetros compensados.<br><br><em style="color:#6A8CA8;font-size:12px">Exemplos: aumente o pré-sopro para 300ms e veja o material ir pra base. Ou coloque Z1-Z2 em 100 no perfil térmico e veja o efeito do calor.</em></div>
       </div>
     </div>
   </div>
-
-  <!-- RIGHT: Info -->
-  <div class="right-panel">
-    <div class="panel-card">
-      <div class="phase-indicator">
-        <div class="phase-dot" id="pDot" style="background:#2E75B6"></div>
-        <div><div class="phase-step" id="pStep">—</div><div class="phase-name" id="pName">Aguardando...</div></div>
-      </div>
-      <div class="info-label" id="ilWhat">O que está acontecendo</div>
-      <div class="info-value" id="pDesc">Selecione uma etapa ou clique em "Iniciar".</div>
-      <div class="info-label" id="ilParams">Parâmetros ativos</div>
-      <div class="params-grid">
-        <div class="param-box"><div class="param-val" id="pPressao">0</div><div class="param-unit">bar (<span id="puPres">pressão</span>)</div></div>
-        <div class="param-box"><div class="param-val" id="pHaste">0%</div><div class="param-unit"><span id="puRod">haste</span> (<span id="puStroke">curso</span>)</div></div>
-        <div class="param-box"><div class="param-val" id="pTemp">~105</div><div class="param-unit">°C (<span id="puPf">pré-forma</span>)</div></div>
-        <div class="param-box"><div class="param-val" id="pMolde">8</div><div class="param-unit">°C (<span id="puMold">molde</span>)</div></div>
-      </div>
-      <div class="timeline">
-        <div class="timeline-step" data-step="0"></div><div class="timeline-step" data-step="1"></div><div class="timeline-step" data-step="2"></div><div class="timeline-step" data-step="3"></div>
-        <div class="timeline-step" data-step="4"></div><div class="timeline-step" data-step="5"></div><div class="timeline-step" data-step="6"></div><div class="timeline-step" data-step="7"></div>
-      </div>
-    </div>
-
-    <div class="panel-card">
-      <div class="panel-title" id="ptDist"><span class="icon">📊</span> Distribuição de Material</div>
-      <div class="bar-row"><span class="bar-label" id="blOmbro">Ombro</span><div class="bar-track"><div class="bar-fill" id="barO" style="width:33%;background:var(--azul)"></div></div><span class="bar-pct" id="pctO">33%</span></div>
-      <div class="bar-row"><span class="bar-label" id="blCentro">Centro</span><div class="bar-track"><div class="bar-fill" id="barC" style="width:34%;background:var(--azul)"></div></div><span class="bar-pct" id="pctC">34%</span></div>
-      <div class="bar-row"><span class="bar-label" id="blBase">Base</span><div class="bar-track"><div class="bar-fill" id="barB" style="width:33%;background:var(--azul)"></div></div><span class="bar-pct" id="pctB">33%</span></div>
-      <div class="result-note good" id="rNote"><strong>Resultado:</strong> Ajuste os parâmetros para ver o efeito na distribuição.</div>
-    </div>
-  </div>
-
-</div>
 </div><!-- end page-sopro -->
+
 
 <script>
 const cv=document.getElementById('cv'),ctx=cv.getContext('2d');
+
+
 const W=cv.width,H=cv.height,CX=W/2,MT=25;
 function L(a,b,t){return a+(b-a)*Math.max(0,Math.min(1,t))}
 
@@ -527,7 +423,9 @@ function dBottle(){
   const pw=17,nY=MT+57,tS=L(78,338,S.sT),nP=48,pts=[];
   // Pre-compute outside loop
   const _tn=tNorm(),_vn=vNorm(),_fn=fNorm(),_pn=pNorm();
-  const _hpB=getHeatProfile();const _hpD=(_hpB.shoulder-_hpB.base)/(_hpB.avg||1)*2.5;
+  const _hpB=getHeatProfile();
+  const _hpAvg=(_hpB.shoulder+_hpB.center+_hpB.base)/3||1;
+  const _hpD=((_hpB.shoulder-_hpAvg)/Math.max(20,_hpAvg)-(_hpB.base-_hpAvg)/Math.max(20,_hpAvg))*5;
   const _combo=_tn+_vn+_fn*2.5+_pn*2.5+_hpD;
   for(let i=0;i<=nP;i++){
     const t=i/nP,y=nY+t*tS;let mR=pw;const rY=y-MT;
@@ -641,9 +539,9 @@ function dBottle(){
   ctx.strokeStyle=S.fT>.8?'rgba(100,190,255,.65)':avgCol;
   ctx.lineWidth=1.5;ctx.stroke();
 
-  // Material accumulation — original style
+  // Material accumulation — top/bottom style
   const blowProgress=Math.max(S.sT*.3, S.bT*.6, S.fT);
-  if(blowProgress>.05&&(S.tm!==180||S.vS!==375||S.fQ!==5||S.pP!==4)){
+  if(blowProgress>.05){
     const combo2=_combo;
     const absC=Math.abs(combo2);
     if(absC>=0.3){
@@ -707,11 +605,10 @@ function dBottle(){
     }
 
     const gEA=ctx.createLinearGradient(CX,nY,CX,nY+20);
-    gEA.addColorStop(0,'rgba(31,58,90,.9)');gEA.addColorStop(1,'rgba(31,58,90,0)');
+    gEA.addColorStop(0,'rgba(42,77,110,.9)');gEA.addColorStop(1,'rgba(42,77,110,0)');
     ctx.fillStyle=gEA;ctx.fillRect(CX-100,nY-5,200,25);
     ctx.restore();}
   }
-  ctx.restore();
 
   // Bocal with threads
   ctx.fillStyle='#E0E0E0';ctx.fillRect(CX-17,MT+36,34,18);
@@ -768,7 +665,7 @@ function dLabels(){ctx.save();ctx.font='600 10px DM Sans';ctx.fillStyle='#3F6080
 function dTimingBar(){
   if(S.ph<3)return;
   ctx.save();const bX=24,bT2=MT+60,bH=340;
-  ctx.fillStyle='#111D2E';ctx.fillRect(bX-6,bT2,12,bH);
+  ctx.fillStyle='#1E3550';ctx.fillRect(bX-6,bT2,12,bH);
   ctx.strokeStyle='#1A2E42';ctx.strokeRect(bX-6,bT2,12,bH);
   // Rod marker
   const rodDisplay=S.sT*(1-S.rR);
@@ -792,7 +689,10 @@ function draw(){
   if(S.ph===7&&S.mO>.05){dBottle()}
   else if(S.ph>=3){dBottle();dRod()}
   else{dBottle()}
-  dLabels();dTimingBar();updateUI()}
+  dLabels();dTimingBar();updateUI();
+  // Sync to mobile canvas
+
+}
 
 // ═══ UI UPDATE ═══
 function tNorm(){return (S.tm-180)/24} // -5 to +5: negative=antecipado, positive=atrasado
@@ -846,14 +746,16 @@ function gDist(){
   const shP=pNorm()*13.5;
   const shMech=shT+shV+shF+shP;
 
-  // Thermal influence: hotter = less material (stretches easier)
+  // Thermal influence: STRONG - hotter zone = material stretches away from it
   const hp=getHeatProfile();
-  // Normalize heat differences: if shoulder is hotter than base, material goes to base
   const heatAvg=(hp.shoulder+hp.center+hp.base)/3||1;
-  const hShoulder=(hp.shoulder-heatAvg)/heatAvg; // positive = hotter than avg
-  const hBase=(hp.base-heatAvg)/heatAvg;
-  // Thermal shift: hotter shoulder pushes material to base (positive sh)
-  const shHeat=(hShoulder-hBase)*10; // thermal influence on distribution
+  // Per-region deviation from average (positive = hotter than avg)
+  const devS=(hp.shoulder-heatAvg)/Math.max(20,heatAvg);
+  const devB=(hp.base-heatAvg)/Math.max(20,heatAvg);
+  // Thermal shift: same weight as ONE mechanical parameter (max ±27)
+  // Hot shoulder → positive shift → material to base
+  // Hot base → negative shift → material to shoulder  
+  const shHeat=(devS-devB)*27;
 
   const sh=shMech+shHeat;
   let o=33-sh,b=33+sh,c=34;
@@ -863,83 +765,117 @@ function gDist(){
 
 function gNote(){
   const t=tNorm(),v=vNorm(),f=fNorm();
-  let msgs=[];
-  const N={
-    pt:{pb:'Pré-sopro',es:'Estiramento',vz:'Vazão',pr:'Pressão',
-      veryEarly:'muito antecipado',early:'antecipado',slEarly:'lev. antecipado',normal:'normal',
-      slLate:'lev. atrasado',late:'atrasado',veryLate:'muito atrasado',
-      veryFast:'muito rápido',fast:'rápido',slow:'lento',verySlow:'muito lento',
-      closed:'fechada',low:'baixa',high:'alta',veryHigh:'muito alta',veryLow:'muito baixa',
-      shoulderExcess:'excesso no ombro, risco de estouro',shoulderMat:'mais material no ombro',
-      baseMat:'mais material na base',thinShoulder:'ombro fino, base grossa',
-      baseMatF:'material no fundo',shoulderMatF:'material no ombro',
-      noPreblow:'sem pré-sopro, material no fundo',shoulderExcessF:'excesso no ombro'},
-    en:{pb:'Pre-blow',es:'Stretching',vz:'Flow',pr:'Pressure',
-      veryEarly:'very early',early:'early',slEarly:'slightly early',normal:'normal',
-      slLate:'slightly late',late:'late',veryLate:'very late',
-      veryFast:'very fast',fast:'fast',slow:'slow',verySlow:'very slow',
-      closed:'closed',low:'low',high:'high',veryHigh:'very high',veryLow:'very low',
-      shoulderExcess:'shoulder excess, burst risk',shoulderMat:'more material on shoulder',
-      baseMat:'more material on base',thinShoulder:'thin shoulder, thick base',
-      baseMatF:'material on base',shoulderMatF:'material on shoulder',
-      noPreblow:'no pre-blow, material on base',shoulderExcessF:'shoulder excess'},
-    es:{pb:'Pre-soplado',es:'Estirado',vz:'Caudal',pr:'Presión',
-      veryEarly:'muy anticipado',early:'anticipado',slEarly:'lev. anticipado',normal:'normal',
-      slLate:'lev. retrasado',late:'retrasado',veryLate:'muy retrasado',
-      veryFast:'muy rápido',fast:'rápido',slow:'lento',verySlow:'muy lento',
-      closed:'cerrado',low:'bajo',high:'alto',veryHigh:'muy alto',veryLow:'muy bajo',
-      shoulderExcess:'exceso en hombro, riesgo de estallido',shoulderMat:'más material en hombro',
-      baseMat:'más material en base',thinShoulder:'hombro fino, base gruesa',
-      baseMatF:'material en fondo',shoulderMatF:'material en hombro',
-      noPreblow:'sin pre-soplado, material en fondo',shoulderExcessF:'exceso en hombro'}
-  };
-  const n=N[lang]||N.pt;
-  if(t<=-4)msgs.push(n.pb+' '+n.veryEarly+' ('+S.tm+'ms): '+n.shoulderExcess+'.');
-  else if(t<=-2)msgs.push(n.pb+' '+n.early+' ('+S.tm+'ms): '+n.shoulderMat+'.');
-  else if(t<=-0.5)msgs.push(n.pb+' '+n.slEarly+' ('+S.tm+'ms).');
-  else if(t<=0.5)msgs.push(n.pb+' '+n.normal+' ('+S.tm+'ms).');
-  else if(t<=1.5)msgs.push(n.pb+' '+n.slLate+' ('+S.tm+'ms).');
-  else if(t<=3.5)msgs.push(n.pb+' '+n.late+' ('+S.tm+'ms): '+n.baseMat+'.');
-  else msgs.push(n.pb+' '+n.veryLate+' ('+S.tm+'ms): '+n.thinShoulder+'.');
-  if(v>=3)msgs.push(n.es+' '+n.veryFast+' ('+S.vS+'ms): '+n.baseMatF+'.');
-  else if(v>=1)msgs.push(n.es+' '+n.fast+' ('+S.vS+'ms).');
-  else if(v>=-1)msgs.push(n.es+' '+n.normal+' ('+S.vS+'ms).');
-  else if(v>=-3)msgs.push(n.es+' '+n.slow+' ('+S.vS+'ms).');
-  else msgs.push(n.es+' '+n.verySlow+' ('+S.vS+'ms): '+n.shoulderMatF+'.');
-  if(S.fQ<1)msgs.push(n.vz+' '+n.closed+' ('+S.fQ+'): '+n.noPreblow+'.');
-  else if(S.fQ<=3)msgs.push(n.vz+' '+n.low+' ('+S.fQ+'): '+n.baseMatF+'.');
-  else if(S.fQ<=6)msgs.push(n.vz+' '+n.normal+' ('+S.fQ+').');
-  else if(S.fQ<=8)msgs.push(n.vz+' '+n.high+' ('+S.fQ+'): '+n.shoulderMatF+'.');
-  else msgs.push(n.vz+' '+n.veryHigh+' ('+S.fQ+'): '+n.shoulderExcessF+'.');
-  if(S.pP<=1)msgs.push(n.pr+' '+n.veryLow+' ('+S.pP+' bar): '+n.baseMatF+'.');
-  else if(S.pP<=2)msgs.push(n.pr+' '+n.low+' ('+S.pP+' bar): '+n.baseMatF+'.');
-  else if(S.pP<=5)msgs.push(n.pr+' '+n.normal+' ('+S.pP+' bar).');
-  else if(S.pP<=7)msgs.push(n.pr+' '+n.high+' ('+S.pP+' bar): '+n.shoulderMatF+'.');
-  else msgs.push(n.pr+' '+n.veryHigh+' ('+S.pP+' bar): '+n.shoulderExcessF+'.');
-
-  // Thermal profile influence
   const hp=getHeatProfile();
-  const TH={
-    pt:{thermal:'Perfil térmico',hotShoulder:'ombro mais quente → menos material no ombro',
-      hotBase:'base mais quente → menos material na base',balanced:'perfil equilibrado',
-      tooLow:'⚠ Temperatura média baixa — risco de não formar!',coldZones:'zonas frias detectadas'},
-    en:{thermal:'Thermal profile',hotShoulder:'hotter shoulder → less material on shoulder',
-      hotBase:'hotter base → less material on base',balanced:'balanced profile',
-      tooLow:'⚠ Low average temp — risk of not forming!',coldZones:'cold zones detected'},
-    es:{thermal:'Perfil térmico',hotShoulder:'hombro más caliente → menos material en hombro',
-      hotBase:'base más caliente → menos material en base',balanced:'perfil equilibrado',
-      tooLow:'⚠ Temperatura media baja — ¡riesgo de no formar!',coldZones:'zonas frías detectadas'}
-  };
-  const th=TH[lang]||TH.pt;
-  const hDiff=hp.shoulder-hp.base;
-  if(hp.avg<15)msgs.push(th.thermal+': '+th.tooLow);
-  else if(Math.abs(hDiff)>10)msgs.push(th.thermal+': '+(hDiff>0?th.hotShoulder:th.hotBase));
-  else msgs.push(th.thermal+': '+th.balanced);
-  // Ventilation info
-  if(hp.airflow>0.6)msgs.push((lang==='en'?'High ventilation: -':'Ventilação alta: -')+Math.round((1-hp.coolingPct)*100)+'%.');
+  const d=gDist();
 
-  const isGood=Math.abs(t)<=1.5&&Math.abs(v)<=1.5&&S.fQ>=2&&S.fQ<=8&&S.pP>=2&&S.pP<=6&&hp.avg>=15;
-  return{t:msgs.join(' '),c:isGood?'good':'warn'}}
+  // Calculate individual contributions (positive = pushes to base)
+  const shT=t*5.4;  // timing
+  const shV=v*5.4;  // stretch
+  const shF=f*13.5; // flow
+  const shP=pNorm()*13.5; // pressure
+  const heatAvg=(hp.shoulder+hp.center+hp.base)/3||1;
+  const devS=(hp.shoulder-heatAvg)/Math.max(20,heatAvg);
+  const devB=(hp.base-heatAvg)/Math.max(20,heatAvg);
+  const shH=(devS-devB)*27; // thermal
+
+  // Identify contributors
+  const contrib=[];
+  const L={
+    pt:{
+      timing:'Pré-sopro',stretch:'Estiramento',flow:'Vazão',pressure:'Pressão',thermal:'Perfil térmico',
+      toBase:'→ base',toShoulder:'→ ombro',neutral:'neutro',
+      because:'Motivo:',summary:'Resumo:',
+      moreBase:'Mais material na BASE porque:',moreShoulder:'Mais material no OMBRO porque:',
+      balanced:'Distribuição equilibrada — todos os parâmetros compensados.',
+      earlyTiming:'pré-sopro antecipado empurra material pro ombro',
+      lateTiming:'pré-sopro atrasado deixa material na base',
+      fastStretch:'estiramento rápido leva material pra base',
+      slowStretch:'estiramento lento concentra no ombro',
+      highFlow:'vazão alta expande mais o ombro',
+      lowFlow:'vazão baixa não expande, material fica na base',
+      highPressure:'pressão alta força material pro ombro',
+      lowPressure:'pressão baixa deixa material na base',
+      hotShoulder:'ombro mais quente → material estica e sai do ombro',
+      hotBase:'base mais quente → material estica e sai da base',
+      coldPreform:'⚠ Temperatura muito baixa — risco de não formar!'
+    },
+    en:{
+      timing:'Pre-blow',stretch:'Stretching',flow:'Flow',pressure:'Pressure',thermal:'Thermal profile',
+      toBase:'→ base',toShoulder:'→ shoulder',neutral:'neutral',
+      because:'Reason:',summary:'Summary:',
+      moreBase:'More material on BASE because:',moreShoulder:'More material on SHOULDER because:',
+      balanced:'Balanced distribution — all parameters compensated.',
+      earlyTiming:'early pre-blow pushes material to shoulder',
+      lateTiming:'late pre-blow leaves material on base',
+      fastStretch:'fast stretching moves material to base',
+      slowStretch:'slow stretching concentrates on shoulder',
+      highFlow:'high flow expands shoulder more',
+      lowFlow:'low flow doesn\'t expand, material stays on base',
+      highPressure:'high pressure forces material to shoulder',
+      lowPressure:'low pressure leaves material on base',
+      hotShoulder:'hotter shoulder → material stretches away from shoulder',
+      hotBase:'hotter base → material stretches away from base',
+      coldPreform:'⚠ Temperature too low — risk of not forming!'
+    },
+    es:{
+      timing:'Pre-soplado',stretch:'Estirado',flow:'Caudal',pressure:'Presión',thermal:'Perfil térmico',
+      toBase:'→ base',toShoulder:'→ hombro',neutral:'neutro',
+      because:'Motivo:',summary:'Resumen:',
+      moreBase:'Más material en la BASE porque:',moreShoulder:'Más material en el HOMBRO porque:',
+      balanced:'Distribución equilibrada — todos los parámetros compensados.',
+      earlyTiming:'pre-soplado anticipado empuja material al hombro',
+      lateTiming:'pre-soplado retrasado deja material en la base',
+      fastStretch:'estirado rápido lleva material a la base',
+      slowStretch:'estirado lento concentra en hombro',
+      highFlow:'caudal alto expande más el hombro',
+      lowFlow:'caudal bajo no expande, material queda en base',
+      highPressure:'presión alta fuerza material al hombro',
+      lowPressure:'presión baja deja material en base',
+      hotShoulder:'hombro más caliente → material se estira y sale del hombro',
+      hotBase:'base más caliente → material se estira y sale de la base',
+      coldPreform:'⚠ Temperatura muy baja — ¡riesgo de no formar!'
+    }
+  };
+  const l=L[lang]||L.pt;
+
+  // Check temperature
+  if(hp.avg<15) return{t:l.coldPreform,c:'warn'};
+
+  // Collect reasons
+  const reasons=[];
+  const absThresh=3;
+
+  if(Math.abs(shT)>absThresh){
+    reasons.push({val:shT, txt:shT>0?(l.timing+' ('+S.tm+'ms): '+l.lateTiming):(l.timing+' ('+S.tm+'ms): '+l.earlyTiming)});
+  }
+  if(Math.abs(shV)>absThresh){
+    reasons.push({val:shV, txt:shV>0?(l.stretch+' ('+S.vS+'ms): '+l.fastStretch):(l.stretch+' ('+S.vS+'ms): '+l.slowStretch)});
+  }
+  if(Math.abs(shF)>absThresh){
+    reasons.push({val:shF, txt:shF>0?(l.flow+' ('+S.fQ+'): '+l.lowFlow):(l.flow+' ('+S.fQ+'): '+l.highFlow)});
+  }
+  if(Math.abs(shP)>absThresh){
+    reasons.push({val:shP, txt:shP>0?(l.pressure+' ('+S.pP+' bar): '+l.lowPressure):(l.pressure+' ('+S.pP+' bar): '+l.highPressure)});
+  }
+  if(Math.abs(shH)>absThresh){
+    reasons.push({val:shH, txt:shH>0?(l.thermal+': '+l.hotShoulder):(l.thermal+': '+l.hotBase)});
+  }
+
+  const totalShift=shT+shV+shF+shP+shH;
+
+  if(reasons.length===0){
+    return{t:l.balanced,c:'good'};
+  }
+
+  // Sort by absolute impact
+  reasons.sort((a,b)=>Math.abs(b.val)-Math.abs(a.val));
+
+  const header=totalShift>3?l.moreBase:totalShift<-3?l.moreShoulder:l.balanced;
+  const lines=reasons.map(r=>'• '+r.txt);
+  const txt=header+'\n'+lines.join('\n');
+
+  const isGood=Math.abs(totalShift)<8&&hp.avg>=15;
+  return{t:txt,c:isGood?'good':'warn'}}
 
 function updateUI(){
   const p=PD[S.ph]||{name:T('waiting'),step:'—',desc:T('selectOrStart'),color:'#2E75B6'};
@@ -952,48 +888,51 @@ function updateUI(){
   document.getElementById('pPressao').textContent=pr.toFixed(0);
   const hastePos=S.sT*(1-S.rR);
   document.getElementById('pHaste').textContent=(hastePos*100).toFixed(0)+'%';
-  // Temperature from heat profile
+  // Temperature: calibrated so zones~50% + vent 30Hz + exaust 30Hz ≈ 100°C
   const hp2=getHeatProfile();
-  const baseTemp=40+hp2.avg*1.3; // 0→40°C, 50→105°C, 77→140°C
+  const baseTemp=Math.min(160,45+hp2.avg*3.1);
   let tmp=Math.round(baseTemp);if(S.fT>.5)tmp=Math.round(L(baseTemp,45,(S.fT-.5)*2));
   document.getElementById('pTemp').textContent='~'+tmp;
 
-  document.querySelectorAll('.timeline-step').forEach((e,i)=>{e.classList.remove('active','done');if(i===S.ph)e.classList.add('active');else if(i<S.ph)e.classList.add('done')});
+  document.querySelectorAll('.timeline-step').forEach((e,i)=>{if(e){e.classList.remove('active','done');if(i===S.ph)e.classList.add('active');else if(i<S.ph)e.classList.add('done')}});
   document.querySelectorAll('.phase-btn').forEach((e,i)=>e.classList.toggle('active',i===S.ph));
 
   // Timing
   const cl=tCl();
-  const tv=document.getElementById('tVal');tv.textContent=S.tm+' ms';tv.className='slider-val '+cl;
-  document.getElementById('tBadge').textContent=tTx();document.getElementById('tBadge').className='timing-badge '+cl;
+  const tv=document.getElementById('mtVal');tv.textContent=S.tm+' ms';tv.className='slider-val '+cl;
+  document.getElementById('mtBadge').textContent=tTx();document.getElementById('mtBadge').className='timing-badge '+cl;
 
   // Velocity
   const vn=vNorm();
   const vCl=vn>=2?'late':vn<=-2?'early':'normal';
-  const vEl=document.getElementById('vVal');vEl.textContent=S.vS+' ms';vEl.className='slider-val '+vCl;
+  const vEl=document.getElementById('mvVal');vEl.textContent=S.vS+' ms';vEl.className='slider-val '+vCl;
   const VB={pt:['Muito rápida','Rápida','Normal','Lenta','Muito lenta'],en:['Very fast','Fast','Normal','Slow','Very slow'],es:['Muy rápida','Rápida','Normal','Lenta','Muy lenta']};const vb=VB[lang]||VB.pt;
   const vTx=S.vS<=270?vb[0]:S.vS<=320?vb[1]:S.vS<=400?vb[2]:S.vS<=450?vb[3]:vb[4];
-  document.getElementById('vBadge').textContent=vTx;document.getElementById('vBadge').className='timing-badge '+vCl;
+  document.getElementById('mvBadge').textContent=vTx;document.getElementById('mvBadge').className='timing-badge '+vCl;
 
   // Flow
   const fCl=S.fQ<1?'late':S.fQ<=2?'late':S.fQ>=9?'early':'normal';
-  document.getElementById('fVal').textContent=S.fQ;document.getElementById('fVal').className='slider-val '+fCl;
+  document.getElementById('mfVal').textContent=S.fQ;document.getElementById('mfVal').className='slider-val '+fCl;
   const FB={pt:['Fechada','Baixa','Normal','Alta','Muito alta'],en:['Closed','Low','Normal','High','Very high'],es:['Cerrado','Bajo','Normal','Alto','Muy alto']};const fb=FB[lang]||FB.pt;
   const fTx=S.fQ<1?fb[0]:S.fQ<=3?fb[1]:S.fQ<=6?fb[2]:S.fQ<=8?fb[3]:fb[4];
-  document.getElementById('fBadge').textContent=fTx;document.getElementById('fBadge').className='timing-badge '+fCl;
+  document.getElementById('mfBadge').textContent=fTx;document.getElementById('mfBadge').className='timing-badge '+fCl;
 
   // Pressure
   const pCl=S.pP<=1?'late':S.pP>=7?'early':'normal';
-  document.getElementById('pPVal').textContent=S.pP+' bar';document.getElementById('pPVal').className='slider-val '+pCl;
+  document.getElementById('mpVal').textContent=S.pP+' bar';document.getElementById('mpVal').className='slider-val '+pCl;
   const PB={pt:['Muito baixa','Baixa','Normal','Alta','Muito alta'],en:['Very low','Low','Normal','High','Very high'],es:['Muy baja','Baja','Normal','Alta','Muy alta']};const pb=PB[lang]||PB.pt;
   const pTx=S.pP<=1?pb[0]:S.pP<=2?pb[1]:S.pP<=5?pb[2]:S.pP<=7?pb[3]:pb[4];
-  document.getElementById('pPBadge').textContent=pTx;document.getElementById('pPBadge').className='timing-badge '+pCl;
+  document.getElementById('mpBadge').textContent=pTx;document.getElementById('mpBadge').className='timing-badge '+pCl;
 
   // Distribution
   const d=gDist();
   document.getElementById('barO').style.width=d.o+'%';document.getElementById('barO').style.background=d.o>42?'#C0392B':d.o<25?'#E8A838':'#2E8B57';document.getElementById('pctO').textContent=d.o+'%';
   document.getElementById('barC').style.width=d.c+'%';document.getElementById('barC').style.background='#2E75B6';document.getElementById('pctC').textContent=d.c+'%';
   document.getElementById('barB').style.width=d.b+'%';document.getElementById('barB').style.background=d.b>42?'#C0392B':d.b<25?'#E8A838':'#2E8B57';document.getElementById('pctB').textContent=d.b+'%';
-  const n=gNote();document.getElementById('rNote').innerHTML='<strong>'+T('result')+'</strong> '+n.t;document.getElementById('rNote').className='result-note '+n.c}
+  const n=gNote();document.getElementById('rNote').innerHTML='<strong>'+T('result')+'</strong><br>'+n.t.replace(/\n/g,'<br>');document.getElementById('rNote').className='result-note '+n.c;
+
+}
+
 
 // ═══ ANIMATION ═══
 function animate(){
@@ -1062,21 +1001,26 @@ document.getElementById('btnReset').addEventListener('click',reset);
 document.querySelectorAll('.phase-btn').forEach(b=>b.addEventListener('click',()=>jump(parseInt(b.dataset.phase))));
 document.querySelectorAll('.timeline-step').forEach(e=>e.addEventListener('click',()=>jump(parseInt(e.dataset.step))));
 
-document.getElementById('tSlider').addEventListener('input',e=>{S.tm=parseInt(e.target.value);updateUI();if(!S.pl)draw()});
+// Sliders now use mob-panel sliders as primary
+document.getElementById('mtSlider').addEventListener('input',e=>{S.tm=parseInt(e.target.value);updateUI();if(!S.pl)draw()});
 document.querySelectorAll('.preset').forEach(b=>b.addEventListener('click',()=>{
-  S.tm=parseInt(b.dataset.t);document.getElementById('tSlider').value=S.tm;updateUI();if(!S.pl)draw()}));
+  S.tm=parseInt(b.dataset.t);document.getElementById('mtSlider').value=S.tm;updateUI();if(!S.pl)draw()}));
 
-document.getElementById('vSlider').addEventListener('input',e=>{S.vS=parseInt(e.target.value);updateUI();if(!S.pl)draw()});
+document.getElementById('mvSlider').addEventListener('input',e=>{S.vS=parseInt(e.target.value);updateUI();if(!S.pl)draw()});
 document.querySelectorAll('.preset-v').forEach(b=>b.addEventListener('click',()=>{
-  S.vS=parseInt(b.dataset.v);document.getElementById('vSlider').value=S.vS;updateUI();if(!S.pl)draw()}));
+  S.vS=parseInt(b.dataset.v);document.getElementById('mvSlider').value=S.vS;updateUI();if(!S.pl)draw()}));
 
-document.getElementById('fSlider').addEventListener('input',e=>{S.fQ=parseInt(e.target.value);updateUI();if(!S.pl)draw()});
+document.getElementById('mfSlider').addEventListener('input',e=>{S.fQ=parseInt(e.target.value);updateUI();if(!S.pl)draw()});
 document.querySelectorAll('.preset-f').forEach(b=>b.addEventListener('click',()=>{
-  S.fQ=parseInt(b.dataset.f);document.getElementById('fSlider').value=S.fQ;updateUI();if(!S.pl)draw()}));
+  S.fQ=parseInt(b.dataset.f);document.getElementById('mfSlider').value=S.fQ;updateUI();if(!S.pl)draw()}));
 
-document.getElementById('pPSlider').addEventListener('input',e=>{S.pP=parseInt(e.target.value);updateUI();if(!S.pl)draw()});
+document.getElementById('mpSlider').addEventListener('input',e=>{S.pP=parseInt(e.target.value);updateUI();if(!S.pl)draw()});
 document.querySelectorAll('.preset-p').forEach(b=>b.addEventListener('click',()=>{
-  S.pP=parseInt(b.dataset.p);document.getElementById('pPSlider').value=S.pP;updateUI();if(!S.pl)draw()}));
+  S.pP=parseInt(b.dataset.p);document.getElementById('mpSlider').value=S.pP;updateUI();if(!S.pl)draw()}));
+
+// Desktop buttons
+document.getElementById('deskPlay')?.addEventListener('click',()=>document.getElementById('btnPlay').click());
+document.getElementById('deskReset')?.addEventListener('click',()=>document.getElementById('btnReset').click());
 
 // ═══ TABS ═══
 document.querySelectorAll('.tab').forEach(tab=>{
@@ -1091,8 +1035,8 @@ document.querySelectorAll('.tab').forEach(tab=>{
 });
 
 // ═══ HEATING ZONES ═══
-const zonesL=[90,100,95,90,55,58,58,50,40];
-const zonesR=[90,100,95,90,55,58,58,50,40];
+const zonesL=[50,50,50,50,50,50,50,50,50];
+const zonesR=[50,50,50,50,50,50,50,50,50];
 const zonesOnL=[1,1,1,1,1,1,1,1,1];
 const zonesOnR=[1,1,1,1,1,1,1,1,1];
 const zoneWatts=[3000,2000,800,800,800,800,800,800,2000]; // Z1=3000W, Z2=2000W, Z3-Z8=800W, Z9=2000W
@@ -1149,10 +1093,16 @@ cvH.addEventListener('click',e=>{
       if(r.type==='vent'){editTarget='vent';editingPot=false;editingZone=null;inputOv.max='60';inputOv.step='1';inputOv.value=ventHz}
       if(r.type==='exaust'){editTarget='exaust';editingPot=false;editingZone=null;inputOv.max='60';inputOv.step='1';inputOv.value=exaustHz}
       if(r.type==='ambient'){editTarget='ambient';editingPot=false;editingZone=null;inputOv.max='45';inputOv.step='1';inputOv.value=ambientTemp}
-      inputOv.style.left=(r.x/sx)+'px';
-      inputOv.style.top=(r.y/sy)+'px';
-      inputOv.style.width=(r.w/sx)+'px';
-      inputOv.style.height=(r.h/sy)+'px';
+      // Position input exactly over the value box
+      const cRect=cvH.getBoundingClientRect();
+      const pRect=cvH.parentElement.getBoundingClientRect();
+      const scaleX=cRect.width/cvH.width;
+      const scaleY=cRect.height/cvH.height;
+      inputOv.style.left=(cRect.left-pRect.left+r.x*scaleX)+'px';
+      inputOv.style.top=(cRect.top-pRect.top+r.y*scaleY)+'px';
+      inputOv.style.width=(r.w*scaleX)+'px';
+      inputOv.style.height=(r.h*scaleY)+'px';
+      inputOv.style.fontSize=(12*scaleY)+'px';
       inputOv.style.display='block';
       inputOv.focus();inputOv.select();
       return;
@@ -1172,7 +1122,7 @@ function drawHeat(){
   const valW=36,valH=20;
   const gap=6;
 
-  ctxH.fillStyle='#1F3A5A';ctxH.fillRect(0,0,WH,HH);
+  ctxH.fillStyle='#2A4D6E';ctxH.fillRect(0,0,WH,HH);
 
   // Régua de refrigeração FIRST (FIXED at max distance = 75px) - Z1 lamps draw on top
   const rT=pfBot-5,rB=pfBot+20;
@@ -1339,27 +1289,35 @@ function drawHeat(){
   ctxH.fillStyle='rgba(200,200,210,.15)';ctxH.fillRect(CXH-pfW,pfTop,pfW*2,pfH);
 
   // Heat per zone = capped at 100, scaled by wattage and proximity
+  // Preform color uses stronger wattage curve so Z1(3000W) is visibly hotter than Z2(2000W)
   for(let i=0;i<6;i++){
     const yB=pfBot-i*zoneH,yT=yB-zoneH;
     const eL=Math.min(100,zonesL[i]*potG)*zonesOnL[i];
     const eR=Math.min(100,zonesR[i]*potG)*zonesOnR[i];
-    const wF=0.45+0.55*Math.sqrt(zoneWatts[i]/maxWatt);
+    const wFcolor=Math.pow(zoneWatts[i]/maxWatt,0.8); // Z1=1.0, Z2=0.72, Z3=0.35
     const absL=0.3+proxL[i]/100*0.7;
     const absR=0.3+proxR[i]/100*0.7;
-    const v=(eL*absL+eR*absR)/2*wF;
-    // Color: cold=blue(v=0) → warm=orange(v=50) → hot=intense red(v=100)
+    const v=(eL*absL+eR*absR)/2*wFcolor;
+    // Color: cold=blue → warm yellow → orange → intense red
     let r,g,b,a;
-    if(v<5){
-      r=40;g=60;b=120;a=.25; // cold blue
-    } else if(v<30){
-      const t=(v-5)/25;
-      r=Math.round(40+t*160);g=Math.round(60-t*30);b=Math.round(120-t*80);a=.2+t*.2;
-    } else if(v<60){
-      const t=(v-30)/30;
-      r=Math.round(200+t*55);g=Math.round(30+t*40);b=Math.round(40-t*25);a=.3+t*.2;
+    if(v<3){
+      r=50;g=70;b=130;a=.2; // cold blue
+    } else if(v<15){
+      // Yellow-amber (800W zones land here at ~11)
+      const t=(v-3)/12;
+      r=Math.round(180+t*60);g=Math.round(150+t*30);b=Math.round(30-t*10);a=.25+t*.15;
+    } else if(v<35){
+      // Orange (2000W zones land here at ~23)
+      const t=(v-15)/20;
+      r=Math.round(240+t*15);g=Math.round(180-t*100);b=Math.round(20-t*10);a=.35+t*.15;
+    } else if(v<65){
+      // Red-orange (3000W zones land here at ~32-52)
+      const t=(v-35)/30;
+      r=255;g=Math.round(80-t*50);b=Math.round(10-t*5);a=.45+t*.2;
     } else {
-      const t=Math.min(1,(v-60)/40);
-      r=255;g=Math.round(70-t*50);b=Math.round(15-t*10);a=.45+t*.3;
+      // Intense red (max heat)
+      const t=Math.min(1,(v-65)/35);
+      r=255;g=Math.round(30-t*20);b=Math.round(5);a=.6+t*.25;
     }
     ctxH.fillStyle='rgba('+r+','+g+','+b+','+a+')';
     ctxH.fillRect(CXH-pfW-5,yT,pfW*2+10,zoneH);
@@ -1473,9 +1431,27 @@ function drawHeat(){
 
   // Cooling indicator
   const hp3=getHeatProfile();
-  const coolPct=Math.round((1-hp3.coolingPct)*100);
-  ctxH.font='500 8px DM Sans';ctxH.fillStyle=coolPct>20?'#E87722':coolPct>5?'#E8A838':'#6A8CA8';
-  ctxH.fillText('Resfriamento: -'+coolPct+'%',CXH,ctrlY+38);
+  // === TEMPERATURA DA PRÉ-FORMA ===
+  const tempAvg=Math.min(160,45+hp3.avg*3.1);
+  const tempRound=Math.round(tempAvg);
+  const tempIdealLow=95,tempIdealHigh=105;
+  const tempY=ctrlY+42;
+  const inIdeal=tempRound>=tempIdealLow&&tempRound<=tempIdealHigh;
+  const tooLow2=tempRound<tempIdealLow;
+  const tempColor=inIdeal?'#33DD55':tooLow2?'#5599EE':'#FF5533';
+  const statusTxt=inIdeal?'IDEAL':(tooLow2?'FRIA':'QUENTE');
+
+  // Title
+  ctxH.font='600 10px DM Sans';ctxH.textAlign='center';ctxH.fillStyle='#6A8CA8';
+  ctxH.fillText('Temperatura da Pré-forma',CXH,tempY);
+
+  // Temperature value
+  ctxH.font='700 22px DM Sans';ctxH.fillStyle=tempColor;
+  ctxH.fillText(tempRound+'°C',CXH,tempY+24);
+
+  // Status
+  ctxH.font='600 11px DM Sans';ctxH.fillStyle=tempColor;
+  ctxH.fillText(statusTxt,CXH,tempY+40);
 
   // === AIR FLOW ANIMATION between lamps ===
   if(hp3.airflow>0.05){
@@ -1516,7 +1492,7 @@ function drawHeat(){
 // ═══ TRANSLATIONS ═══
 let lang='pt';
 const TR={
-  pt:{title:'Simulação de Sopro - v8.4',tabHeat:'🔥 Perfil Térmico',tabBlow:'⚙ Processo de Sopro',
+  pt:{title:'Simulação de Sopro - v9.7',tabHeat:'🔥 Perfil Térmico',tabBlow:'⚙ Processo de Sopro',
     badge:'Especialista - Wesley Uelber',zona:'Zona',preForno:'Pré-Forno',forno:'Forno',perfil:'Perfil',
     mold:'MOLDE',start:'▶ Iniciar',pause:'⏸ Pausar',resume:'▶ Continuar',reset:'↺ Reiniciar',done:'✓ Completo',
     phases:['Posicionamento','Fechamento','Vedação do Bocal','Estiramento + Pré-Sopro','Sopro Final','Residência','Alívio de Sopro','Extração'],
@@ -1540,7 +1516,7 @@ const TR={
       'A pressão interna é aliviada gradualmente. A haste de estiramento sobe de volta.',
       'A vedação sobe, o molde abre e a garrafa é extraída com seu formato final.'
     ]},
-  en:{title:'Blow Molding Simulation - v8.4',tabHeat:'🔥 Thermal Profile',tabBlow:'⚙ Blow Process',
+  en:{title:'Blow Molding Simulation - v9.7',tabHeat:'🔥 Thermal Profile',tabBlow:'⚙ Blow Process',
     badge:'Specialist - Wesley Uelber',zona:'Zone',preForno:'Pre-Oven',forno:'Oven',perfil:'Profile',
     mold:'MOLD',start:'▶ Start',pause:'⏸ Pause',resume:'▶ Resume',reset:'↺ Reset',done:'✓ Done',
     phases:['Positioning','Mold Closing','Nozzle Seal','Stretching + Pre-Blow','Final Blow','Holding','Blow Relief','Extraction'],
@@ -1564,7 +1540,7 @@ const TR={
       'Internal pressure is gradually relieved. The stretch rod rises back.',
       'The seal rises, the mold opens and the bottle is extracted in its final shape.'
     ]},
-  es:{title:'Simulación de Soplado - v8.4',tabHeat:'🔥 Perfil Térmico',tabBlow:'⚙ Proceso de Soplado',
+  es:{title:'Simulación de Soplado - v9.7',tabHeat:'🔥 Perfil Térmico',tabBlow:'⚙ Proceso de Soplado',
     badge:'Especialista - Wesley Uelber',zona:'Zona',preForno:'Pre-Horno',forno:'Horno',perfil:'Perfil',
     mold:'MOLDE',start:'▶ Iniciar',pause:'⏸ Pausar',resume:'▶ Continuar',reset:'↺ Reiniciar',done:'✓ Completo',
     phases:['Posicionamiento','Cierre del Molde','Sellado de Boquilla','Estirado + Pre-Soplado','Soplado Final','Residencia','Alivio de Soplado','Extracción'],
@@ -1599,7 +1575,7 @@ function applyLang(){
   document.getElementById('tabBlow').textContent=T('tabBlow');
   document.getElementById('badgeSpec').textContent=T('badge');
   // Panel titles
-  document.getElementById('ptPhases').innerHTML='<span class="icon">⚙</span> '+T('ptPhases').replace('⚙ ','');
+  const ptPh=document.getElementById('ptPhases');if(ptPh)ptPh.innerHTML='<span class="icon">⚙</span> '+T('ptPhases').replace('⚙ ','');
   document.getElementById('ptTiming').innerHTML='<span class="icon">🎛</span> '+T('ptTiming').replace('🎛 ','');
   document.getElementById('ptSpeed').innerHTML='<span class="icon">⚡</span> '+T('ptSpeed').replace('⚡ ','');
   document.getElementById('ptFlow').innerHTML='<span class="icon">💨</span> '+T('ptFlow').replace('💨 ','');
@@ -1669,13 +1645,12 @@ draw();
 </div>
 
 <script>
-// ═══ MOBILE SWIPE CONTROLS ═══
+// ═══ SCROLL TAB CONTROLS ═══
 (function(){
   const scroll=document.getElementById('mobScroll');
   const tabs=document.querySelectorAll('.mob-tab');
   if(!scroll)return;
 
-  // Tab click → scroll to panel
   tabs.forEach((t,i)=>{
     t.addEventListener('click',()=>{
       scroll.scrollTo({left:scroll.clientWidth*i,behavior:'smooth'});
@@ -1684,136 +1659,93 @@ draw();
     });
   });
 
-  // Scroll → update active tab
   scroll.addEventListener('scroll',()=>{
     const idx=Math.round(scroll.scrollLeft/scroll.clientWidth);
     tabs.forEach((t,i)=>{t.classList.toggle('active',i===idx)});
   });
 
-  // Sync mobile sliders with main state
-  const sync=()=>{
-    const mtV=document.getElementById('mtVal'),mvV=document.getElementById('mvVal');
-    const mfV=document.getElementById('mfVal'),mpV=document.getElementById('mpVal');
-    const mtB=document.getElementById('mtBadge'),mvB=document.getElementById('mvBadge');
-    const mfB=document.getElementById('mfBadge'),mpB=document.getElementById('mpBadge');
-    const tV=document.getElementById('tVal'),vV=document.getElementById('vVal');
-    const fV=document.getElementById('fVal'),pV=document.getElementById('pPVal');
-    const tB=document.getElementById('tBadge'),vB=document.getElementById('vBadge');
-    const fB=document.getElementById('fBadge'),pB=document.getElementById('pPBadge');
-    if(mtV&&tV){mtV.textContent=tV.textContent;mtV.className=tV.className}
-    if(mvV&&vV){mvV.textContent=vV.textContent;mvV.className=vV.className}
-    if(mfV&&fV){mfV.textContent=fV.textContent;mfV.className=fV.className}
-    if(mpV&&pV){mpV.textContent=pV.textContent;mpV.className=pV.className}
-    if(mtB&&tB){mtB.textContent=tB.textContent;mtB.className=tB.className}
-    if(mvB&&vB){mvB.textContent=vB.textContent;mvB.className=vB.className}
-    if(mfB&&fB){mfB.textContent=fB.textContent;mfB.className=fB.className}
-    if(mpB&&pB){mpB.textContent=pB.textContent;mpB.className=pB.className}
-  };
-  setInterval(sync,200);
-
-  // Mobile slider events → update main state
-  document.getElementById('mtSlider').addEventListener('input',e=>{
-    S.tm=parseInt(e.target.value);document.getElementById('tSlider').value=S.tm;updateUI();if(!S.pl)draw()});
-  document.getElementById('mvSlider').addEventListener('input',e=>{
-    S.vS=parseInt(e.target.value);document.getElementById('vSlider').value=S.vS;updateUI();if(!S.pl)draw()});
-  document.getElementById('mfSlider').addEventListener('input',e=>{
-    S.fQ=parseInt(e.target.value);document.getElementById('fSlider').value=S.fQ;updateUI();if(!S.pl)draw()});
-  document.getElementById('mpSlider').addEventListener('input',e=>{
-    S.pP=parseInt(e.target.value);document.getElementById('pPSlider').value=S.pP;updateUI();if(!S.pl)draw()});
-
-  // Mobile phase buttons
+  // Phase buttons (all instances)
   document.querySelectorAll('.mob-ph').forEach(b=>{
     b.addEventListener('click',()=>jump(parseInt(b.dataset.phase)))});
 
-  // Mobile play/reset
-  document.getElementById('mobPlay').addEventListener('click',()=>{
-    document.getElementById('btnPlay').click()});
-  document.getElementById('mobReset').addEventListener('click',()=>{
-    document.getElementById('btnReset').click()});
+  // Mobile play/reset sync
+  
+  
 
   // Sync play button text
-  const syncBtn=()=>{
+  setInterval(()=>{
     const main=document.getElementById('btnPlay');
-    const mob=document.getElementById('mobPlay');
-    if(main&&mob)mob.textContent=main.textContent;
-  };
-  setInterval(syncBtn,300);
+  },300);
 })();
 
 // ═══ GUIDED TOUR ═══
 const tourSteps={
   pt:[
-    {el:null,title:'Bem-vindo ao Simulador de Sopro!',text:'Este tour vai te mostrar todas as funcionalidades do simulador. Vamos lá?',pos:'center'},
-    {el:'#tabHeat',title:'Abas de Navegação',text:'Alterne entre o Perfil Térmico (aquecimento das zonas) e o Processo de Sopro (simulação das etapas).',pos:'bottom'},
-    {el:'#cvHeat',title:'Pré-forma Girando',text:'A pré-forma gira continuamente mostrando a absorção de calor. Vermelho = quente, azul = frio. As cores variam por zona.',pos:'bottom',page:'aquecimento'},
-    {el:'#cvHeat',title:'Zonas de Aquecimento (1-9)',text:'Clique nos valores ao lado das lâmpadas para editar (0-100). Cada lado é independente: Pré-Forno (esquerda) e Forno (direita).',pos:'bottom',page:'aquecimento'},
-    {el:'#cvHeat',title:'Potência das Lâmpadas',text:'Z1 = 3000W (máxima intensidade), Z2 e Z9 = 2000W, Z3 a Z8 = 800W. A mesma % gera mais calor nas lâmpadas de maior potência.',pos:'bottom',page:'aquecimento'},
-    {el:'#cvHeat',title:'Ligar/Desligar Lâmpadas',text:'Clique nas lâmpadas (cápsulas arredondadas) para ligar ou desligar cada zona individualmente.',pos:'bottom',page:'aquecimento'},
-    {el:'#cvHeat',title:'Aproximação ◀▶',text:'Setas atrás dos nomes controlam distância da lâmpada. 3 níveis: perto (100), médio (50), longe (0). Mais perto = mais calor absorvido.',pos:'bottom',page:'aquecimento'},
-    {el:'#cvHeat',title:'Perfil (Potência Geral)',text:'Clique no valor "Perfil" no centro (0-200). Multiplica todas as zonas, mas nenhuma ultrapassa 100 de intensidade real.',pos:'bottom',page:'aquecimento'},
-    {el:'#cvHeat',title:'Ventilação e Exaustão',text:'Abaixo da pré-forma: Ventilação (0-60 Hz), Exaustão (0-60 Hz) e Temp. Ambiente (5-45°C). Controlam o resfriamento do ar entre as lâmpadas.',pos:'bottom',page:'aquecimento'},
-    {el:'#cvHeat',title:'Efeito do Resfriamento',text:'Vent. 60Hz + Exaust. 60Hz a 25°C = -80% de calor. Dia quente (40°C) = ar não esfria. Dia frio (10°C) = resfriamento máximo (-90%).',pos:'bottom',page:'aquecimento'},
-    {el:'#cvHeat',title:'Régua de Refrigeração',text:'A régua metálica protege a rosca do bocal do calor das lâmpadas. O ar azul entre a régua e o bocal representa a refrigeração.',pos:'bottom',page:'aquecimento'},
-    {el:'#tabBlow',title:'Processo de Sopro',text:'Vamos para a simulação do processo. O perfil térmico influencia a distribuição de material!',pos:'bottom',switchTo:'sopro'},
-    {el:'#btnPlay',title:'8 Etapas do Processo',text:'1.Posicionamento 2.Fechamento 3.Vedação 4.Estiramento+Pré-Sopro 5.Sopro Final 6.Residência 7.Alívio 8.Extração',pos:'bottom',page:'sopro'},
-    {el:'#tSlider',title:'Início de Pré-Sopro',text:'Momento do ar de pré-sopro (60-300ms). Antecipado = material no ombro. Atrasado = material na base. Os 4 ajustes se compensam.',pos:'bottom',page:'sopro'},
-    {el:'#vSlider',title:'Tempo de Estiramento',text:'Tempo de descida da haste (250-500ms). Rápido = material no fundo. Lento = material no ombro.',pos:'bottom',page:'sopro'},
-    {el:'#fSlider',title:'Vazão de Pré-Sopro',text:'Fluxo de ar (0-10). Fechada (0) = sem expansão, material no fundo. Aberta (10) = expansão forte, material no ombro.',pos:'bottom',page:'sopro'},
-    {el:'#pPSlider',title:'Pressão de Pré-Sopro',text:'Pressão do ar (0-8 bar). Baixa = material no fundo. Alta = material no ombro. Pressão setada aparece nos parâmetros ativos.',pos:'bottom',page:'sopro'},
-    {el:'#rNote',title:'Resultado e Distribuição',text:'Barras mostram Ombro/Centro/Base (%). Diagnóstico inclui perfil térmico: zonas mais quentes = menos material naquela região.',pos:'top',page:'sopro'},
-    {el:'.flags',title:'Idiomas 🇧🇷 🇺🇸 🇪🇸',text:'Clique nas bandeiras para trocar o idioma. Todo o simulador traduz automaticamente.',pos:'bottom'},
-    {el:null,title:'Tour Completo!',text:'O perfil térmico e o processo de sopro trabalham juntos: zonas mais quentes = material estica mais = menos concentração. Bom trabalho!',pos:'center'}
+    {el:null,title:'Bem-vindo ao Simulador de Sopro PET!',text:'Este simulador permite ajustar o perfil térmico e os parâmetros de sopro para entender como cada ajuste afeta a distribuição de material na garrafa. Vamos conhecer tudo?',pos:'center'},
+    {el:'#tabHeat',title:'Aba: Perfil Térmico',text:'Aqui você controla o aquecimento da pré-forma. Clique nesta aba para acessar as 9 zonas de aquecimento, ventilação, exaustão e temperatura ambiente.',pos:'bottom'},
+    {el:'#cvHeat',title:'Valores das Zonas (clicável)',text:'Clique no número ao lado de cada lâmpada para editar o valor (0-100). O editor aparece sobre o valor — digite e pressione Enter. Cada lado é independente: Pré-Forno (esquerda) e Forno (direita).',pos:'bottom',page:'aquecimento'},
+    {el:'#cvHeat',title:'Potência das Lâmpadas',text:'Z1 = 3000W (vermelho intenso), Z2 e Z9 = 2000W (laranja), Z3 a Z8 = 800W (amarelo). A mesma porcentagem gera mais calor nas lâmpadas mais potentes — observe a diferença de cor na pré-forma.',pos:'bottom',page:'aquecimento'},
+    {el:'#cvHeat',title:'Ligar/Desligar (clique na lâmpada)',text:'Clique diretamente na lâmpada (cápsula arredondada) para ligar ou desligar. Quando desligada, a zona não aquece e fica azul na pré-forma.',pos:'bottom',page:'aquecimento'},
+    {el:'#cvHeat',title:'Aproximação ◀ ▶ (distância)',text:'As setas brancas atrás do nome da zona controlam a distância. 3 níveis: perto (100), médio (50) e longe (0). Quanto mais perto, mais calor a pré-forma absorve naquela zona.',pos:'bottom',page:'aquecimento'},
+    {el:'#cvHeat',title:'Perfil — Potência Geral (clicável)',text:'Clique no valor "Perfil" no centro da pré-forma. Varia de 0 a 200 e multiplica todas as zonas proporcionalmente. Nenhuma zona ultrapassa 100 de intensidade real.',pos:'bottom',page:'aquecimento'},
+    {el:'#cvHeat',title:'Ventilação / Exaustão / Temp. Ambiente',text:'Abaixo da pré-forma — clique para editar. Ventilação (0-60 Hz) e Exaustão (0-60 Hz) resfriam o ar entre as lâmpadas. A temperatura ambiente (5-45°C) influencia: dia quente = ar não esfria, dia frio = resfriamento forte.',pos:'bottom',page:'aquecimento'},
+    {el:'#cvHeat',title:'Temperatura da Pré-forma',text:'Mostra a temperatura estimada. Ideal: 95-105°C (verde). Calibrado para zonas a 50% + ventilação 30Hz + exaustão 30Hz = 100°C. Azul = fria, vermelho = quente demais.',pos:'bottom',page:'aquecimento'},
+    {el:'#tabBlow',title:'Aba: Processo de Sopro',text:'Aqui você simula as 8 etapas do sopro e ajusta 4 parâmetros mecânicos. O perfil térmico da outra aba influencia diretamente a distribuição!',pos:'bottom',switchTo:'sopro'},
+    {el:'#btnPlay',title:'Botões: Iniciar / Reiniciar',text:'Clique em Iniciar para rodar a animação das 8 etapas. Ou clique num número (1-8) para ir direto a uma etapa específica.',pos:'bottom',page:'sopro'},
+    {el:'#tSlider',title:'Ajuste: Início de Pré-Sopro (60-300ms)',text:'Controla quando o ar começa. Antecipado (60ms) = material vai pro ombro. Atrasado (300ms) = material fica na base. Use os presets para testar valores rápidos.',pos:'bottom',page:'sopro'},
+    {el:'#vSlider',title:'Ajuste: Tempo de Estiramento (250-500ms)',text:'Tempo de descida da haste. Rápido (250ms) = material empurrado pra base. Lento (500ms) = material concentra no ombro.',pos:'bottom',page:'sopro'},
+    {el:'#fSlider',title:'Ajuste: Vazão de Pré-Sopro (0-10)',text:'Fluxo de ar. Fechada (0) = sem expansão, material no fundo. Aberta (10) = expansão forte, material se distribui pro ombro.',pos:'bottom',page:'sopro'},
+    {el:'#pPSlider',title:'Ajuste: Pressão de Pré-Sopro (0-8 bar)',text:'Pressão do ar. Baixa = material na base. Alta = material no ombro. Todos os 5 fatores (4 mecânicos + perfil térmico) trabalham juntos e se compensam.',pos:'bottom',page:'sopro'},
+    {el:'#rNote',title:'Resultado — Diagnóstico Inteligente',text:'Mostra POR QUE o material está concentrado em determinada região. Lista cada fator que contribui (pré-sopro, estiramento, vazão, pressão, perfil térmico) por ordem de impacto.',pos:'top',page:'sopro'},
+    {el:'.flags',title:'Idiomas 🇧🇷 🇺🇸 🇪🇸',text:'Clique nas bandeiras para trocar o idioma. Todo o simulador traduz automaticamente — incluindo o diagnóstico.',pos:'bottom'},
+    {el:null,title:'Pronto para Explorar!',text:'Dica: vá no Perfil Térmico e coloque Z1-Z2 em 100 e Z5-Z6 em 20, depois veja o resultado na distribuição. Ou aumente o pré-sopro para 300ms e observe. Clique no botão ? para rever este tour a qualquer momento.',pos:'center'}
   ],
   en:[
-    {el:null,title:'Welcome to the Blow Molding Simulator!',text:'This tour will show you all the simulator features. Let\'s go?',pos:'center'},
-    {el:'#tabHeat',title:'Navigation Tabs',text:'Switch between Thermal Profile (zone heating) and Blow Process (step simulation).',pos:'bottom'},
-    {el:'#cvHeat',title:'Rotating Preform',text:'The preform rotates continuously showing heat absorption. Red = hot, blue = cold. Colors vary per zone.',pos:'bottom',page:'aquecimento'},
-    {el:'#cvHeat',title:'Heating Zones (1-9)',text:'Click values next to lamps to edit (0-100). Each side is independent: Pre-Oven (left) and Oven (right).',pos:'bottom',page:'aquecimento'},
-    {el:'#cvHeat',title:'Lamp Wattage',text:'Z1 = 3000W (max intensity), Z2 and Z9 = 2000W, Z3-Z8 = 800W. Same % generates more heat on higher wattage lamps.',pos:'bottom',page:'aquecimento'},
-    {el:'#cvHeat',title:'Toggle Lamps On/Off',text:'Click on the lamps (rounded capsules) to turn each zone on or off individually.',pos:'bottom',page:'aquecimento'},
-    {el:'#cvHeat',title:'Proximity ◀▶',text:'Arrows behind zone names control lamp distance. 3 levels: close (100), medium (50), far (0). Closer = more heat absorbed.',pos:'bottom',page:'aquecimento'},
-    {el:'#cvHeat',title:'Profile (General Power)',text:'Click "Profile" value in center (0-200). Multiplies all zones, but none exceeds 100 actual intensity.',pos:'bottom',page:'aquecimento'},
-    {el:'#cvHeat',title:'Ventilation & Exhaust',text:'Below preform: Ventilation (0-60 Hz), Exhaust (0-60 Hz) and Ambient Temp (5-45°C). Control air cooling between lamps.',pos:'bottom',page:'aquecimento'},
-    {el:'#cvHeat',title:'Cooling Effect',text:'Vent 60Hz + Exh 60Hz at 25°C = -80% heat. Hot day (40°C) = air doesn\'t cool. Cold day (10°C) = max cooling (-90%).',pos:'bottom',page:'aquecimento'},
-    {el:'#cvHeat',title:'Cooling Rail',text:'The metallic rail protects the neck threads from lamp heat. Blue air between rail and neck represents refrigeration.',pos:'bottom',page:'aquecimento'},
-    {el:'#tabBlow',title:'Blow Process',text:'Let\'s go to the process simulation. The thermal profile influences material distribution!',pos:'bottom',switchTo:'sopro'},
-    {el:'#btnPlay',title:'8 Process Steps',text:'1.Positioning 2.Closing 3.Seal 4.Stretch+Pre-Blow 5.Final Blow 6.Holding 7.Relief 8.Extraction',pos:'bottom',page:'sopro'},
-    {el:'#tSlider',title:'Pre-Blow Start',text:'Pre-blow air timing (60-300ms). Early = material on shoulder. Late = material on base. All 4 adjustments compensate each other.',pos:'bottom',page:'sopro'},
-    {el:'#vSlider',title:'Stretch Time',text:'Rod descent time (250-500ms). Fast = material on base. Slow = material on shoulder.',pos:'bottom',page:'sopro'},
-    {el:'#fSlider',title:'Pre-Blow Flow',text:'Air flow (0-10). Closed (0) = no expansion, material on base. Open (10) = strong expansion, material on shoulder.',pos:'bottom',page:'sopro'},
-    {el:'#pPSlider',title:'Pre-Blow Pressure',text:'Air pressure (0-8 bar). Low = material on base. High = material on shoulder. Set pressure shows in active parameters.',pos:'bottom',page:'sopro'},
-    {el:'#rNote',title:'Result & Distribution',text:'Bars show Shoulder/Center/Base (%). Diagnosis includes thermal profile: hotter zones = less material in that region.',pos:'top',page:'sopro'},
-    {el:'.flags',title:'Languages 🇧🇷 🇺🇸 🇪🇸',text:'Click flags to change language. The entire simulator translates automatically.',pos:'bottom'},
-    {el:null,title:'Tour Complete!',text:'Thermal profile and blow process work together: hotter zones = material stretches more = less concentration. Great work!',pos:'center'}
+    {el:null,title:'Welcome to the PET Blow Molding Simulator!',text:'This simulator lets you adjust thermal profile and blow parameters to understand how each adjustment affects material distribution in the bottle.',pos:'center'},
+    {el:'#tabHeat',title:'Tab: Thermal Profile',text:'Here you control preform heating. Access the 9 heating zones, ventilation, exhaust and ambient temperature.',pos:'bottom'},
+    {el:'#cvHeat',title:'Zone Values (clickable)',text:'Click the number next to each lamp to edit (0-100). The editor appears over the value — type and press Enter. Each side is independent: Pre-Oven (left) and Oven (right).',pos:'bottom',page:'aquecimento'},
+    {el:'#cvHeat',title:'Lamp Wattage',text:'Z1 = 3000W (intense red), Z2/Z9 = 2000W (orange), Z3-Z8 = 800W (yellow). Same % generates more heat on higher wattage lamps.',pos:'bottom',page:'aquecimento'},
+    {el:'#cvHeat',title:'Toggle On/Off (click lamp)',text:'Click directly on the lamp capsule to turn on/off. When off, the zone stops heating and turns blue on the preform.',pos:'bottom',page:'aquecimento'},
+    {el:'#cvHeat',title:'Proximity ◀ ▶ (distance)',text:'White arrows behind zone names control distance. 3 levels: close (100), medium (50), far (0). Closer = more heat absorbed.',pos:'bottom',page:'aquecimento'},
+    {el:'#cvHeat',title:'Profile — General Power (clickable)',text:'Click "Profile" value in center. Range 0-200, multiplies all zones proportionally. No zone exceeds 100 actual intensity.',pos:'bottom',page:'aquecimento'},
+    {el:'#cvHeat',title:'Ventilation / Exhaust / Ambient Temp',text:'Below preform — click to edit. Ventilation and Exhaust (0-60 Hz) cool air between lamps. Ambient temp (5-45°C): hot day = no cooling, cold day = strong cooling.',pos:'bottom',page:'aquecimento'},
+    {el:'#cvHeat',title:'Preform Temperature',text:'Shows estimated temperature. Ideal: 95-105°C (green). Calibrated: zones at 50% + vent 30Hz + exhaust 30Hz = 100°C.',pos:'bottom',page:'aquecimento'},
+    {el:'#tabBlow',title:'Tab: Blow Process',text:'Simulate the 8 blow steps and adjust 4 mechanical parameters. The thermal profile directly influences distribution!',pos:'bottom',switchTo:'sopro'},
+    {el:'#btnPlay',title:'Buttons: Start / Reset',text:'Click Start to run the 8-step animation. Or click a number (1-8) to jump to a specific step.',pos:'bottom',page:'sopro'},
+    {el:'#tSlider',title:'Adjustment: Pre-Blow Start (60-300ms)',text:'Controls when air starts. Early (60ms) = material to shoulder. Late (300ms) = material stays on base.',pos:'bottom',page:'sopro'},
+    {el:'#vSlider',title:'Adjustment: Stretch Time (250-500ms)',text:'Rod descent time. Fast (250ms) = material pushed to base. Slow (500ms) = material concentrates on shoulder.',pos:'bottom',page:'sopro'},
+    {el:'#fSlider',title:'Adjustment: Pre-Blow Flow (0-10)',text:'Air flow. Closed (0) = no expansion, material on base. Open (10) = strong expansion, material to shoulder.',pos:'bottom',page:'sopro'},
+    {el:'#pPSlider',title:'Adjustment: Pre-Blow Pressure (0-8 bar)',text:'Air pressure. Low = material on base. High = material on shoulder. All 5 factors (4 mechanical + thermal) work together.',pos:'bottom',page:'sopro'},
+    {el:'#rNote',title:'Result — Smart Diagnosis',text:'Shows WHY material concentrates in a region. Lists each contributing factor (pre-blow, stretch, flow, pressure, thermal) by impact order.',pos:'top',page:'sopro'},
+    {el:'.flags',title:'Languages 🇧🇷 🇺🇸 🇪🇸',text:'Click flags to switch language. Everything translates automatically — including the diagnosis.',pos:'bottom'},
+    {el:null,title:'Ready to Explore!',text:'Tip: set Z1-Z2 to 100 and Z5-Z6 to 20 in Thermal Profile, then check the distribution result. Or increase pre-blow to 300ms. Click ? to review this tour anytime.',pos:'center'}
   ],
   es:[
-    {el:null,title:'¡Bienvenido al Simulador de Soplado!',text:'Este tour le mostrará todas las funcionalidades. ¿Vamos?',pos:'center'},
-    {el:'#tabHeat',title:'Pestañas de Navegación',text:'Alterne entre Perfil Térmico (calentamiento) y Proceso de Soplado (simulación de etapas).',pos:'bottom'},
-    {el:'#cvHeat',title:'Preforma Girando',text:'La preforma gira mostrando la absorción de calor. Rojo = caliente, azul = frío. Los colores varían por zona.',pos:'bottom',page:'aquecimento'},
-    {el:'#cvHeat',title:'Zonas de Calentamiento (1-9)',text:'Haga clic en los valores junto a las lámparas para editar (0-100). Cada lado es independiente: Pre-Horno y Horno.',pos:'bottom',page:'aquecimento'},
-    {el:'#cvHeat',title:'Potencia de Lámparas',text:'Z1 = 3000W (máxima), Z2 y Z9 = 2000W, Z3-Z8 = 800W. El mismo % genera más calor en lámparas de mayor potencia.',pos:'bottom',page:'aquecimento'},
-    {el:'#cvHeat',title:'Encender/Apagar Lámparas',text:'Haga clic en las lámparas para encender o apagar cada zona individualmente.',pos:'bottom',page:'aquecimento'},
-    {el:'#cvHeat',title:'Aproximación ◀▶',text:'Flechas detrás de los nombres controlan la distancia. 3 niveles: cerca (100), medio (50), lejos (0). Más cerca = más calor.',pos:'bottom',page:'aquecimento'},
-    {el:'#cvHeat',title:'Perfil (Potencia General)',text:'Haga clic en "Perfil" en el centro (0-200). Multiplica todas las zonas, pero ninguna supera 100.',pos:'bottom',page:'aquecimento'},
-    {el:'#cvHeat',title:'Ventilación y Extracción',text:'Debajo: Ventilación (0-60 Hz), Extracción (0-60 Hz) y Temp. Ambiente (5-45°C). Controlan el enfriamiento del aire.',pos:'bottom',page:'aquecimento'},
-    {el:'#cvHeat',title:'Efecto de Enfriamiento',text:'Vent 60Hz + Ext 60Hz a 25°C = -80% calor. Día caluroso (40°C) = aire no enfría. Día frío (10°C) = enfriamiento máximo (-90%).',pos:'bottom',page:'aquecimento'},
-    {el:'#cvHeat',title:'Regla de Refrigeración',text:'La regla metálica protege la rosca de la boquilla del calor. El aire azul representa la refrigeración.',pos:'bottom',page:'aquecimento'},
-    {el:'#tabBlow',title:'Proceso de Soplado',text:'Vamos a la simulación. ¡El perfil térmico influye en la distribución de material!',pos:'bottom',switchTo:'sopro'},
-    {el:'#btnPlay',title:'8 Etapas del Proceso',text:'1.Posicionamiento 2.Cierre 3.Sellado 4.Estirado+Pre-Soplado 5.Soplado Final 6.Residencia 7.Alivio 8.Extracción',pos:'bottom',page:'sopro'},
-    {el:'#tSlider',title:'Inicio de Pre-Soplado',text:'Momento del aire (60-300ms). Anticipado = material en hombro. Retrasado = material en base. Los 4 ajustes se compensan.',pos:'bottom',page:'sopro'},
-    {el:'#vSlider',title:'Tiempo de Estirado',text:'Tiempo de descenso de la varilla (250-500ms). Rápido = material en fondo. Lento = material en hombro.',pos:'bottom',page:'sopro'},
-    {el:'#fSlider',title:'Caudal de Pre-Soplado',text:'Flujo de aire (0-10). Cerrado (0) = sin expansión. Abierto (10) = expansión fuerte, material en hombro.',pos:'bottom',page:'sopro'},
-    {el:'#pPSlider',title:'Presión de Pre-Soplado',text:'Presión del aire (0-8 bar). Baja = material en fondo. Alta = material en hombro.',pos:'bottom',page:'sopro'},
-    {el:'#rNote',title:'Resultado y Distribución',text:'Barras muestran Hombro/Centro/Base (%). El diagnóstico incluye perfil térmico: zonas más calientes = menos material.',pos:'top',page:'sopro'},
-    {el:'.flags',title:'Idiomas 🇧🇷 🇺🇸 🇪🇸',text:'Haga clic en las banderas para cambiar idioma. Todo se traduce automáticamente.',pos:'bottom'},
-    {el:null,title:'¡Tour Completo!',text:'Perfil térmico y proceso trabajan juntos: zonas más calientes = material se estira más = menos concentración. ¡Buen trabajo!',pos:'center'}
+    {el:null,title:'¡Bienvenido al Simulador de Soplado PET!',text:'Este simulador permite ajustar el perfil térmico y los parámetros de soplado para entender cómo afectan la distribución de material en la botella.',pos:'center'},
+    {el:'#tabHeat',title:'Pestaña: Perfil Térmico',text:'Aquí controla el calentamiento de la preforma. Acceda a las 9 zonas, ventilación, extracción y temperatura ambiente.',pos:'bottom'},
+    {el:'#cvHeat',title:'Valores de Zonas (clic)',text:'Haga clic en el número junto a cada lámpara para editar (0-100). El editor aparece sobre el valor. Cada lado es independiente.',pos:'bottom',page:'aquecimento'},
+    {el:'#cvHeat',title:'Potencia de Lámparas',text:'Z1 = 3000W (rojo intenso), Z2/Z9 = 2000W (naranja), Z3-Z8 = 800W (amarillo).',pos:'bottom',page:'aquecimento'},
+    {el:'#cvHeat',title:'Encender/Apagar (clic en lámpara)',text:'Haga clic en la cápsula para encender o apagar.',pos:'bottom',page:'aquecimento'},
+    {el:'#cvHeat',title:'Aproximación ◀ ▶',text:'Flechas controlan distancia. 3 niveles: cerca (100), medio (50), lejos (0).',pos:'bottom',page:'aquecimento'},
+    {el:'#cvHeat',title:'Perfil — Potencia General',text:'Haga clic en "Perfil" (0-200). Multiplica todas las zonas proporcionalmente.',pos:'bottom',page:'aquecimento'},
+    {el:'#cvHeat',title:'Ventilación / Extracción / Temp.',text:'Debajo de la preforma. Controlan el enfriamiento del aire entre lámparas.',pos:'bottom',page:'aquecimento'},
+    {el:'#cvHeat',title:'Temperatura de la Preforma',text:'Ideal: 95-105°C (verde). Calibrado: zonas 50% + vent 30Hz + ext 30Hz = 100°C.',pos:'bottom',page:'aquecimento'},
+    {el:'#tabBlow',title:'Pestaña: Proceso de Soplado',text:'Simule las 8 etapas y ajuste 4 parámetros mecánicos. ¡El perfil térmico influye directamente!',pos:'bottom',switchTo:'sopro'},
+    {el:'#btnPlay',title:'Botones: Iniciar / Reiniciar',text:'Inicie la animación o haga clic en un número (1-8) para ir a una etapa específica.',pos:'bottom',page:'sopro'},
+    {el:'#tSlider',title:'Inicio de Pre-Soplado (60-300ms)',text:'Anticipado = material en hombro. Retrasado = material en base.',pos:'bottom',page:'sopro'},
+    {el:'#vSlider',title:'Tiempo de Estirado (250-500ms)',text:'Rápido = material en base. Lento = material en hombro.',pos:'bottom',page:'sopro'},
+    {el:'#fSlider',title:'Caudal de Pre-Soplado (0-10)',text:'Cerrado = material en base. Abierto = material en hombro.',pos:'bottom',page:'sopro'},
+    {el:'#pPSlider',title:'Presión de Pre-Soplado (0-8 bar)',text:'Los 5 factores (4 mecánicos + térmico) trabajan juntos y se compensan.',pos:'bottom',page:'sopro'},
+    {el:'#rNote',title:'Resultado — Diagnóstico',text:'Muestra POR QUÉ el material se concentra en una región, listando cada factor por orden de impacto.',pos:'top',page:'sopro'},
+    {el:'.flags',title:'Idiomas 🇧🇷 🇺🇸 🇪🇸',text:'Haga clic en las banderas para cambiar idioma.',pos:'bottom'},
+    {el:null,title:'¡Listo para Explorar!',text:'Pruebe: coloque Z1-Z2 en 100 y Z5-Z6 en 20, luego vea el resultado. Haga clic en ? para revisar este tour.',pos:'center'}
   ]
 };
 
 const tourBtnLabels={
-  pt:{next:'Próximo →',skip:'Pular',done:'Finalizar',restart:'Rever Tour'},
-  en:{next:'Next →',skip:'Skip',done:'Finish',restart:'Review Tour'},
-  es:{next:'Siguiente →',skip:'Saltar',done:'Finalizar',restart:'Revisar Tour'}
+  pt:{next:'Próximo →',skip:'Pular Tudo',done:'Finalizar',restart:'Rever Tour'},
+  en:{next:'Next →',skip:'Skip All',done:'Finish',restart:'Review Tour'},
+  es:{next:'Siguiente →',skip:'Saltar Todo',done:'Finalizar',restart:'Revisar Tour'}
 };
 
 let tourIdx=0;
@@ -1927,8 +1859,8 @@ function startTour(){
 document.getElementById('helpBtn').addEventListener('click',startTour);
 document.getElementById('tourBg').addEventListener('click',e=>{if(e.target===document.getElementById('tourBg')){}});
 
-// Auto-start on first visit
-try{if(!localStorage.getItem('tourDone'))setTimeout(startTour,800)}catch(e){setTimeout(startTour,800)}
+// Always auto-start tour
+setTimeout(startTour,600);
 </script>
 </body>
 </html>
