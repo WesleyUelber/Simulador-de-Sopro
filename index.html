@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Simulação de Sopro - v10.1</title>
+<title>Simulação de Sopro - v10.2</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap');
 :root{--azul:#2E75B6;--azul-escuro:#1A4B8C;--laranja:#E87722;--verde:#2E8B57;--vermelho:#C0392B;--bg:#2A4D6E;--panel:#335A7A;--border:#3E6D8E}
@@ -239,7 +239,7 @@ canvas{border-radius:12px;background:var(--panel);box-shadow:0 4px 20px rgba(0,0
 <body>
 
 <div class="topbar">
-  <h1 id="mainTitle">Simulação de Sopro - v10.1</h1>
+  <h1 id="mainTitle">Simulação de Sopro - v10.2</h1>
   <div class="tabs">
     <button class="tab active" data-tab="aquecimento" id="tabHeat">🔥 Perfil Térmico</button>
     <button class="tab" data-tab="sopro" id="tabBlow">⚙ Processo de Sopro</button>
@@ -321,8 +321,8 @@ canvas{border-radius:12px;background:var(--panel);box-shadow:0 4px 20px rgba(0,0
       <canvas id="cv" width="540" height="580"></canvas>
       <!-- Mobile fixed buttons -->
       <div class="mob-btn-fixed">
-        <button class="btn btn-play" id="mobBtnPlay" onclick="document.getElementById('btnPlay').click()">▶ Iniciar</button>
-        <button class="btn btn-reset" onclick="document.getElementById('btnReset').click()">↺ Reiniciar</button>
+        <button class="btn btn-play" id="mobBtnPlay">▶ Iniciar</button>
+        <button class="btn btn-reset" id="mobBtnReset">↺ Reiniciar</button>
       </div>
       <!-- Unified scroll control under canvas -->
       <div class="mob-scroll-wrap" id="mobWrap">
@@ -390,7 +390,23 @@ canvas{border-radius:12px;background:var(--panel);box-shadow:0 4px 20px rgba(0,0
 </div><!-- end page-sopro -->
 
 
+<!-- Help button -->
+<button class="help-btn" id="helpBtn">?</button>
+
+<!-- Tour overlay -->
+<div class="tour-overlay" id="tourOverlay">
+  <div class="tour-bg" id="tourBg"></div>
+  <div class="tour-highlight" id="tourHL"></div>
+  <div class="tour-tooltip" id="tourTip">
+    <div class="tour-step-ind" id="tourStepInd"></div>
+    <div class="tour-title" id="tourTitle"></div>
+    <div class="tour-text" id="tourText"></div>
+    <div class="tour-btns" id="tourBtns"></div>
+  </div>
+</div>
+
 <script>
+
 const cv=document.getElementById('cv'),ctx=cv.getContext('2d');
 
 
@@ -1543,7 +1559,7 @@ function drawHeat(){
 // ═══ TRANSLATIONS ═══
 let lang='pt';
 const TR={
-  pt:{title:'Simulação de Sopro - v10.1',tabHeat:'🔥 Perfil Térmico',tabBlow:'⚙ Processo de Sopro',
+  pt:{title:'Simulação de Sopro - v10.2',tabHeat:'🔥 Perfil Térmico',tabBlow:'⚙ Processo de Sopro',
     badge:'Especialista - Wesley Uelber',zona:'Zona',preForno:'Pré-Forno',forno:'Forno',perfil:'Perfil',
     mold:'MOLDE',start:'▶ Iniciar',pause:'⏸ Pausar',resume:'▶ Continuar',reset:'↺ Reiniciar',done:'✓ Completo',
     phases:['Posicionamento','Fechamento','Vedação do Bocal','Estiramento + Pré-Sopro','Sopro Final','Residência','Alívio de Sopro','Extração'],
@@ -1567,7 +1583,7 @@ const TR={
       'A pressão interna é aliviada gradualmente. A haste de estiramento sobe de volta.',
       'A vedação sobe, o molde abre e a garrafa é extraída com seu formato final.'
     ]},
-  en:{title:'Blow Molding Simulation - v10.1',tabHeat:'🔥 Thermal Profile',tabBlow:'⚙ Blow Process',
+  en:{title:'Blow Molding Simulation - v10.2',tabHeat:'🔥 Thermal Profile',tabBlow:'⚙ Blow Process',
     badge:'Specialist - Wesley Uelber',zona:'Zone',preForno:'Pre-Oven',forno:'Oven',perfil:'Profile',
     mold:'MOLD',start:'▶ Start',pause:'⏸ Pause',resume:'▶ Resume',reset:'↺ Reset',done:'✓ Done',
     phases:['Positioning','Mold Closing','Nozzle Seal','Stretching + Pre-Blow','Final Blow','Holding','Blow Relief','Extraction'],
@@ -1591,7 +1607,7 @@ const TR={
       'Internal pressure is gradually relieved. The stretch rod rises back.',
       'The seal rises, the mold opens and the bottle is extracted in its final shape.'
     ]},
-  es:{title:'Simulación de Soplado - v10.1',tabHeat:'🔥 Perfil Térmico',tabBlow:'⚙ Proceso de Soplado',
+  es:{title:'Simulación de Soplado - v10.2',tabHeat:'🔥 Perfil Térmico',tabBlow:'⚙ Proceso de Soplado',
     badge:'Especialista - Wesley Uelber',zona:'Zona',preForno:'Pre-Horno',forno:'Horno',perfil:'Perfil',
     mold:'MOLDE',start:'▶ Iniciar',pause:'⏸ Pausar',resume:'▶ Continuar',reset:'↺ Reiniciar',done:'✓ Completo',
     phases:['Posicionamiento','Cierre del Molde','Sellado de Boquilla','Estirado + Pre-Soplado','Soplado Final','Residencia','Alivio de Soplado','Extracción'],
@@ -1678,24 +1694,10 @@ function animateHeat(){drawHeat();heatAnim=requestAnimationFrame(animateHeat)}
 animateHeat();
 draw();
 
-</script>
 
-<!-- Help button -->
-<button class="help-btn" id="helpBtn" onclick="try{startTour()}catch(e){}">?</button>
 
-<!-- Tour overlay -->
-<div class="tour-overlay" id="tourOverlay">
-  <div class="tour-bg" id="tourBg"></div>
-  <div class="tour-highlight" id="tourHL"></div>
-  <div class="tour-tooltip" id="tourTip">
-    <div class="tour-step-ind" id="tourStepInd"></div>
-    <div class="tour-title" id="tourTitle"></div>
-    <div class="tour-text" id="tourText"></div>
-    <div class="tour-btns" id="tourBtns"></div>
-  </div>
-</div>
+// ═══ MERGED FROM SECOND SCRIPT ═══
 
-<script>
 // ═══ SCROLL TAB CONTROLS ═══
 (function(){
   const scroll=document.getElementById('mobScroll');
@@ -1781,4 +1783,5 @@ const tourSteps={
     {el:null,title:'¡Bienvenido al Simulador de Soplado PET!',text:'Este simulador permite ajustar el perfil térmico y los parámetros de soplado para entender cómo afectan la distribución de material en la botella.',pos:'center'},
     {el:'#tabHeat',title:'Pestaña: Perfil Térmico',text:'Aquí controla el calentamiento de la preforma. Acceda a las 9 zonas, ventilación, extracción y temperatura ambiente.',pos:'bottom'},
     {el:'#cvHeat',title:'Valores de Zonas (clic)',text:'Haga clic en el número junto a cada lámpara para editar (0-100). El editor aparece sobre el valor. Cada lado es independiente.',pos:'bottom',page:'aquecimento'},
-    {el:'#cvHeat',title:'Potencia de Lámparas',text:'Z1 = 3000W (rojo intenso),
+    {el:'#cvHeat',title:'Potencia de Lámparas',text:'Z1 = 3000W (rojo intenso), Z2/Z9 = 2000W (naranja), Z3-Z8 = 800W (amarillo).',pos:'bottom',page:'aquecimento'},
+    {el:'#cvHeat',ti
