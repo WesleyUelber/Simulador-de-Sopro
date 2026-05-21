@@ -1,0 +1,1985 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simulação de Sopro - v10.2</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap');
+:root{--azul:#2E75B6;--azul-escuro:#1A4B8C;--laranja:#E87722;--verde:#2E8B57;--vermelho:#C0392B;--bg:#2A4D6E;--panel:#335A7A;--border:#3E6D8E}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:#E8ECF1;min-height:100vh;display:flex;flex-direction:column;align-items:center}
+.topbar{width:100%;background:var(--azul-escuro);padding:10px 24px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 2px 8px rgba(0,0,0,.2)}
+.topbar h1{color:#fff;font-size:19px;font-weight:700}
+.topbar .badge{color:#6A8CA8;font-size:10px;padding:3px 8px;font-weight:500}
+.tabs{display:flex;gap:4px}
+.tab{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);color:#8AB;font-size:13px;font-weight:600;padding:8px 18px;border-radius:6px;cursor:pointer;transition:all .2s}
+.tab:hover{background:rgba(255,255,255,.15)}
+.tab.active{background:var(--azul);color:#fff;border-color:var(--azul)}
+.flags{display:flex;gap:4px;align-items:center}
+.flag{cursor:pointer;font-size:20px;opacity:.5;transition:opacity .2s;border:none;background:none;padding:2px}
+.flag:hover,.flag.active{opacity:1}
+.page{width:100%}
+.zone-row{display:flex;align-items:center;gap:6px;margin-bottom:6px}
+.zone-label{font-size:10px;font-weight:600;color:#8AB;width:30px;text-align:right}
+.zone-input{width:52px;background:#274A68;border:1px solid var(--border);color:#fff;font-size:12px;font-weight:700;text-align:center;padding:4px 2px;border-radius:4px;font-family:'DM Sans'}
+.zone-input:focus{border-color:var(--azul);outline:none}
+.zone-unit{font-size:10px;color:#6A8CA8;font-weight:500}
+.zone-toggle{width:28px;height:16px;border-radius:8px;border:none;cursor:pointer;transition:all .2s;position:relative;padding:0}
+.zone-toggle.on{background:var(--azul)}
+.zone-toggle.off{background:#444}
+
+/* Blow page layout */
+.blow-row{display:flex;gap:14px;padding:14px 20px;width:100%;margin:0 auto;align-items:stretch;box-sizing:border-box}
+.blow-left{flex:1;min-width:260px;display:flex;flex-direction:column}
+.blow-center{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;gap:10px}
+.blow-right{flex:1;min-width:280px;display:flex;flex-direction:column}
+.blow-panel-full{display:flex;flex-direction:column;height:100%;box-sizing:border-box}
+.info-section{margin-bottom:8px}
+.phase-btns-compact{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:10px}
+.phase-btns-compact .phase-btn{font-size:12px;padding:14px 6px;border-radius:8px;text-align:center;min-width:0;line-height:1.3}
+.phase-btns-compact .phase-btn .num{font-size:20px;display:block;margin-bottom:2px}
+.phase-btns-compact .phase-btn.active{background:var(--azul);color:#fff}
+/* Unified scroll control - tabs + panel in one card */
+.mob-scroll-wrap{display:block;width:100%;margin:0 auto;box-sizing:border-box}
+.mob-card{background:var(--panel);border-radius:10px;overflow:hidden;box-shadow:0 4px 16px rgba(0,0,0,.25)}
+.mob-tabs{display:flex;gap:0;border-bottom:1px solid var(--border);padding:0}
+.mob-tab{flex:1;padding:12px 10px;background:transparent;color:#6A8CA8;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;border:none;cursor:pointer;text-align:center;border-bottom:3px solid transparent;transition:all .15s;white-space:nowrap}
+.mob-tab.active{color:#fff;border-bottom-color:var(--azul);background:rgba(46,117,182,.1)}
+.mob-scroll{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.mob-scroll::-webkit-scrollbar{display:none}
+.mob-panel{min-width:100%;scroll-snap-align:start;padding:16px 20px;box-sizing:border-box;display:flex;flex-direction:column;align-items:center}
+.mob-panel .slider-group{max-width:340px;width:100%;margin-bottom:6px}
+.mob-panel .slider-hdr span{font-size:13px}
+.mob-panel .slider-val{font-size:17px!important}
+.mob-panel .slider-hints{font-size:10px}
+.mob-panel .timing-badge{font-size:11px;padding:3px 12px}
+.mob-panel .presets{gap:5px;margin-top:6px;display:flex;flex-wrap:wrap;justify-content:center}
+.mob-panel .preset,.mob-panel .preset-v,.mob-panel .preset-f,.mob-panel .preset-p{padding:6px 12px;font-size:11px}
+.mob-panel input[type=range]{width:100%}
+
+/* Left panel controls */
+.panel-card{background:var(--panel);border-radius:12px;padding:18px;box-shadow:0 4px 16px rgba(0,0,0,.25)}
+.panel-title{font-size:15px;font-weight:700;color:#fff;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px}
+.panel-title .icon{font-size:18px}
+
+/* Phase selector */
+.phase-btns{display:grid;grid-template-columns:1fr 1fr;gap:5px}
+.phase-btn{padding:8px 6px;border:2px solid var(--border);border-radius:8px;background:var(--panel);color:#7A9AB5;font-family:'DM Sans',sans-serif;font-size:11px;font-weight:600;cursor:pointer;transition:all .15s;text-align:center;line-height:1.2}
+.phase-btn:hover{border-color:var(--azul);color:#C8D8E8;background:#234058}
+.phase-btn.active{border-color:var(--azul);background:var(--azul);color:#fff}
+.phase-btn .num{display:block;font-size:16px;font-weight:700;margin-bottom:1px}
+
+.btn{padding:11px 20px;border:none;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:all .15s}
+.btn-play{background:var(--azul);color:#fff;flex:1}.btn-play:hover{background:var(--azul-escuro)}
+.btn-reset{background:var(--border);color:#AAC0D4;flex:1}.btn-reset:hover{background:#264A68;color:#fff}
+.btn-row{display:flex;gap:8px;margin-top:12px}
+
+/* Pre-blow slider */
+.slider-group{margin-bottom:4px}
+.slider-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.slider-hdr span{font-size:12px;font-weight:600;color:#6A8CA8;text-transform:uppercase;letter-spacing:.06em}
+.slider-val{font-size:18px;font-weight:700;min-width:40px;text-align:right}
+.slider-val.early{color:var(--verde)}.slider-val.late{color:var(--vermelho)}.slider-val.normal{color:var(--azul)}
+input[type=range]{-webkit-appearance:none;width:100%;height:8px;border-radius:4px;background:linear-gradient(to right,var(--verde),var(--azul),var(--vermelho));outline:none;cursor:pointer}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 2px 6px rgba(0,0,0,.4);cursor:pointer}
+input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 2px 6px rgba(0,0,0,.4);cursor:pointer;border:none}
+.slider-hints{display:flex;justify-content:space-between;font-size:10px;color:#5A7A94;margin-top:3px}
+.timing-badge{display:inline-block;padding:4px 12px;border-radius:16px;font-size:12px;font-weight:700;margin-top:5px}
+.timing-badge.early{background:rgba(46,139,87,.2);color:var(--verde);border:1px solid var(--verde)}
+.timing-badge.normal{background:rgba(46,117,182,.2);color:var(--azul);border:1px solid var(--azul)}
+.timing-badge.late{background:rgba(192,57,43,.2);color:var(--vermelho);border:1px solid var(--vermelho)}
+
+.presets{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
+.preset,.preset-v,.preset-f,.preset-p{padding:6px 12px;border:1px solid var(--border);border-radius:6px;background:var(--panel);color:#6A8CA8;font-size:11px;font-weight:600;cursor:pointer;transition:all .15s}
+.preset:hover,.preset-v:hover,.preset-f:hover,.preset-p:hover{border-color:var(--azul);color:#fff;background:#234058}
+
+/* Canvas */
+.canvas-col{flex:1;display:flex;flex-direction:column;align-items:center}
+canvas{border-radius:12px;background:var(--panel);box-shadow:0 4px 20px rgba(0,0,0,.35)}
+
+/* Right panel */
+
+.phase-indicator{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.phase-dot{width:13px;height:13px;border-radius:50%;flex-shrink:0}
+.phase-name{font-size:17px;font-weight:700;color:#fff}
+.phase-step{font-size:10px;color:#6A8CA8;text-transform:uppercase;letter-spacing:.08em}
+.info-label{font-size:11px;font-weight:600;color:#6A8CA8;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;margin-top:10px}
+.info-value{font-size:14px;color:#C8D8E8;line-height:1.6}
+
+.params-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:6px}
+.param-box{background:#234058;border-radius:8px;padding:8px 8px;text-align:center}
+.param-val{font-size:18px;font-weight:700;color:var(--azul)}
+.param-unit{font-size:9px;color:#6A8CA8}
+
+.timeline{display:flex;gap:3px;margin-top:10px;padding-top:10px;border-top:1px solid var(--border)}
+.timeline-step{flex:1;height:5px;border-radius:3px;background:var(--border);transition:background .3s;cursor:pointer}
+.timeline-step:hover{background:#2A5A7A}
+.timeline-step.active{background:var(--azul)}
+.timeline-step.done{background:var(--verde)}
+
+/* Distribution bars */
+.bar-row{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.bar-label{font-size:14px;color:#6A8CA8;width:65px;text-align:right;flex-shrink:0;font-weight:600}
+.bar-track{flex:1;height:26px;background:#234058;border-radius:5px;overflow:hidden}
+.bar-fill{height:100%;border-radius:5px;transition:width .4s}
+.bar-pct{font-size:16px;font-weight:700;color:#fff;width:48px;flex-shrink:0}
+.result-note{margin-top:12px;font-size:14px;color:#C0D0E0;line-height:1.8;padding:14px 16px;border-radius:8px;border-left:4px solid var(--azul);background:rgba(46,117,182,.08)}
+.result-note.warn{border-left-color:var(--vermelho);background:rgba(192,57,43,.08)}
+.result-note.good{border-left-color:var(--verde);background:rgba(46,139,87,.08)}
+.result-note.good{border-left-color:var(--verde);background:rgba(46,139,87,.06)}
+
+@media(max-width:700px){
+  body{overflow-x:hidden}
+  .topbar{flex-wrap:wrap;gap:4px;padding:8px 12px}
+  .topbar h1{font-size:14px;width:100%;text-align:center;order:1}
+  .tabs{width:100%;order:3;gap:3px;justify-content:center}
+  .tab{font-size:11px;padding:8px 10px;flex:1;text-align:center}
+  .flags{order:2}.flag{font-size:18px}
+  .badge{font-size:9px;padding:3px 8px;order:2}
+  #page-aquecimento>div{padding:0!important;overflow-x:hidden}
+  #cvHeat{width:100%;height:auto;display:block}
+  .blow-row{flex-direction:column;align-items:stretch;padding:6px 8px!important;gap:0}
+  .blow-left,.blow-right{width:100%;min-width:unset;max-width:unset;flex:unset}
+  .blow-center{width:100%;order:1}
+  .blow-left{order:3}
+  .blow-right{order:4}
+  .blow-panel-full{height:auto}
+  #cv{width:100%;height:auto}
+  .mob-btn-fixed{display:flex!important;gap:8px;padding:8px;position:sticky;top:0;z-index:50;background:var(--bg);border-radius:0 0 10px 10px;margin-bottom:6px}
+  .mob-btn-fixed .btn{flex:1;padding:12px 10px;font-size:14px}
+  .blow-left .btn-row{display:none}
+  .mob-scroll-wrap{padding:0;margin-top:6px}
+  .mob-card{border-radius:10px}
+  .mob-tabs{padding:0}
+  .mob-tab{font-size:11px;padding:10px 6px}
+  .mob-panel{padding:14px 12px}
+  .mob-panel .slider-group{max-width:100%}
+  .mob-panel .slider-hdr span{font-size:12px}
+  .mob-panel .slider-val{font-size:16px!important}
+  .mob-panel .slider-hints{font-size:9px}
+  .mob-panel .timing-badge{font-size:10px;padding:3px 10px}
+  .mob-panel .presets{gap:4px;justify-content:center}
+  .mob-panel .preset,.mob-panel .preset-v,.mob-panel .preset-f,.mob-panel .preset-p{padding:8px 14px;font-size:11px}
+  .mob-panel input[type=range]{height:10px}
+  .mob-panel input[type=range]::-webkit-slider-thumb{width:26px;height:26px}
+  .panel-card{padding:12px;margin-bottom:6px;border-radius:10px}
+  .panel-title{font-size:13px;margin-bottom:8px;padding-bottom:6px}
+  .phase-indicator{margin-bottom:8px}
+  .phase-name{font-size:15px}
+  .phase-step{font-size:9px}
+  .info-label{font-size:9px;margin-top:8px}
+  .info-value{font-size:12px;line-height:1.5}
+  .params-grid{gap:4px}
+  .param-box{padding:8px 6px}
+  .param-val{font-size:16px}
+  .param-unit{font-size:8px}
+  .phase-btns-compact{grid-template-columns:repeat(4,1fr);gap:4px}
+  .phase-btns-compact .phase-btn{font-size:9px;padding:8px 3px}
+  .phase-btns-compact .phase-btn .num{font-size:15px}
+  .btn{padding:10px 14px;font-size:12px;border-radius:8px}
+  .btn-row{gap:8px}
+  .bar-row{gap:6px;margin-bottom:8px}
+  .bar-label{font-size:12px;width:50px}
+  .bar-pct{font-size:13px;width:36px}
+  .bar-track{height:18px;border-radius:4px}
+  .bar-fill{border-radius:4px}
+  .result-note{font-size:12px;padding:10px 12px;line-height:1.6}
+  .help-btn{width:48px;height:48px;font-size:20px;bottom:14px;right:14px;z-index:9500}
+  .tour-overlay{overflow-y:auto}
+  .tour-tooltip{position:fixed!important;max-width:none!important;min-width:0!important;padding:16px 18px;border-radius:12px;left:12px!important;right:12px!important;width:auto!important;box-sizing:border-box}
+  .tour-tooltip.top,.tour-tooltip.bottom,.tour-tooltip.left{left:12px!important;right:12px!important;width:auto!important}
+  .tour-tooltip::before{display:none}
+  .tour-title{font-size:15px;margin-bottom:8px}
+  .tour-text{font-size:13px;line-height:1.7;margin-bottom:14px}
+  .tour-step-ind{font-size:11px;margin-bottom:6px}
+  .tour-btns{gap:10px}
+  .tour-btn{padding:10px 20px;font-size:13px;border-radius:8px}
+  .tour-btn-skip{flex:1;text-align:center}
+  .tour-btn-next,.tour-btn-done{flex:1;text-align:center}
+  .tour-highlight{border-radius:6px;transition:all .3s ease}
+}
+@media(min-width:701px){
+  .mob-btn-fixed{display:none!important}
+}
+/* Mobile sticky buttons */
+.mobile-sticky-btns{display:none;gap:8px;padding:8px 12px;background:var(--panel);border-radius:10px;margin-bottom:6px}
+.mobile-sticky-btns .btn{flex:1;padding:12px 10px;font-size:14px}
+@media(min-width:701px){.mobile-sticky-btns{display:none!important}}
+
+.mob-panel .slider-group{margin-bottom:10px}
+.mob-panel .slider-hdr span{font-size:11px}
+.mob-panel .slider-val{font-size:15px!important}
+.mob-panel .slider-hints{font-size:9px}
+.mob-panel .timing-badge{font-size:10px;padding:3px 10px}
+.mob-panel .presets{display:flex;gap:4px;flex-wrap:wrap;margin-top:6px}
+.mob-panel .preset,.mob-panel .preset-v,.mob-panel .preset-f,.mob-panel .preset-p{padding:6px 10px;font-size:10px}
+.mob-panel input[type=range]{height:10px}
+/* Tour overlay */
+.tour-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;z-index:9998;pointer-events:all}
+.tour-bg{position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.65)}
+.tour-highlight{position:absolute;border-radius:8px;box-shadow:0 0 0 9999px rgba(0,0,0,.65),0 0 20px rgba(46,117,182,.5);z-index:9999;pointer-events:none;transition:all .4s ease}
+.tour-tooltip{position:absolute;z-index:10000;background:#274A68;border:1px solid #2E75B6;border-radius:12px;padding:16px 18px;max-width:340px;min-width:220px;box-shadow:0 8px 30px rgba(0,0,0,.5);pointer-events:all}
+.tour-tooltip::before{content:'';position:absolute;width:12px;height:12px;background:#274A68;border:1px solid #2E75B6;transform:rotate(45deg)}
+.tour-tooltip.top::before{bottom:-7px;left:30px;border-top:none;border-left:none}
+.tour-tooltip.bottom::before{top:-7px;left:30px;border-bottom:none;border-right:none}
+.tour-tooltip.left::before{right:-7px;top:20px;border-bottom:none;border-left:none}
+.tour-title{font-size:14px;font-weight:700;color:#fff;margin-bottom:6px}
+.tour-text{font-size:12px;color:#A0B8D0;line-height:1.6;margin-bottom:14px}
+.tour-step-ind{font-size:10px;color:#5A7A94;margin-bottom:8px}
+.tour-btns{display:flex;gap:8px;justify-content:flex-end}
+.tour-btn{padding:7px 16px;border:none;border-radius:6px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;transition:all .15s}
+.tour-btn-next{background:#2E75B6;color:#fff}.tour-btn-next:hover{background:#1A4B8C}
+.tour-btn-skip{background:transparent;color:#6A8CA8;border:1px solid #2A5070}.tour-btn-skip:hover{color:#fff;border-color:#fff}
+.tour-btn-done{background:#2E8B57;color:#fff}.tour-btn-done:hover{background:#1F6B42}
+.help-btn{position:fixed;bottom:20px;right:20px;width:44px;height:44px;border-radius:50%;background:#2E75B6;color:#fff;border:2px solid #4A9AD8;font-size:20px;font-weight:700;cursor:pointer;z-index:9000;box-shadow:0 4px 15px rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;transition:all .2s;-webkit-tap-highlight-color:rgba(0,0,0,0);touch-action:manipulation}
+.help-btn:hover,.help-btn:active{background:#1A4B8C;transform:scale(1.1)}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <h1 id="mainTitle">Simulação de Sopro - v10.2</h1>
+  <div class="tabs">
+    <button class="tab active" data-tab="aquecimento" id="tabHeat">🔥 Perfil Térmico</button>
+    <button class="tab" data-tab="sopro" id="tabBlow">⚙ Processo de Sopro</button>
+  </div>
+  <div style="display:flex;align-items:center;gap:10px">
+    <div class="flags">
+      <button class="flag active" data-lang="pt"><svg width="24" height="16" viewBox="0 0 24 16"><rect width="24" height="16" fill="#009739" rx="2"/><polygon points="12,2 22,8 12,14 2,8" fill="#FEDD00"/><circle cx="12" cy="8" r="3.5" fill="#012169"/><circle cx="12" cy="8" r="3" fill="#012169"/></svg></button>
+      <button class="flag" data-lang="en"><svg width="24" height="16" viewBox="0 0 24 16"><rect width="24" height="16" fill="#B22234" rx="2"/><rect y="1.23" width="24" height="1.23" fill="#fff"/><rect y="3.69" width="24" height="1.23" fill="#fff"/><rect y="6.15" width="24" height="1.23" fill="#fff"/><rect y="8.62" width="24" height="1.23" fill="#fff"/><rect y="11.08" width="24" height="1.23" fill="#fff"/><rect y="13.54" width="24" height="1.23" fill="#fff"/><rect width="10" height="8.6" fill="#3C3B6E"/></svg></button>
+      <button class="flag" data-lang="es"><svg width="24" height="16" viewBox="0 0 24 16"><rect width="24" height="4" fill="#AA151B" rx="2"/><rect y="4" width="24" height="8" fill="#F1BF00"/><rect y="12" width="24" height="4" fill="#AA151B"/></svg></button>
+    </div>
+    <span class="badge" id="badgeSpec">Especialista - Wesley Uelber</span>
+  </div>
+</div>
+
+<!-- PAGE 1: Aquecimento -->
+<div class="page" id="page-aquecimento">
+  <div style="display:flex;justify-content:center;padding:10px;overflow-x:auto">
+    <canvas id="cvHeat" width="740" height="740"></canvas>
+  </div>
+</div>
+
+<!-- PAGE 2: Sopro -->
+<div class="page" id="page-sopro" style="display:none">
+
+  <!-- 3-COLUMN: Info+Etapas | Canvas+Controls | Distribuição -->
+  <div class="blow-row">
+    <div class="blow-left">
+      <div class="panel-card blow-panel-full">
+        <!-- Phase indicator -->
+        <div class="phase-indicator">
+          <div class="phase-dot" id="pDot" style="background:#2E75B6"></div>
+          <div><div class="phase-step" id="pStep">—</div><div class="phase-name" id="pName">Aguardando...</div></div>
+        </div>
+
+        <!-- What's happening -->
+        <div class="info-section">
+          <div class="info-label" id="ilWhat">O que está acontecendo</div>
+          <div class="info-value" id="pDesc">Selecione uma etapa ou clique em "Iniciar".</div>
+        </div>
+
+        <!-- Parameters -->
+        <div class="info-label" id="ilParams">Parâmetros ativos</div>
+        <div class="params-grid">
+          <div class="param-box"><div class="param-val" id="pPressao">0</div><div class="param-unit">bar (<span id="puPres">pressão</span>)</div></div>
+          <div class="param-box"><div class="param-val" id="pHaste">0%</div><div class="param-unit"><span id="puRod">haste</span> (<span id="puStroke">curso</span>)</div></div>
+          <div class="param-box"><div class="param-val" id="pTemp">~105</div><div class="param-unit">°C (<span id="puPf">pré-forma</span>)</div></div>
+          <div class="param-box"><div class="param-val" id="pMolde">8</div><div class="param-unit">°C (<span id="puMold">molde</span>)</div></div>
+        </div>
+
+        <!-- Divider -->
+        <div style="border-top:1px solid var(--border);margin:8px 0"></div>
+
+        <!-- Etapas grid -->
+        <div class="phase-btns-compact">
+          <button class="phase-btn mob-ph" data-phase="0"><span class="num">1</span>Posic.</button>
+          <button class="phase-btn mob-ph" data-phase="1"><span class="num">2</span>Fecha.</button>
+          <button class="phase-btn mob-ph" data-phase="2"><span class="num">3</span>Vedação</button>
+          <button class="phase-btn mob-ph" data-phase="3"><span class="num">4</span>Estir.</button>
+          <button class="phase-btn mob-ph" data-phase="4"><span class="num">5</span>Sopro</button>
+          <button class="phase-btn mob-ph" data-phase="5"><span class="num">6</span>Resid.</button>
+          <button class="phase-btn mob-ph" data-phase="6"><span class="num">7</span>Alívio</button>
+          <button class="phase-btn mob-ph" data-phase="7"><span class="num">8</span>Extração</button>
+        </div>
+
+        <!-- Buttons -->
+        <div class="btn-row desktop-btns" style="margin-top:auto;padding-top:8px">
+          <button class="btn btn-play" id="btnPlay">▶ Iniciar</button>
+          <button class="btn btn-reset" id="btnReset">↺ Reiniciar</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="blow-center">
+      <!-- Mobile sticky buttons -->
+      <div class="mobile-sticky-btns">
+        <button class="btn btn-play">▶ Iniciar</button>
+        <button class="btn btn-reset">↺ Reiniciar</button>
+      </div>
+      <canvas id="cv" width="540" height="580"></canvas>
+      <!-- Mobile fixed buttons -->
+      <div class="mob-btn-fixed">
+        <button class="btn btn-play" id="mobBtnPlay">▶ Iniciar</button>
+        <button class="btn btn-reset" id="mobBtnReset">↺ Reiniciar</button>
+      </div>
+      <!-- Unified scroll control under canvas -->
+      <div class="mob-scroll-wrap" id="mobWrap">
+        <div class="mob-card">
+          <div class="mob-tabs">
+            <button class="mob-tab active" data-mi="0">🎛 Pré-Sopro</button>
+            <button class="mob-tab" data-mi="1">⚡ Estir.</button>
+            <button class="mob-tab" data-mi="2">💨 Vazão</button>
+            <button class="mob-tab" data-mi="3">🔵 Pressão</button>
+          </div>
+          <div class="mob-scroll" id="mobScroll">
+            <div class="mob-panel">
+              <div class="slider-group">
+                <div class="slider-hdr"><span class="slbl" data-k="time">Tempo</span><span class="slider-val normal" id="mtVal">180 ms</span></div>
+                <input type="range" id="mtSlider" min="60" max="300" step="10" value="180">
+                <div class="slider-hints"><span id="hTL">60 ms (antecipado)</span><span id="hTR">300 ms (atrasado)</span></div>
+                <div style="text-align:center;margin-top:4px"><span class="timing-badge normal" id="mtBadge">Normal</span></div>
+              </div>
+              <div class="presets"><button class="preset" data-t="60">60</button><button class="preset" data-t="120">120</button><button class="preset" data-t="180">180</button><button class="preset" data-t="240">240</button><button class="preset" data-t="300">300</button></div>
+            </div>
+            <div class="mob-panel">
+              <div class="slider-group">
+                <div class="slider-hdr"><span class="slbl" data-k="speed">Estiramento</span><span class="slider-val normal" id="mvVal">375 ms</span></div>
+                <input type="range" id="mvSlider" min="250" max="500" step="10" value="375">
+                <div class="slider-hints"><span id="hVL">250 ms (rápida)</span><span id="hVR">500 ms (lenta)</span></div>
+                <div style="text-align:center;margin-top:4px"><span class="timing-badge normal" id="mvBadge">Normal</span></div>
+              </div>
+              <div class="presets"><button class="preset-v" data-v="250">250</button><button class="preset-v" data-v="310">310</button><button class="preset-v" data-v="375">375</button><button class="preset-v" data-v="440">440</button><button class="preset-v" data-v="500">500</button></div>
+            </div>
+            <div class="mob-panel">
+              <div class="slider-group">
+                <div class="slider-hdr"><span class="slbl" data-k="flow">Vazão</span><span class="slider-val normal" id="mfVal">5</span></div>
+                <input type="range" id="mfSlider" min="0" max="10" step="1" value="5">
+                <div class="slider-hints"><span id="hFL">0 (fechada)</span><span>5</span><span id="hFR">10 (aberta)</span></div>
+                <div style="text-align:center;margin-top:4px"><span class="timing-badge normal" id="mfBadge">Normal</span></div>
+              </div>
+              <div class="presets"><button class="preset-f" data-f="0">0</button><button class="preset-f" data-f="3">3</button><button class="preset-f" data-f="5">5</button><button class="preset-f" data-f="7">7</button><button class="preset-f" data-f="10">10</button></div>
+            </div>
+            <div class="mob-panel">
+              <div class="slider-group">
+                <div class="slider-hdr"><span class="slbl" data-k="pressure">Pressão</span><span class="slider-val normal" id="mpVal">4 bar</span></div>
+                <input type="range" id="mpSlider" min="0" max="8" step="1" value="4">
+                <div class="slider-hints"><span>0 bar</span><span>4 bar</span><span>8 bar</span></div>
+                <div style="text-align:center;margin-top:4px"><span class="timing-badge normal" id="mpBadge">Normal</span></div>
+              </div>
+              <div class="presets"><button class="preset-p" data-p="0">0</button><button class="preset-p" data-p="2">2</button><button class="preset-p" data-p="4">4</button><button class="preset-p" data-p="6">6</button><button class="preset-p" data-p="8">8</button></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="blow-right">
+      <div class="panel-card blow-panel-full">
+        <div class="panel-title" id="ptDist"><span class="icon">📊</span> Distribuição de Material</div>
+        <div style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:12px">
+          <div class="bar-row"><span class="bar-label" id="blOmbro">Ombro</span><div class="bar-track"><div class="bar-fill" id="barO" style="width:33%;background:var(--laranja)"></div></div><span class="bar-pct" id="pctO">33%</span></div>
+          <div class="bar-row"><span class="bar-label" id="blCentro">Centro</span><div class="bar-track"><div class="bar-fill" id="barC" style="width:34%;background:var(--azul)"></div></div><span class="bar-pct" id="pctC">34%</span></div>
+          <div class="bar-row"><span class="bar-label" id="blBase">Base</span><div class="bar-track"><div class="bar-fill" id="barB" style="width:33%;background:var(--verde)"></div></div><span class="bar-pct" id="pctB">33%</span></div>
+        </div>
+        <div class="result-note good" id="rNote"><strong>Resultado:</strong><br>Distribuição equilibrada — todos os parâmetros compensados.<br><br><em style="color:#6A8CA8;font-size:12px">Exemplos: aumente o pré-sopro para 300ms e veja o material ir pra base. Ou coloque Z1-Z2 em 100 no perfil térmico e veja o efeito do calor.</em></div>
+      </div>
+    </div>
+  </div>
+</div><!-- end page-sopro -->
+
+
+<!-- Help button -->
+<button class="help-btn" id="helpBtn">?</button>
+
+<!-- Tour overlay -->
+<div class="tour-overlay" id="tourOverlay">
+  <div class="tour-bg" id="tourBg"></div>
+  <div class="tour-highlight" id="tourHL"></div>
+  <div class="tour-tooltip" id="tourTip">
+    <div class="tour-step-ind" id="tourStepInd"></div>
+    <div class="tour-title" id="tourTitle"></div>
+    <div class="tour-text" id="tourText"></div>
+    <div class="tour-btns" id="tourBtns"></div>
+  </div>
+</div>
+
+<script>
+
+const cv=document.getElementById('cv'),ctx=cv.getContext('2d');
+
+
+const W=cv.width,H=cv.height,CX=W/2,MT=25;
+function L(a,b,t){return a+(b-a)*Math.max(0,Math.min(1,t))}
+
+// Mold profile
+const MP=[{x:18,y:57},{x:18,y:75},{x:22,y:90},{x:38,y:112},{x:58,y:132},{x:72,y:152},{x:80,y:172},
+  {x:83,y:198},{x:83,y:300},{x:83,y:370},{x:83,y:400}];
+
+const PD=[
+  {name:"Posicionamento",step:"Etapa 1 de 8",desc:"A pré-forma aquecida (~105°C) é posicionada dentro do molde refrigerado a 8°C.",color:"#2E75B6",dur:140},
+  {name:"Fechamento do Molde",step:"Etapa 2 de 8",desc:"A prensa fecha as duas metades do molde e o fundo petalóide sobe, encaixando por baixo. O bocal fica preso na parte superior.",color:"#2E75B6",dur:100},
+  {name:"Vedação do Bocal",step:"Etapa 3 de 8",desc:"A vedação cilíndrica desce sobre o bocal da pré-forma, selando a entrada de ar. A haste de estiramento passa por dentro da vedação.",color:"#2E75B6",dur:80},
+  {name:"Estiramento + Pré-Sopro",step:"Etapa 4 de 8",desc:"A haste desce esticando a pré-forma axialmente, enquanto o ar de baixa pressão inicia a expansão radial. Estes dois movimentos ocorrem simultaneamente.",color:"#E87722",dur:300},
+  {name:"Sopro Final",step:"Etapa 5 de 8",desc:"Ar de alta pressão (30 bar) pressiona o material contra as paredes do molde refrigerado. A garrafa adquire seu formato definitivo.",color:"#2E8B57",dur:180},
+  {name:"Residência",step:"Etapa 6 de 8",desc:"A garrafa permanece pressurizada dentro do molde refrigerado. O tempo de residência permite o resfriamento e a cristalização uniforme do PET.",color:"#2E8B57",dur:160},
+  {name:"Alívio de Sopro",step:"Etapa 7 de 8",desc:"A pressão interna é aliviada gradualmente. A haste de estiramento sobe de volta. A garrafa já está formada e resfriada.",color:"#2E8B57",dur:200},
+  {name:"Extração",step:"Etapa 8 de 8",desc:"A vedação sobe, o molde abre e a garrafa é extraída com seu formato final.",color:"#2E8B57",dur:140}
+];
+
+// State
+let S={ph:-1,fr:0,pl:false,an:null,sT:0,bT:0,fT:0,mO:1,tm:180,vS:375,rR:0,sP:0,fQ:5,pP:4};
+let BShape={pts:[],baseY:0,cornerR:0,petalD:0,wallX:17,nY:0,shapeT:0};
+
+// ═══ DRAWING ═══
+function dGrid(){ctx.strokeStyle='rgba(46,117,182,0.05)';ctx.lineWidth=.5;
+  for(let x=0;x<W;x+=20){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke()}
+  for(let y=0;y<H;y+=20){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke()}}
+
+function dMold(){ctx.save();const o=S.mO*65;
+  // Bottom mold position - rises independently
+  const bottomY=MT+415;const bottomDrop=S.mO*50;
+  const bMoldTop=bottomY+bottomDrop;
+  // Side mold bottom edge - fixed position
+  const sideBottom=MT+415;
+
+  // Mold cavity profile
+  const moldCavity=[
+    {x:18,y:57},{x:18,y:75},{x:22,y:90},{x:38,y:112},{x:58,y:132},{x:72,y:152},{x:80,y:172},
+    {x:83,y:198},{x:83,y:300},{x:83,y:370},{x:83,y:400}
+  ];
+  // Side mold halves - fixed bottom, open sideways
+  for(let s=-1;s<=1;s+=2){ctx.beginPath();ctx.moveTo(CX+s*(moldCavity[0].x+o),MT+moldCavity[0].y);
+    for(let i=1;i<moldCavity.length;i++)ctx.lineTo(CX+s*(moldCavity[i].x+o),MT+moldCavity[i].y);
+    // Bottom edge of side mold (fixed, doesn't follow bottom plate)
+    ctx.lineTo(CX+s*(83+o),sideBottom);
+    ctx.lineTo(CX+s*(115+o),sideBottom);
+    ctx.lineTo(CX+s*(115+o),MT+50);
+    ctx.closePath();
+    const g=ctx.createLinearGradient(CX-115,0,CX+115,0);
+    g.addColorStop(0,'#3A5068');g.addColorStop(.5,'#4A6A85');g.addColorStop(1,'#3A5068');
+    ctx.fillStyle=g;ctx.fill();ctx.strokeStyle='#5A8AAA';ctx.lineWidth=1.5;ctx.stroke()}
+
+  // Bottom mold plate - rises from below, only touches sides when closed
+  ctx.beginPath();
+  ctx.moveTo(CX-115,bMoldTop);
+  ctx.lineTo(CX+115,bMoldTop);
+  ctx.lineTo(CX+115,bMoldTop+25);
+  ctx.lineTo(CX-115,bMoldTop+25);
+  ctx.closePath();
+  ctx.fillStyle='#3D5570';ctx.fill();ctx.strokeStyle='#5A8AAA';ctx.lineWidth=1.5;ctx.stroke();
+
+  // Petaloid bump — gentle dome on bottom plate
+  const petalH=12;
+  ctx.beginPath();
+  ctx.moveTo(CX-50,bMoldTop);
+  ctx.bezierCurveTo(CX-30,bMoldTop,CX-20,bMoldTop-petalH,CX,bMoldTop-petalH);
+  ctx.bezierCurveTo(CX+20,bMoldTop-petalH,CX+30,bMoldTop,CX+50,bMoldTop);
+  ctx.closePath();
+  const pg=ctx.createLinearGradient(CX,bMoldTop,CX,bMoldTop-petalH);
+  pg.addColorStop(0,'#3D5570');pg.addColorStop(1,'#506880');
+  ctx.fillStyle=pg;ctx.fill();ctx.strokeStyle='#5A8AAA';ctx.lineWidth=1;ctx.stroke();
+
+  // Cooling channels
+  if(S.mO<.05){ctx.strokeStyle='rgba(100,180,255,0.1)';ctx.lineWidth=2;
+    for(let y=145;y<395;y+=36)for(let s=-1;s<=1;s+=2){ctx.beginPath();ctx.arc(CX+s*100,MT+y,5,0,Math.PI*2);ctx.stroke()}}
+  ctx.restore()}
+
+function dBottle(){
+  const pw=17,nY=MT+57,tS=L(78,338,S.sT),nP=48,pts=[];
+  // Pre-compute outside loop
+  const _tn=tNorm(),_vn=vNorm(),_fn=fNorm(),_pn=pNorm();
+  const _hpB=getHeatProfile();
+  const _hpAvg=(_hpB.shoulder+_hpB.center+_hpB.base)/3||1;
+  const _hpD=((_hpB.shoulder-_hpAvg)/Math.max(20,_hpAvg)-(_hpB.base-_hpAvg)/Math.max(20,_hpAvg))*5;
+  const _combo=_tn+_vn+_fn*2.5+_pn*2.5+_hpD;
+  for(let i=0;i<=nP;i++){
+    const t=i/nP,y=nY+t*tS;let mR=pw;const rY=y-MT;
+    let found=false;
+    for(let j=0;j<MP.length-1;j++){
+      if(rY>=MP[j].y&&rY<=MP[j+1].y){mR=L(MP[j].x,MP[j+1].x,(rY-MP[j].y)/(MP[j+1].y-MP[j].y));found=true;break}}
+    if(!found){if(rY>MP[MP.length-1].y)mR=MP[MP.length-1].x;else if(rY<MP[0].y)mR=MP[0].x}
+    let tx;
+    if(t<.02)tx=pw;
+    else{
+      const bp=Math.max(S.bT,S.fT);const pR=L(pw,pw*.5,S.sT);let lb=bp;
+      const timingEffect=1-S.fT;
+      const combo=_combo;
+      if(combo!==0&&timingEffect>0){
+        if(combo<0){if(t<.35)lb=Math.min(1,bp*L(1.3,1,(combo+10)/10)*timingEffect+bp*(1-timingEffect));if(t>.7)lb=bp*L(.65,1,(combo+10)/10)*timingEffect+bp*(1-timingEffect)}
+        else{if(t<.35)lb=bp*L(.65,1,(10-combo)/10)*timingEffect+bp*(1-timingEffect);if(t>.7)lb=Math.min(1,bp*L(1.3,1,(10-combo)/10)*timingEffect+bp*(1-timingEffect))}}
+      tx=L(pR,mR,lb);
+      if(S.bT>0&&S.fT<.2&&combo<-2){tx=L(tx,mR*.75,Math.sin(t*Math.PI)*S.bT*.3*Math.abs(combo)/8)}}
+    pts.push({x:Math.max(0,tx),y})}
+
+  const lastPt=pts[pts.length-1];
+  const baseY=nY+tS;
+  const blowProg=Math.max(S.bT,S.fT);
+  const petalD=L(0,12,blowProg);
+  const wallX=lastPt.x;
+  const cornerR=L(0,15,blowProg);
+  // How much the shape has transitioned from preform to bottle (0=preform, 1=bottle)
+  const shapeT=Math.min(1,S.sT*.3+blowProg*.7);
+
+  // Store shape for air particles
+  BShape={pts:pts.slice(),baseY,cornerR,petalD,wallX,nY,shapeT};
+
+  ctx.save();ctx.beginPath();
+
+  // Top: neck transition from preform width to shoulder
+  ctx.moveTo(CX+pw,nY);
+  for(const p of pts)ctx.lineTo(CX+p.x,p.y);
+
+  // Bottom shape: blend from rounded test tube to flat petaloid base
+  if(shapeT<.95){
+    // Preform: rounded semicircle bottom
+    const preR=lastPt.x; // radius of the round bottom
+    const botY=baseY;
+    // Bottle base: flat + petaloid
+    const bY=baseY+cornerR;
+    // Blend between round bottom and flat petaloid
+    const maxBotY=MT+413;
+    const roundBotY=Math.min(botY+preR*.9, maxBotY);
+    const roundCtrlY=Math.min(botY+preR*.7, maxBotY);
+    // Round bottom control points
+    const rCX1=CX+preR,rCY1=roundCtrlY;
+    const rCX2=CX-preR,rCY2=roundCtrlY;
+    // Flat bottom control points
+    const fR_x1=CX+wallX,fR_y1=bY;
+    const fL_x1=CX-wallX,fL_y1=bY;
+    // Blended curve
+    ctx.bezierCurveTo(
+      L(rCX1,fR_x1,shapeT), L(rCY1,fR_y1,shapeT),
+      L(CX,CX+wallX*.2,shapeT), L(roundBotY,bY-petalD*.8,shapeT),
+      CX, L(roundBotY,bY-petalD,shapeT)
+    );
+    ctx.bezierCurveTo(
+      L(CX,CX-wallX*.2,shapeT), L(roundBotY,bY-petalD*.8,shapeT),
+      L(rCX2,fL_x1,shapeT), L(rCY2,fL_y1,shapeT),
+      CX-lastPt.x, L(botY,baseY,shapeT)
+    );
+  } else {
+    // Full bottle: flat base with petaloid
+    const bY=baseY+cornerR;
+    ctx.quadraticCurveTo(CX+wallX,bY,CX+wallX-cornerR,bY);
+    ctx.lineTo(CX+wallX*.45,bY);
+    ctx.quadraticCurveTo(CX+wallX*.2,bY-petalD*.8,CX,bY-petalD);
+    ctx.quadraticCurveTo(CX-wallX*.2,bY-petalD*.8,CX-wallX*.45,bY);
+    ctx.lineTo(CX-wallX+cornerR,bY);
+    ctx.quadraticCurveTo(CX-wallX,bY,CX-lastPt.x,baseY);
+  }
+
+  // Left wall back up
+  for(let i=pts.length-2;i>=0;i--)ctx.lineTo(CX-pts[i].x,pts[i].y);
+  ctx.closePath();
+
+  // Color: based on heat profile from thermal page
+  const hp=getHeatProfile();
+  const hpAvg=hp.avg;
+  const g=ctx.createLinearGradient(CX,nY,CX,nY+tS);
+  if(S.fT>.8){
+    // Cooled bottle
+    g.addColorStop(0,'rgba(140,210,255,.45)');
+    g.addColorStop(1,'rgba(160,220,255,.45)');
+  } else if(blowProg>.1){
+    // During blow: color per zone heat (shoulder=top, base=bottom)
+    const zH=[hp.shoulder,hp.center,hp.base];
+    for(let z=0;z<3;z++){
+      const v=zH[z];const t2=z/2;
+      const r=Math.min(255,120+v*1.4),gC=Math.max(30,80-v*.5),b=Math.max(20,60-v*.4);
+      const a=.3+v/100*.5;
+      g.addColorStop(t2,'rgba('+Math.round(r)+','+Math.round(gC)+','+Math.round(b)+','+a+')');
+    }
+  } else {
+    // Hot preform: show heat zones vertically
+    const zH=[hp.shoulder,hp.center,hp.base];
+    for(let z=0;z<3;z++){
+      const v=zH[z];const t2=z/2;
+      const r=Math.min(255,130+v*1.3),gC=Math.max(20,60-v*.5),b=Math.max(15,50-v*.4);
+      const a=.35+v/100*.5;
+      g.addColorStop(t2,'rgba('+Math.round(r)+','+Math.round(gC)+','+Math.round(b)+','+a+')');
+    }
+  }
+  ctx.fillStyle=g;ctx.fill();
+  const avgCol=hpAvg>40?'rgba(220,80,40,.55)':hpAvg>20?'rgba(200,120,80,.45)':'rgba(100,140,200,.45)';
+  ctx.strokeStyle=S.fT>.8?'rgba(100,190,255,.65)':avgCol;
+  ctx.lineWidth=1.5;ctx.stroke();
+
+  // Material accumulation — top/bottom style
+  const blowProgress=Math.max(S.sT*.3, S.bT*.6, S.fT);
+  if(blowProgress>.05){
+    const combo2=_combo;
+    const absC=Math.abs(combo2);
+    if(absC>=0.3){
+    ctx.save();
+    const bYA=baseY+cornerR;
+    const maxBotYA=MT+413;
+    const roundBotYA=Math.min(baseY+lastPt.x*.9,maxBotYA);
+    const roundCtrlYA=Math.min(baseY+lastPt.x*.7,maxBotYA);
+
+    function drawBottomA(){
+      if(shapeT<.95){
+        const preRA=lastPt.x;
+        ctx.bezierCurveTo(L(CX+preRA,CX+wallX,shapeT),L(roundCtrlYA,bYA,shapeT),L(CX,CX+wallX*.2,shapeT),L(roundBotYA,bYA-petalD*.8,shapeT),CX,L(roundBotYA,bYA-petalD,shapeT));
+        ctx.bezierCurveTo(L(CX,CX-wallX*.2,shapeT),L(roundBotYA,bYA-petalD*.8,shapeT),L(CX-preRA,CX-wallX,shapeT),L(roundCtrlYA,bYA,shapeT),CX-lastPt.x,L(baseY,baseY,shapeT));
+      } else {
+        ctx.quadraticCurveTo(CX+wallX,bYA,CX+wallX-cornerR,bYA);ctx.lineTo(CX+wallX*.45,bYA);
+        ctx.quadraticCurveTo(CX+wallX*.2,bYA-petalD*.8,CX,bYA-petalD);
+        ctx.quadraticCurveTo(CX-wallX*.2,bYA-petalD*.8,CX-wallX*.45,bYA);ctx.lineTo(CX-wallX+cornerR,bYA);
+        ctx.quadraticCurveTo(CX-wallX,bYA,CX-lastPt.x,baseY);
+      }
+    }
+
+    ctx.beginPath();ctx.moveTo(CX+pw,nY);
+    for(const p of pts)ctx.lineTo(CX+p.x,p.y);
+    drawBottomA();
+    for(let ii=pts.length-2;ii>=0;ii--)ctx.lineTo(CX-pts[ii].x,pts[ii].y);
+    ctx.closePath();ctx.clip();
+
+    const maxTh=L(2,20,absC/5)*blowProgress;
+    const intensity=L(.1,.6,absC/5)*blowProgress;
+    ctx.lineWidth=maxTh;
+    ctx.strokeStyle='rgba(20,100,220,'+intensity+')';
+    ctx.lineCap='round';ctx.lineJoin='round';
+
+    const midIdx=Math.floor(pts.length*.5);
+
+    if(combo2>0){
+      ctx.beginPath();
+      ctx.moveTo(CX+pts[midIdx].x,pts[midIdx].y);
+      for(let ii=midIdx+1;ii<pts.length;ii++)ctx.lineTo(CX+pts[ii].x,pts[ii].y);
+      drawBottomA();
+      for(let ii=pts.length-1;ii>=midIdx;ii--)ctx.lineTo(CX-pts[ii].x,pts[ii].y);
+      ctx.stroke();
+    } else {
+      ctx.beginPath();
+      for(let ii=0;ii<pts.length;ii++){
+        const p=pts[ii];if(p.x<4)continue;
+        if(ii<=midIdx){
+          if(ii===0||pts[Math.max(0,ii-1)].x<4)ctx.moveTo(CX+p.x,p.y);
+          else ctx.lineTo(CX+p.x,p.y);
+        }
+      }
+      ctx.stroke();
+      ctx.beginPath();
+      for(let ii=0;ii<=midIdx;ii++){
+        const p=pts[ii];if(p.x<4)continue;
+        if(ii===0||pts[Math.max(0,ii-1)].x<4)ctx.moveTo(CX-p.x,p.y);
+        else ctx.lineTo(CX-p.x,p.y);
+      }
+      ctx.stroke();
+    }
+
+    const gEA=ctx.createLinearGradient(CX,nY,CX,nY+20);
+    gEA.addColorStop(0,'rgba(42,77,110,.9)');gEA.addColorStop(1,'rgba(42,77,110,0)');
+    ctx.fillStyle=gEA;ctx.fillRect(CX-100,nY-5,200,25);
+    ctx.restore();}
+  }
+
+  // Bocal with threads
+  ctx.fillStyle='#E0E0E0';ctx.fillRect(CX-17,MT+36,34,18);
+  ctx.strokeStyle='#AAA';ctx.lineWidth=1;ctx.strokeRect(CX-17,MT+36,34,18);
+  // Rosca (threads)
+  ctx.strokeStyle='#BBB';ctx.lineWidth=.8;
+  for(let y=MT+38;y<MT+53;y+=3){
+    ctx.beginPath();ctx.moveTo(CX-17,y);ctx.lineTo(CX-19,y+1.5);ctx.lineTo(CX-17,y+3);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(CX+17,y);ctx.lineTo(CX+19,y+1.5);ctx.lineTo(CX+17,y+3);ctx.stroke();
+  }
+
+  // Anel trava (support ring) — fino, logo abaixo do bocal
+  ctx.fillStyle='#D0D0D0';
+  ctx.fillRect(CX-22,MT+54,44,3);
+  ctx.strokeStyle='#AAA';ctx.lineWidth=.8;ctx.strokeRect(CX-22,MT+54,44,3);
+
+  // Vedação do bocal (cylindrical seal) — always visible
+  const sealH=45;
+  const sealBot=L(MT-12,MT+38,S.sP); // up=above view, down=on top of bocal
+  const sealTop=sealBot-sealH;
+  // Outer cylinder
+  ctx.fillStyle='#5A7A95';
+  ctx.fillRect(CX-24,sealTop,48,sealH);
+  ctx.strokeStyle='#7AA0B8';ctx.lineWidth=1.2;ctx.strokeRect(CX-24,sealTop,48,sealH);
+  // Inner bore (darker)
+  ctx.fillStyle='#3A5570';
+  ctx.fillRect(CX-8,sealTop,16,sealH);
+  // Bottom edge highlight
+  ctx.strokeStyle='#8AB8D0';ctx.lineWidth=.5;
+  ctx.beginPath();ctx.moveTo(CX-24,sealBot);ctx.lineTo(CX+24,sealBot);ctx.stroke();
+  // Ridges
+  ctx.strokeStyle='rgba(122,160,184,.4)';ctx.lineWidth=.5;
+  for(let y=sealTop+4;y<sealBot-2;y+=5){
+    ctx.beginPath();ctx.moveTo(CX-24,y);ctx.lineTo(CX-19,y);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(CX+24,y);ctx.lineTo(CX+19,y);ctx.stroke();
+  }
+}
+function dRod(){
+  if(S.ph<3)return;
+  if(S.sT<=0&&S.rR>=1)return;
+  const rodPos=S.sT*(1-S.rR);
+  if(rodPos<=0.01)return;
+  const sBot=L(MT-12,MT+38,S.sP);
+  const rT=sBot-45,rB=MT+57+rodPos*325;
+  ctx.fillStyle='#8AB';ctx.fillRect(CX-3,rT,6,rB-rT);
+  ctx.beginPath();ctx.arc(CX,rB,4,0,Math.PI*2);ctx.fillStyle='#9BC';ctx.fill();
+  ctx.strokeStyle='rgba(200,230,255,.3)';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(CX-1,rT+5);ctx.lineTo(CX-1,rB-5);ctx.stroke()}
+
+function dLabels(){ctx.save();ctx.font='600 10px DM Sans';ctx.fillStyle='#3F6080';ctx.textAlign='center';
+  ctx.fillText(T('mold'),CX-95,MT+240);ctx.fillText(T('mold'),CX+95,MT+240);
+  ctx.restore()}
+
+// Timing indicator bar
+function dTimingBar(){
+  if(S.ph<3)return;
+  ctx.save();const bX=24,bT2=MT+60,bH=340;
+  ctx.fillStyle='#1E3550';ctx.fillRect(bX-6,bT2,12,bH);
+  ctx.strokeStyle='#1A2E42';ctx.strokeRect(bX-6,bT2,12,bH);
+  // Rod marker
+  const rodDisplay=S.sT*(1-S.rR);
+  const rP=bT2+rodDisplay*bH;
+  ctx.fillStyle='#8AB';ctx.beginPath();ctx.moveTo(bX+6,rP);ctx.lineTo(bX+13,rP-4);ctx.lineTo(bX+13,rP+4);ctx.closePath();ctx.fill();
+  ctx.font='600 8px DM Sans';ctx.fillStyle='#8AB';ctx.textAlign='left';ctx.fillText('Haste',bX+15,rP+3);
+  // Air marker
+  if(S.bT>0){
+    const tn=tNorm();
+    const aN=Math.max(.05,Math.min(.95,.3+tn*.07)),aP=bT2+aN*bH;
+    const cl=tn<=-2?'#2E8B57':tn>=2?'#C0392B':'#2E75B6';
+    ctx.fillStyle=cl;ctx.beginPath();ctx.moveTo(bX-6,aP);ctx.lineTo(bX-13,aP-4);ctx.lineTo(bX-13,aP+4);ctx.closePath();ctx.fill();
+    ctx.textAlign='right';ctx.fillStyle=cl;ctx.fillText('Ar',bX-15,aP+3)}
+  ctx.font='600 7px DM Sans';ctx.fillStyle='#4A6A85';ctx.textAlign='center';
+  ctx.fillText(T('top'),bX,bT2-4);ctx.fillText(T('bottom'),bX,bT2+bH+10);
+  ctx.restore()}
+
+// ═══ DRAW ═══
+function draw(){
+  ctx.clearRect(0,0,W,H);dGrid();dMold();
+  if(S.ph===7&&S.mO>.05){dBottle()}
+  else if(S.ph>=3){dBottle();dRod()}
+  else{dBottle()}
+  dLabels();dTimingBar();updateUI();
+  // Sync to mobile canvas
+
+}
+
+// ═══ UI UPDATE ═══
+function tNorm(){return (S.tm-180)/24} // -5 to +5: negative=antecipado, positive=atrasado
+function vNorm(){return (375-S.vS)/25} // -5(slow/ombro) to +5(fast/base)
+function fNorm(){return (5-S.fQ)/2.5} // +2(fechada/fundo) to -2(aberta/ombro)
+function pNorm(){return (4-S.pP)/2} // +2(baixa/fundo) to -2(alta/ombro)
+function tCl(){const n=tNorm();return n<=-2?'early':n>=2?'late':'normal'}
+function tTx(){const n=tNorm();const B={pt:['Muito antecipado','Antecipado','Lev. antecipado','Normal','Lev. atrasado','Atrasado','Muito atrasado'],en:['Very early','Early','Slightly early','Normal','Slightly late','Late','Very late'],es:['Muy anticipado','Anticipado','Lev. anticipado','Normal','Lev. retrasado','Retrasado','Muy retrasado']};const b=B[lang]||B.pt;if(n<=-4)return b[0];if(n<=-2)return b[1];if(n<=-0.5)return b[2];if(n<=0.5)return b[3];if(n<=1.5)return b[4];if(n<=3.5)return b[5];return b[6]}
+
+// Heat profile from thermal page → affects blow distribution
+let _hpCache=null;let _hpFrame=0;
+function getHeatProfile(){
+  const now=Date.now();
+  if(_hpCache&&now-_hpFrame<50)return _hpCache;
+  _hpFrame=now;
+  const potG=potGeral/100;
+  
+  // Cooling from ventilation + exhaust + ambient
+  const ventNorm=ventHz/60; // 0-1
+  const exaNorm=exaustHz/60; // 0-1
+  const airflow=(ventNorm*0.6+exaNorm*0.4); // combined air cooling 0-1
+  // Ambient: at 25°C factor=1.0 (reference), at 40°C=0.0, at 10°C=1.3(cap)
+  const ambientFactor=Math.max(0,Math.min(1.3,(40-ambientTemp)/15));
+  // Non-linear airflow: low Hz = less effect, high Hz = strong
+  const airPow=Math.pow(airflow,1.3);
+  // At 60/60/25°C: airPow=1.0 * ambF=1.0 * 0.8 = 80% cooling
+  const coolingPct=Math.max(0.1,1-airPow*ambientFactor*0.8);
+  
+  const heats=[];
+  for(let i=0;i<6;i++){
+    const eL=Math.min(100,(zonesL[i]||0)*potG)*(zonesOnL[i]||0);
+    const eR=Math.min(100,(zonesR[i]||0)*potG)*(zonesOnR[i]||0);
+    const wF=0.45+0.55*Math.sqrt((zoneWatts[i]||800)/3000);
+    const absL=0.3+(proxL[i]||50)/100*0.7;
+    const absR=0.3+(proxR[i]||50)/100*0.7;
+    heats.push((eL*absL+eR*absR)/2*wF*coolingPct);
+  }
+  const shoulder=(heats[0]+heats[1])/2;
+  const center=(heats[2]+heats[3])/2;
+  const base=(heats[4]+heats[5])/2;
+  const avg=(shoulder+center+base)/3;
+  _hpCache={shoulder,center,base,avg,heats,coolingPct,airflow,ambientFactor};
+  return _hpCache;
+}
+
+function gDist(){
+  // Mechanical parameters (max ±27 each)
+  const shT=tNorm()*5.4;
+  const shV=vNorm()*5.4;
+  const shF=fNorm()*13.5;
+  const shP=pNorm()*13.5;
+  const shMech=shT+shV+shF+shP;
+
+  // Thermal influence: STRONG - hotter zone = material stretches away from it
+  const hp=getHeatProfile();
+  const heatAvg=(hp.shoulder+hp.center+hp.base)/3||1;
+  // Per-region deviation from average (positive = hotter than avg)
+  const devS=(hp.shoulder-heatAvg)/Math.max(20,heatAvg);
+  const devB=(hp.base-heatAvg)/Math.max(20,heatAvg);
+  // Thermal shift: same weight as ONE mechanical parameter (max ±27)
+  // Hot shoulder → positive shift → material to base
+  // Hot base → negative shift → material to shoulder  
+  const shHeat=(devS-devB)*27;
+
+  const sh=shMech+shHeat;
+  let o=33-sh,b=33+sh,c=34;
+  o=Math.max(12,Math.min(60,o));b=Math.max(12,Math.min(60,b));c=100-o-b;
+  if(c<16){c=16;o=(100-c)*(o/(o+b));b=100-c-o}
+  const t=o+c+b;return{o:Math.round(o/t*100),c:Math.round(c/t*100),b:100-Math.round(o/t*100)-Math.round(c/t*100)}}
+
+function gNote(){
+  const t=tNorm(),v=vNorm(),f=fNorm();
+  const hp=getHeatProfile();
+  const d=gDist();
+
+  // Calculate individual contributions (positive = pushes to base)
+  const shT=t*5.4;  // timing
+  const shV=v*5.4;  // stretch
+  const shF=f*13.5; // flow
+  const shP=pNorm()*13.5; // pressure
+  const heatAvg=(hp.shoulder+hp.center+hp.base)/3||1;
+  const devS=(hp.shoulder-heatAvg)/Math.max(20,heatAvg);
+  const devB=(hp.base-heatAvg)/Math.max(20,heatAvg);
+  const shH=(devS-devB)*27; // thermal
+
+  // Identify contributors
+  const contrib=[];
+  const L={
+    pt:{
+      timing:'Pré-sopro',stretch:'Estiramento',flow:'Vazão',pressure:'Pressão',thermal:'Perfil térmico',
+      toBase:'→ base',toShoulder:'→ ombro',neutral:'neutro',
+      because:'Motivo:',summary:'Resumo:',
+      moreBase:'Mais material na BASE porque:',moreShoulder:'Mais material no OMBRO porque:',
+      balanced:'Distribuição equilibrada — todos os parâmetros compensados.',
+      earlyTiming:'pré-sopro antecipado empurra material pro ombro',
+      lateTiming:'pré-sopro atrasado deixa material na base',
+      fastStretch:'estiramento rápido leva material pra base',
+      slowStretch:'estiramento lento concentra no ombro',
+      highFlow:'vazão alta expande mais o ombro',
+      lowFlow:'vazão baixa não expande, material fica na base',
+      highPressure:'pressão alta força material pro ombro',
+      lowPressure:'pressão baixa deixa material na base',
+      hotShoulder:'ombro mais quente → material estica e sai do ombro',
+      hotBase:'base mais quente → material estica e sai da base',
+      coldPreform:'⚠ Temperatura muito baixa — risco de não formar!'
+    },
+    en:{
+      timing:'Pre-blow',stretch:'Stretching',flow:'Flow',pressure:'Pressure',thermal:'Thermal profile',
+      toBase:'→ base',toShoulder:'→ shoulder',neutral:'neutral',
+      because:'Reason:',summary:'Summary:',
+      moreBase:'More material on BASE because:',moreShoulder:'More material on SHOULDER because:',
+      balanced:'Balanced distribution — all parameters compensated.',
+      earlyTiming:'early pre-blow pushes material to shoulder',
+      lateTiming:'late pre-blow leaves material on base',
+      fastStretch:'fast stretching moves material to base',
+      slowStretch:'slow stretching concentrates on shoulder',
+      highFlow:'high flow expands shoulder more',
+      lowFlow:'low flow doesn\'t expand, material stays on base',
+      highPressure:'high pressure forces material to shoulder',
+      lowPressure:'low pressure leaves material on base',
+      hotShoulder:'hotter shoulder → material stretches away from shoulder',
+      hotBase:'hotter base → material stretches away from base',
+      coldPreform:'⚠ Temperature too low — risk of not forming!'
+    },
+    es:{
+      timing:'Pre-soplado',stretch:'Estirado',flow:'Caudal',pressure:'Presión',thermal:'Perfil térmico',
+      toBase:'→ base',toShoulder:'→ hombro',neutral:'neutro',
+      because:'Motivo:',summary:'Resumen:',
+      moreBase:'Más material en la BASE porque:',moreShoulder:'Más material en el HOMBRO porque:',
+      balanced:'Distribución equilibrada — todos los parámetros compensados.',
+      earlyTiming:'pre-soplado anticipado empuja material al hombro',
+      lateTiming:'pre-soplado retrasado deja material en la base',
+      fastStretch:'estirado rápido lleva material a la base',
+      slowStretch:'estirado lento concentra en hombro',
+      highFlow:'caudal alto expande más el hombro',
+      lowFlow:'caudal bajo no expande, material queda en base',
+      highPressure:'presión alta fuerza material al hombro',
+      lowPressure:'presión baja deja material en base',
+      hotShoulder:'hombro más caliente → material se estira y sale del hombro',
+      hotBase:'base más caliente → material se estira y sale de la base',
+      coldPreform:'⚠ Temperatura muy baja — ¡riesgo de no formar!'
+    }
+  };
+  const l=L[lang]||L.pt;
+
+  // Check temperature
+  if(hp.avg<15) return{t:l.coldPreform,c:'warn'};
+
+  // Collect reasons
+  const reasons=[];
+  const absThresh=3;
+
+  if(Math.abs(shT)>absThresh){
+    reasons.push({val:shT, txt:shT>0?(l.timing+' ('+S.tm+'ms): '+l.lateTiming):(l.timing+' ('+S.tm+'ms): '+l.earlyTiming)});
+  }
+  if(Math.abs(shV)>absThresh){
+    reasons.push({val:shV, txt:shV>0?(l.stretch+' ('+S.vS+'ms): '+l.fastStretch):(l.stretch+' ('+S.vS+'ms): '+l.slowStretch)});
+  }
+  if(Math.abs(shF)>absThresh){
+    reasons.push({val:shF, txt:shF>0?(l.flow+' ('+S.fQ+'): '+l.lowFlow):(l.flow+' ('+S.fQ+'): '+l.highFlow)});
+  }
+  if(Math.abs(shP)>absThresh){
+    reasons.push({val:shP, txt:shP>0?(l.pressure+' ('+S.pP+' bar): '+l.lowPressure):(l.pressure+' ('+S.pP+' bar): '+l.highPressure)});
+  }
+  if(Math.abs(shH)>absThresh){
+    reasons.push({val:shH, txt:shH>0?(l.thermal+': '+l.hotShoulder):(l.thermal+': '+l.hotBase)});
+  }
+
+  const totalShift=shT+shV+shF+shP+shH;
+
+  if(reasons.length===0){
+    return{t:l.balanced,c:'good'};
+  }
+
+  // Sort by absolute impact
+  reasons.sort((a,b)=>Math.abs(b.val)-Math.abs(a.val));
+
+  const header=totalShift>3?l.moreBase:totalShift<-3?l.moreShoulder:l.balanced;
+  const lines=reasons.map(r=>'• '+r.txt);
+  const txt=header+'\n'+lines.join('\n');
+
+  const isGood=Math.abs(totalShift)<8&&hp.avg>=15;
+  return{t:txt,c:isGood?'good':'warn'}}
+
+function updateUI(){
+  const p=PD[S.ph]||{name:T('waiting'),step:'—',desc:T('selectOrStart'),color:'#2E75B6'};
+  document.getElementById('pName').textContent=p.name;
+  document.getElementById('pStep').textContent=p.step;
+  document.getElementById('pDesc').textContent=p.desc;
+  document.getElementById('pDot').style.background=p.color;
+
+  let pr=0;if(S.ph===3)pr=L(0,S.pP,S.bT);else if(S.ph===4)pr=L(S.pP,30,S.fT);else if(S.ph===5)pr=30;else if(S.ph===6)pr=L(30,0,S.rR);
+  document.getElementById('pPressao').textContent=pr.toFixed(0);
+  const hastePos=S.sT*(1-S.rR);
+  document.getElementById('pHaste').textContent=(hastePos*100).toFixed(0)+'%';
+  // Temperature: calibrated so zones~50% + vent 30Hz + exaust 30Hz ≈ 100°C
+  const hp2=getHeatProfile();
+  const baseTemp=Math.min(160,45+hp2.avg*3.1);
+  let tmp=Math.round(baseTemp);if(S.fT>.5)tmp=Math.round(L(baseTemp,45,(S.fT-.5)*2));
+  document.getElementById('pTemp').textContent='~'+tmp;
+
+  document.querySelectorAll('.timeline-step').forEach((e,i)=>{if(e){e.classList.remove('active','done');if(i===S.ph)e.classList.add('active');else if(i<S.ph)e.classList.add('done')}});
+  document.querySelectorAll('.phase-btn').forEach((e,i)=>e.classList.toggle('active',i===S.ph));
+
+  // Timing
+  const cl=tCl();
+  const tv=document.getElementById('mtVal');tv.textContent=S.tm+' ms';tv.className='slider-val '+cl;
+  document.getElementById('mtBadge').textContent=tTx();document.getElementById('mtBadge').className='timing-badge '+cl;
+
+  // Velocity
+  const vn=vNorm();
+  const vCl=vn>=2?'late':vn<=-2?'early':'normal';
+  const vEl=document.getElementById('mvVal');vEl.textContent=S.vS+' ms';vEl.className='slider-val '+vCl;
+  const VB={pt:['Muito rápida','Rápida','Normal','Lenta','Muito lenta'],en:['Very fast','Fast','Normal','Slow','Very slow'],es:['Muy rápida','Rápida','Normal','Lenta','Muy lenta']};const vb=VB[lang]||VB.pt;
+  const vTx=S.vS<=270?vb[0]:S.vS<=320?vb[1]:S.vS<=400?vb[2]:S.vS<=450?vb[3]:vb[4];
+  document.getElementById('mvBadge').textContent=vTx;document.getElementById('mvBadge').className='timing-badge '+vCl;
+
+  // Flow
+  const fCl=S.fQ<1?'late':S.fQ<=2?'late':S.fQ>=9?'early':'normal';
+  document.getElementById('mfVal').textContent=S.fQ;document.getElementById('mfVal').className='slider-val '+fCl;
+  const FB={pt:['Fechada','Baixa','Normal','Alta','Muito alta'],en:['Closed','Low','Normal','High','Very high'],es:['Cerrado','Bajo','Normal','Alto','Muy alto']};const fb=FB[lang]||FB.pt;
+  const fTx=S.fQ<1?fb[0]:S.fQ<=3?fb[1]:S.fQ<=6?fb[2]:S.fQ<=8?fb[3]:fb[4];
+  document.getElementById('mfBadge').textContent=fTx;document.getElementById('mfBadge').className='timing-badge '+fCl;
+
+  // Pressure
+  const pCl=S.pP<=1?'late':S.pP>=7?'early':'normal';
+  document.getElementById('mpVal').textContent=S.pP+' bar';document.getElementById('mpVal').className='slider-val '+pCl;
+  const PB={pt:['Muito baixa','Baixa','Normal','Alta','Muito alta'],en:['Very low','Low','Normal','High','Very high'],es:['Muy baja','Baja','Normal','Alta','Muy alta']};const pb=PB[lang]||PB.pt;
+  const pTx=S.pP<=1?pb[0]:S.pP<=2?pb[1]:S.pP<=5?pb[2]:S.pP<=7?pb[3]:pb[4];
+  document.getElementById('mpBadge').textContent=pTx;document.getElementById('mpBadge').className='timing-badge '+pCl;
+
+  // Distribution
+  const d=gDist();
+  document.getElementById('barO').style.width=d.o+'%';document.getElementById('barO').style.background=d.o>42?'#C0392B':d.o<25?'#E8A838':'#2E8B57';document.getElementById('pctO').textContent=d.o+'%';
+  document.getElementById('barC').style.width=d.c+'%';document.getElementById('barC').style.background='#2E75B6';document.getElementById('pctC').textContent=d.c+'%';
+  document.getElementById('barB').style.width=d.b+'%';document.getElementById('barB').style.background=d.b>42?'#C0392B':d.b<25?'#E8A838':'#2E8B57';document.getElementById('pctB').textContent=d.b+'%';
+  const n=gNote();document.getElementById('rNote').innerHTML='<strong>'+T('result')+'</strong><br>'+n.t.replace(/\n/g,'<br>');document.getElementById('rNote').className='result-note '+n.c;
+
+}
+
+
+// ═══ ANIMATION ═══
+function animate(){
+  if(!S.pl)return;
+  const baseDur=PD[S.ph]?.dur||140;
+  // Phase 3 uses dynamic duration based on stretch speed
+  const dur=S.ph===3?Math.round(baseDur*(S.vS/375)):baseDur;
+  const pr=S.fr/dur;
+  switch(S.ph){
+    case 0:S.mO=L(1,.5,pr);break;
+    case 1:S.mO=L(.5,0,pr);break;
+    case 2:S.sP=L(0,1,pr);break; // seal descends
+    case 3:
+      // Stretch + Pre-blow (vazão controls how much pre-blow air)
+      S.sT=Math.min(1,pr);
+      const flowRate=S.fQ/10; // 0=no air, 1=full air
+      if(flowRate>0){
+        const blowStart=L(.05,.65,(S.tm-60)/240);
+        if(pr>=blowStart){
+          const blowPr=(pr-blowStart)/(1-blowStart);
+          S.bT=L(0,.7*flowRate,blowPr);
+        }
+      } else {
+        S.bT=0; // vazão fechada = zero pré-sopro
+      }
+      break;
+    case 4:
+      const preBT=.7*(S.fQ/10);
+      S.bT=L(preBT,1,pr);
+      S.fT=L(0,1,pr);S.rR=0;
+      break;
+    case 5:
+      // Residência — garrafa pressurizada, nada muda visualmente
+      S.rR=0;
+      break;
+    case 6:
+      // Alívio de sopro — pressão cai gradualmente, haste sobe
+      S.rR=L(0,1,Math.min(1,pr*1.8)); // rod up in first ~55% of phase
+      break;
+    case 7:
+      // Extração — seal up, then mold opens (rod already up)
+      if(pr<.15){S.sP=L(1,0,pr/.15);S.mO=0}
+      else{S.sP=0;S.mO=L(0,.8,(pr-.15)/.85)}
+      break;
+  }
+  S.fr++;
+  if(pr>=1){S.fr=0;S.ph++;if(S.ph>=PD.length){S.pl=false;document.getElementById('btnPlay').textContent=T('done')}}
+  draw();if(S.pl)S.an=requestAnimationFrame(animate)}
+
+function setEnd(idx){S.sT=0;S.bT=0;S.fT=0;S.mO=1;S.rR=0;S.sP=0;
+  const fr=S.fQ/10;
+  for(let p=0;p<=idx;p++){switch(p){case 0:S.mO=.5;break;case 1:S.mO=0;break;case 2:S.sP=1;break;case 3:S.sT=1;S.bT=.7*fr;break;case 4:S.bT=1;S.fT=1;S.rR=0;break;case 5:break;case 6:S.rR=1;break;case 7:S.mO=.8;S.sP=0;break}}}
+
+function jump(i){S.pl=false;cancelAnimationFrame(S.an);if(i>0)setEnd(i-1);else{S.sT=0;S.bT=0;S.fT=0;S.mO=1;S.rR=0;S.sP=0}
+  S.ph=i;S.fr=0;S.pl=true;document.getElementById('btnPlay').textContent=T('pause');animate()}
+
+function reset(){S.pl=false;cancelAnimationFrame(S.an);S.ph=-1;S.fr=0;S.sT=0;S.bT=0;S.fT=0;S.mO=1;S.rR=0;S.sP=0;
+  document.getElementById('btnPlay').textContent=T('start');draw()}
+
+// ═══ EVENTS ═══
+document.getElementById('btnPlay').addEventListener('click',()=>{
+  if(S.ph>=PD.length)return;if(S.ph<0)S.ph=0;
+  S.pl=!S.pl;document.getElementById('btnPlay').textContent=S.pl?T('pause'):T('resume');
+  if(S.pl)animate()});
+document.getElementById('btnReset').addEventListener('click',reset);
+document.querySelectorAll('.phase-btn').forEach(b=>b.addEventListener('click',()=>jump(parseInt(b.dataset.phase))));
+document.querySelectorAll('.timeline-step').forEach(e=>e.addEventListener('click',()=>jump(parseInt(e.dataset.step))));
+
+// Sliders now use mob-panel sliders as primary
+document.getElementById('mtSlider').addEventListener('input',e=>{S.tm=parseInt(e.target.value);updateUI();if(!S.pl)draw()});
+document.querySelectorAll('.preset').forEach(b=>b.addEventListener('click',()=>{
+  S.tm=parseInt(b.dataset.t);document.getElementById('mtSlider').value=S.tm;updateUI();if(!S.pl)draw()}));
+
+document.getElementById('mvSlider').addEventListener('input',e=>{S.vS=parseInt(e.target.value);updateUI();if(!S.pl)draw()});
+document.querySelectorAll('.preset-v').forEach(b=>b.addEventListener('click',()=>{
+  S.vS=parseInt(b.dataset.v);document.getElementById('mvSlider').value=S.vS;updateUI();if(!S.pl)draw()}));
+
+document.getElementById('mfSlider').addEventListener('input',e=>{S.fQ=parseInt(e.target.value);updateUI();if(!S.pl)draw()});
+document.querySelectorAll('.preset-f').forEach(b=>b.addEventListener('click',()=>{
+  S.fQ=parseInt(b.dataset.f);document.getElementById('mfSlider').value=S.fQ;updateUI();if(!S.pl)draw()}));
+
+document.getElementById('mpSlider').addEventListener('input',e=>{S.pP=parseInt(e.target.value);updateUI();if(!S.pl)draw()});
+document.querySelectorAll('.preset-p').forEach(b=>b.addEventListener('click',()=>{
+  S.pP=parseInt(b.dataset.p);document.getElementById('mpSlider').value=S.pP;updateUI();if(!S.pl)draw()}));
+
+// Desktop buttons
+document.getElementById('deskPlay')?.addEventListener('click',()=>document.getElementById('btnPlay').click());
+document.getElementById('deskReset')?.addEventListener('click',()=>document.getElementById('btnReset').click());
+
+// ═══ TABS ═══
+document.querySelectorAll('.tab').forEach(tab=>{
+  tab.addEventListener('click',()=>{
+    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+    tab.classList.add('active');
+    document.querySelectorAll('.page').forEach(p=>p.style.display='none');
+    document.getElementById('page-'+tab.dataset.tab).style.display='block';
+    if(tab.dataset.tab==='aquecimento'){if(!heatAnim)animateHeat();}
+    else{if(heatAnim){cancelAnimationFrame(heatAnim);heatAnim=null;}}
+  });
+});
+
+// ═══ HEATING ZONES ═══
+const zonesL=[50,50,50,50,50,50,50,50,50];
+const zonesR=[50,50,50,50,50,50,50,50,50];
+const zonesOnL=[1,1,1,1,1,1,1,1,1];
+const zonesOnR=[1,1,1,1,1,1,1,1,1];
+const zoneWatts=[3000,2000,800,800,800,800,800,800,2000]; // Z1=3000W, Z2=2000W, Z3-Z8=800W, Z9=2000W
+const maxWatt=3000; // reference for scaling
+let potGeral=100; // 0-200
+const proxL=[50,50,50,50,50,50,50,50,50];
+const proxR=[50,50,50,50,50,50,50,50,50];
+let ventHz=30; // ventilação 0-60 Hz (normal=30)
+let exaustHz=30; // exaustão 0-60 Hz (normal=30)
+let ambientTemp=25; // temperatura ambiente °C (15-45)
+let editingZone=null;
+let editingSide=null;
+let editingPot=false;
+let editTarget=null; // 'vent','exaust','ambient'
+
+const cvH=document.getElementById('cvHeat'),ctxH=cvH.getContext('2d');
+const WH=cvH.width,HH=cvH.height,CXH=WH/2;
+
+const inputOv=document.createElement('input');
+inputOv.type='number';inputOv.min='0';inputOv.max='100';inputOv.step='5';
+inputOv.style.cssText='position:absolute;width:42px;height:20px;background:#fff;border:1px solid #888;color:#000;font:700 12px DM Sans;text-align:center;display:none;z-index:10;padding:0';
+cvH.parentElement.style.position='relative';
+cvH.parentElement.appendChild(inputOv);
+
+inputOv.addEventListener('blur',()=>{
+  const v=parseInt(inputOv.value)||0;
+  if(editingZone!==null&&editingSide==='L'){zonesL[editingZone]=Math.max(0,Math.min(100,v));editingZone=null}
+  if(editingZone!==null&&editingSide==='R'){zonesR[editingZone]=Math.max(0,Math.min(100,v));editingZone=null}
+  if(editingPot){potGeral=Math.max(0,Math.min(200,v));editingPot=false}
+  if(editTarget==='vent'){ventHz=Math.max(0,Math.min(60,v));editTarget=null}
+  if(editTarget==='exaust'){exaustHz=Math.max(0,Math.min(60,v));editTarget=null}
+  if(editTarget==='ambient'){ambientTemp=Math.max(5,Math.min(45,v));editTarget=null}
+  editingSide=null;inputOv.style.display='none';
+});
+inputOv.addEventListener('keydown',e=>{if(e.key==='Enter')inputOv.blur()});
+
+let clickR=[];
+
+cvH.addEventListener('click',e=>{
+  const rect=cvH.getBoundingClientRect();
+  const sx=cvH.width/rect.width,sy=cvH.height/rect.height;
+  const mx=(e.clientX-rect.left)*sx,my=(e.clientY-rect.top)*sy;
+  for(const r of clickR){
+    if(mx>=r.x&&mx<=r.x+r.w&&my>=r.y&&my<=r.y+r.h){
+      if(r.type==='toggleL'){zonesOnL[r.z]=zonesOnL[r.z]?0:1;return}
+      if(r.type==='toggleR'){zonesOnR[r.z]=zonesOnR[r.z]?0:1;return}
+      if(r.type==='proxLup'){proxL[r.z]=Math.min(100,proxL[r.z]+50);return}
+      if(r.type==='proxLdn'){proxL[r.z]=Math.max(0,proxL[r.z]-50);return}
+      if(r.type==='proxRup'){proxR[r.z]=Math.min(100,proxR[r.z]+50);return}
+      if(r.type==='proxRdn'){proxR[r.z]=Math.max(0,proxR[r.z]-50);return}
+      if(r.type==='zoneL'){editingZone=r.z;editingSide='L';editingPot=false;inputOv.max='100';inputOv.value=zonesL[r.z]}
+      if(r.type==='zoneR'){editingZone=r.z;editingSide='R';editingPot=false;inputOv.max='100';inputOv.value=zonesR[r.z]}
+      if(r.type==='pot'){editingPot=true;editingZone=null;editTarget=null;inputOv.max='200';inputOv.value=potGeral}
+      if(r.type==='vent'){editTarget='vent';editingPot=false;editingZone=null;inputOv.max='60';inputOv.step='1';inputOv.value=ventHz}
+      if(r.type==='exaust'){editTarget='exaust';editingPot=false;editingZone=null;inputOv.max='60';inputOv.step='1';inputOv.value=exaustHz}
+      if(r.type==='ambient'){editTarget='ambient';editingPot=false;editingZone=null;inputOv.max='45';inputOv.step='1';inputOv.value=ambientTemp}
+      // Position input exactly over the value box
+      const cRect=cvH.getBoundingClientRect();
+      const pRect=cvH.parentElement.getBoundingClientRect();
+      const scaleX=cRect.width/cvH.width;
+      const scaleY=cRect.height/cvH.height;
+      inputOv.style.left=(cRect.left-pRect.left+r.x*scaleX)+'px';
+      inputOv.style.top=(cRect.top-pRect.top+r.y*scaleY)+'px';
+      inputOv.style.width=(r.w*scaleX)+'px';
+      inputOv.style.height=(r.h*scaleY)+'px';
+      inputOv.style.fontSize=(12*scaleY)+'px';
+      inputOv.style.display='block';
+      inputOv.focus();inputOv.select();
+      return;
+    }
+  }
+});
+
+function drawHeat(){
+  ctxH.clearRect(0,0,WH,HH);
+  clickR=[];
+  const potG=potGeral/100;
+  const pfW=22,pfBot=530,zoneH=52;
+  const pfTop=pfBot-6*zoneH; // =218
+  const pfH=pfBot-pfTop;
+
+  const lampW=10;
+  const valW=36,valH=20;
+  const gap=6;
+
+  ctxH.fillStyle='#2A4D6E';ctxH.fillRect(0,0,WH,HH);
+
+  // Régua de refrigeração FIRST (FIXED at max distance = 75px) - Z1 lamps draw on top
+  const rT=pfBot-5,rB=pfBot+20;
+  const rFixedDist=75;
+  const rLampL=CXH-pfW-rFixedDist-lampW;
+  const rLampR=CXH+pfW+rFixedDist+lampW;
+  for(let side=-1;side<=1;side+=2){
+    const oX=side<0?rLampL:rLampR;
+    const iX=side<0?CXH-pfW-13:CXH+pfW+13;
+    const lI=side<0?CXH-pfW-5:CXH+pfW+5;
+    const d=side<0?1:-1;const mX=(oX+iX)/2;
+    ctxH.fillStyle='#2E3E4E';ctxH.beginPath();
+    ctxH.moveTo(oX,rB);ctxH.lineTo(oX,rT+10);ctxH.quadraticCurveTo(oX+d*5,rT,mX,rT);
+    ctxH.lineTo(lI,rT);ctxH.lineTo(lI,rT+4);ctxH.lineTo(iX,rT+4);ctxH.lineTo(iX,rB);ctxH.lineTo(oX,rB);
+    ctxH.closePath();ctxH.fill();ctxH.strokeStyle='#4A6478';ctxH.lineWidth=.8;ctxH.stroke();
+    const aG=ctxH.createLinearGradient(iX,0,side<0?CXH-pfW:CXH+pfW,0);
+    aG.addColorStop(0,'rgba(40,140,255,.35)');aG.addColorStop(.4,'rgba(40,140,255,.2)');aG.addColorStop(.7,'rgba(40,140,255,.08)');aG.addColorStop(1,'rgba(40,140,255,0)');
+    ctxH.fillStyle=aG;ctxH.fillRect(Math.min(iX,side<0?CXH-pfW:CXH+pfW),rT+4,Math.abs((side<0?CXH-pfW:CXH+pfW)-iX),rB-rT-4);
+  }
+
+  for(let i=0;i<9;i++){
+    let yMid;
+    if(i<6){yMid=pfBot-i*zoneH-zoneH/2}
+    else{yMid=pfTop-(i-6)*zoneH-zoneH/2}
+
+    // Effective lamp value: perfil scales but caps at 100
+    const effL=Math.min(100,zonesL[i]*potG)*zonesOnL[i];
+    const effR=Math.min(100,zonesR[i]*potG)*zonesOnR[i];
+    // Wattage factor: sqrt scaling so 800W zones are still visible
+    const wF=0.45+0.55*Math.sqrt(zoneWatts[i]/maxWatt); // Z1=1.0, Z2/Z9=0.90, Z3-Z8=0.74
+    // Lamp visual intensity (higher wattage = brighter at same %)
+    const valL=effL*wF;
+    const valR=effR*wF;
+
+    // Independent distances per side
+    const pFL=proxL[i]/100;
+    const pFR=proxR[i]/100;
+    const distL=75-pFL*53;
+    const distR=75-pFR*53;
+    const lH=zoneH-6;
+    const lR=lampW/2;
+
+    const lampLX=CXH-pfW-distL-lampW;
+    const lampRX=CXH+pfW+distR;
+    const valLX=lampLX-gap-valW;
+    const valRX=lampRX+lampW+gap;
+    const ly1=yMid-lH/2,ly2=yMid+lH/2;
+
+    function drawLamp(lx,v){
+      const cx=lx+lampW/2;
+      // Color based ONLY on zone value, not proximity
+      if(v>5){
+        const r=255,g=Math.max(80,220-v*1.4),b=Math.max(20,80-v*.8);
+        ctxH.fillStyle='rgba('+r+','+Math.round(g)+','+Math.round(b)+','+(0.3+v/250)+')';
+      } else {
+        ctxH.fillStyle='rgba(80,80,80,.35)';
+      }
+      ctxH.beginPath();
+      ctxH.arc(cx,ly1+lR,lR,Math.PI,0);
+      ctxH.lineTo(lx+lampW,ly2-lR);
+      ctxH.arc(cx,ly2-lR,lR,0,Math.PI);
+      ctxH.closePath();ctxH.fill();
+      ctxH.strokeStyle='rgba(150,130,100,.25)';ctxH.lineWidth=.6;ctxH.stroke();
+      if(v>8){
+        const fA=Math.min(.85,v/80);
+        ctxH.strokeStyle='rgba(255,'+Math.round(Math.max(80,255-v*2))+',20,'+fA+')';
+        ctxH.lineWidth=.8;
+        const nFil=Math.max(2,Math.floor(lH/12));
+        for(let f=0;f<nFil;f++){
+          const fy=ly1+lR+4+f*((lH-lR*2-8)/(nFil-1||1));
+          ctxH.beginPath();ctxH.moveTo(lx+2,fy);ctxH.lineTo(lx+lampW-2,fy);ctxH.stroke();
+        }
+      }
+    }
+
+    function drawBeam(lx,side,v){
+      if(v<=5)return;
+      const intensity=v/100;
+      const beamStart=lx+(side<0?lampW:0);
+      const beamEnd=side<0?CXH-pfW:CXH+pfW;
+      const narrowH=lH*.6;const wideH=zoneH-2;
+      const r=255,g=Math.round(Math.max(80,200-v)),b=Math.round(Math.max(20,60-v*.5));
+      const beam=ctxH.createLinearGradient(beamStart,0,beamEnd,0);
+      beam.addColorStop(0,'rgba('+r+','+g+','+b+','+(intensity*.3)+')');
+      beam.addColorStop(0.3,'rgba('+r+','+g+','+b+','+(intensity*.18)+')');
+      beam.addColorStop(0.7,'rgba('+r+','+g+','+b+','+(intensity*.08)+')');
+      beam.addColorStop(1,'rgba('+r+','+g+','+b+','+(intensity*.03)+')');
+      ctxH.fillStyle=beam;
+      ctxH.beginPath();
+      ctxH.moveTo(beamStart,yMid-narrowH/2);ctxH.lineTo(beamEnd,yMid-wideH/2);
+      ctxH.lineTo(beamEnd,yMid+wideH/2);ctxH.lineTo(beamStart,yMid+narrowH/2);
+      ctxH.closePath();ctxH.fill();
+    }
+
+    // === LEFT (Pré-Forno) ===
+    // Proximity arrows behind label
+    const btnSz=18;
+    const lblTxtL='Zona '+(i+1);
+    const lblLX=valLX-6;
+    const btnLX=lblLX-75;
+    // Arrow → (approach)
+    ctxH.font='900 16px DM Sans';ctxH.textAlign='center';
+    ctxH.fillStyle='#fff';
+    ctxH.fillText('▶',btnLX+btnSz/2,yMid+5);
+    clickR.push({x:btnLX,y:yMid-btnSz/2,w:btnSz,h:btnSz,type:'proxLup',z:i});
+    // Arrow ← (move away)
+    ctxH.fillText('◀',btnLX-btnSz,yMid+5);
+    clickR.push({x:btnLX-btnSz*1.5,y:yMid-btnSz/2,w:btnSz,h:btnSz,type:'proxLdn',z:i});
+
+    // Label
+    ctxH.font='600 11px DM Sans';ctxH.textAlign='right';ctxH.fillStyle='#8AB';
+    ctxH.fillText(lblTxtL,lblLX,yMid+4);
+
+    // Value box
+    ctxH.fillStyle='#fff';ctxH.fillRect(valLX,yMid-valH/2,valW,valH);
+    ctxH.strokeStyle='#999';ctxH.lineWidth=.8;ctxH.strokeRect(valLX,yMid-valH/2,valW,valH);
+    ctxH.font='700 12px DM Sans';ctxH.textAlign='center';ctxH.fillStyle='#000';
+    ctxH.fillText(zonesL[i],valLX+valW/2,yMid+4);
+    clickR.push({x:valLX,y:yMid-valH/2,w:valW,h:valH,type:'zoneL',z:i});
+
+    drawBeam(lampLX,-1,valL);
+    drawLamp(lampLX,valL);
+    clickR.push({x:lampLX,y:ly1,w:lampW,h:lH,type:'toggleL',z:i});
+
+    // === RIGHT (Forno) ===
+    drawBeam(lampRX,1,valR);
+    drawLamp(lampRX,valR);
+
+    // Value box
+    ctxH.fillStyle='#fff';ctxH.fillRect(valRX,yMid-valH/2,valW,valH);
+    ctxH.strokeStyle='#999';ctxH.lineWidth=.8;ctxH.strokeRect(valRX,yMid-valH/2,valW,valH);
+    ctxH.font='700 12px DM Sans';ctxH.textAlign='center';ctxH.fillStyle='#000';
+    ctxH.fillText(zonesR[i],valRX+valW/2,yMid+4);
+    clickR.push({x:valRX,y:yMid-valH/2,w:valW,h:valH,type:'zoneR',z:i});
+
+    // Label
+    ctxH.font='600 11px DM Sans';ctxH.textAlign='left';ctxH.fillStyle='#8AB';
+    const lblRX=valRX+valW+6;
+    ctxH.fillText(T('zona')+' '+(i+1),lblRX,yMid+4);
+
+    // Proximity arrows behind label (right side)
+    const btnRX=lblRX+52;
+    ctxH.font='900 16px DM Sans';ctxH.textAlign='center';
+    ctxH.fillStyle='#fff';
+    // Arrow ← (approach from right)
+    ctxH.fillText('◀',btnRX,yMid+5);
+    clickR.push({x:btnRX-btnSz/2,y:yMid-btnSz/2,w:btnSz,h:btnSz,type:'proxRup',z:i});
+    // Arrow → (move away from right)
+    ctxH.fillText('▶',btnRX+btnSz+2,yMid+5);
+    clickR.push({x:btnRX+btnSz/2+2,y:yMid-btnSz/2,w:btnSz,h:btnSz,type:'proxRdn',z:i});
+  }
+
+  // === PREFORM with continuous rotation (reversed direction) ===
+  const angle=(-Date.now()/1200)%(Math.PI*2); // negative = reversed
+  const sinA=Math.sin(angle);
+  const cosA=Math.cos(angle);
+
+  ctxH.save();ctxH.beginPath();
+  ctxH.moveTo(CXH-pfW,pfBot);ctxH.lineTo(CXH-pfW,pfTop+pfW);
+  ctxH.quadraticCurveTo(CXH-pfW,pfTop,CXH,pfTop);
+  ctxH.quadraticCurveTo(CXH+pfW,pfTop,CXH+pfW,pfTop+pfW);
+  ctxH.lineTo(CXH+pfW,pfBot);ctxH.closePath();ctxH.clip();
+
+  ctxH.fillStyle='rgba(200,200,210,.15)';ctxH.fillRect(CXH-pfW,pfTop,pfW*2,pfH);
+
+  // Heat per zone = capped at 100, scaled by wattage and proximity
+  // Preform color uses stronger wattage curve so Z1(3000W) is visibly hotter than Z2(2000W)
+  for(let i=0;i<6;i++){
+    const yB=pfBot-i*zoneH,yT=yB-zoneH;
+    const eL=Math.min(100,zonesL[i]*potG)*zonesOnL[i];
+    const eR=Math.min(100,zonesR[i]*potG)*zonesOnR[i];
+    const wFcolor=Math.pow(zoneWatts[i]/maxWatt,0.8); // Z1=1.0, Z2=0.72, Z3=0.35
+    const absL=0.3+proxL[i]/100*0.7;
+    const absR=0.3+proxR[i]/100*0.7;
+    const v=(eL*absL+eR*absR)/2*wFcolor;
+    // Color: cold=blue → warm yellow → orange → intense red
+    let r,g,b,a;
+    if(v<3){
+      r=50;g=70;b=130;a=.2; // cold blue
+    } else if(v<15){
+      // Yellow-amber (800W zones land here at ~11)
+      const t=(v-3)/12;
+      r=Math.round(180+t*60);g=Math.round(150+t*30);b=Math.round(30-t*10);a=.25+t*.15;
+    } else if(v<35){
+      // Orange (2000W zones land here at ~23)
+      const t=(v-15)/20;
+      r=Math.round(240+t*15);g=Math.round(180-t*100);b=Math.round(20-t*10);a=.35+t*.15;
+    } else if(v<65){
+      // Red-orange (3000W zones land here at ~32-52)
+      const t=(v-35)/30;
+      r=255;g=Math.round(80-t*50);b=Math.round(10-t*5);a=.45+t*.2;
+    } else {
+      // Intense red (max heat)
+      const t=Math.min(1,(v-65)/35);
+      r=255;g=Math.round(30-t*20);b=Math.round(5);a=.6+t*.25;
+    }
+    ctxH.fillStyle='rgba('+r+','+g+','+b+','+a+')';
+    ctxH.fillRect(CXH-pfW-5,yT,pfW*2+10,zoneH);
+  }
+
+  // Light reflection: only visible when on front face (cosA > 0)
+  if(cosA>0){
+    const hlX=CXH+sinA*pfW*.75;
+    const hlWidth=4+cosA*4; // wider when directly facing
+    const hlAlpha=cosA*.18;
+    const hlG=ctxH.createLinearGradient(hlX-hlWidth,0,hlX+hlWidth,0);
+    hlG.addColorStop(0,'rgba(255,255,255,0)');
+    hlG.addColorStop(.5,'rgba(255,255,255,'+hlAlpha+')');
+    hlG.addColorStop(1,'rgba(255,255,255,0)');
+    ctxH.fillStyle=hlG;
+    ctxH.fillRect(CXH-pfW,pfTop,pfW*2,pfH);
+  }
+
+  // Shadow when highlight is on back: darken front slightly
+  if(cosA<-0.3){
+    ctxH.fillStyle='rgba(0,0,0,'+(Math.abs(cosA)*.06)+')';
+    ctxH.fillRect(CXH-pfW,pfTop,pfW*2,pfH);
+  }
+
+  // Edge shadows (always present)
+  const sL=ctxH.createLinearGradient(CXH-pfW,0,CXH-pfW+7,0);
+  sL.addColorStop(0,'rgba(0,0,0,.25)');sL.addColorStop(1,'rgba(0,0,0,0)');
+  ctxH.fillStyle=sL;ctxH.fillRect(CXH-pfW,pfTop,7,pfH);
+  const sR=ctxH.createLinearGradient(CXH+pfW,0,CXH+pfW-7,0);
+  sR.addColorStop(0,'rgba(0,0,0,.25)');sR.addColorStop(1,'rgba(0,0,0,0)');
+  ctxH.fillStyle=sR;ctxH.fillRect(CXH+pfW-7,pfTop,7,pfH);
+  ctxH.restore();
+
+  // Outline
+  ctxH.beginPath();ctxH.moveTo(CXH-pfW,pfBot);ctxH.lineTo(CXH-pfW,pfTop+pfW);
+  ctxH.quadraticCurveTo(CXH-pfW,pfTop,CXH,pfTop);
+  ctxH.quadraticCurveTo(CXH+pfW,pfTop,CXH+pfW,pfTop+pfW);
+  ctxH.lineTo(CXH+pfW,pfBot);ctxH.closePath();
+  ctxH.strokeStyle='rgba(200,200,220,.4)';ctxH.lineWidth=1.5;ctxH.stroke();
+
+  // Seam line: only visible on front, moves continuously right→left
+  if(cosA>0.05){
+    const seamX=CXH+sinA*pfW*.8;
+    const seamA=cosA*.1;
+    ctxH.strokeStyle='rgba(255,220,180,'+seamA+')';ctxH.lineWidth=1;
+    ctxH.beginPath();ctxH.moveTo(seamX,pfBot);ctxH.lineTo(seamX,pfTop+pfW+5);ctxH.stroke();
+  }
+
+  // Bocal (drawn after preform so it's on top)
+  ctxH.fillStyle='#E0E0E0';ctxH.fillRect(CXH-pfW,pfBot,pfW*2,22);
+  ctxH.strokeStyle='#AAA';ctxH.lineWidth=1;ctxH.strokeRect(CXH-pfW,pfBot,pfW*2,22);
+  ctxH.strokeStyle='#BBB';ctxH.lineWidth=.7;
+  for(let y=pfBot+2;y<pfBot+20;y+=3){ctxH.beginPath();ctxH.moveTo(CXH-pfW,y);ctxH.lineTo(CXH-pfW-2,y+1.5);ctxH.stroke();ctxH.beginPath();ctxH.moveTo(CXH+pfW,y);ctxH.lineTo(CXH+pfW+2,y+1.5);ctxH.stroke()}
+  // Anel trava
+  ctxH.fillStyle='#D0D0D0';ctxH.fillRect(CXH-pfW-5,pfBot-3,pfW*2+10,3);
+  ctxH.strokeStyle='#AAA';ctxH.lineWidth=.8;ctxH.strokeRect(CXH-pfW-5,pfBot-3,pfW*2+10,3);
+
+  // Perfil label
+  ctxH.font='600 13px DM Sans';ctxH.textAlign='center';ctxH.fillStyle='#fff';
+  ctxH.fillText(T('perfil'),CXH,(pfTop+pfBot)/2-8);
+  ctxH.font='700 15px DM Sans';
+  ctxH.fillText(potGeral,CXH,(pfTop+pfBot)/2+12);
+  clickR.push({x:CXH-25,y:(pfTop+pfBot)/2-18,w:50,h:36,type:'pot'});
+
+  // Labels above Zone 9
+  const z9yMid=pfTop-(9-6-1)*zoneH-zoneH/2;
+  const labelY=z9yMid-zoneH/2-12;
+  const z9DistL=75-proxL[8]/100*53;
+  const z9DistR=75-proxR[8]/100*53;
+  const lbLX=CXH-pfW-z9DistL-lampW/2;
+  const lbRX=CXH+pfW+z9DistR+lampW/2;
+  ctxH.font='700 13px DM Sans';ctxH.textAlign='center';ctxH.fillStyle='#8AB';
+  ctxH.fillText(T('preForno'),lbLX,labelY);
+  ctxH.fillText(T('forno'),lbRX,labelY);
+
+  // === VENTILATION / EXHAUST / AMBIENT CONTROLS ===
+  const ctrlY=pfBot+40; // below bocal/régua
+  const ctrlH=20;
+  const ctrlW=42;
+  const ctrlGap=12;
+  
+  // Ventilation
+  const ventX=CXH-110;
+  ctxH.font='500 9px DM Sans';ctxH.textAlign='center';ctxH.fillStyle='#6A8CA8';
+  ctxH.fillText('Ventilação',ventX,ctrlY);
+  ctxH.fillStyle='#fff';ctxH.fillRect(ventX-ctrlW/2,ctrlY+4,ctrlW,ctrlH);
+  ctxH.strokeStyle='#999';ctxH.lineWidth=.8;ctxH.strokeRect(ventX-ctrlW/2,ctrlY+4,ctrlW,ctrlH);
+  ctxH.font='700 11px DM Sans';ctxH.fillStyle='#000';
+  ctxH.fillText(ventHz+' Hz',ventX,ctrlY+17);
+  clickR.push({x:ventX-ctrlW/2,y:ctrlY+4,w:ctrlW,h:ctrlH,type:'vent'});
+
+  // Exhaust
+  const exaX=CXH;
+  ctxH.font='500 9px DM Sans';ctxH.fillStyle='#6A8CA8';
+  ctxH.fillText('Exaustão',exaX,ctrlY);
+  ctxH.fillStyle='#fff';ctxH.fillRect(exaX-ctrlW/2,ctrlY+4,ctrlW,ctrlH);
+  ctxH.strokeStyle='#999';ctxH.lineWidth=.8;ctxH.strokeRect(exaX-ctrlW/2,ctrlY+4,ctrlW,ctrlH);
+  ctxH.font='700 11px DM Sans';ctxH.fillStyle='#000';
+  ctxH.fillText(exaustHz+' Hz',exaX,ctrlY+17);
+  clickR.push({x:exaX-ctrlW/2,y:ctrlY+4,w:ctrlW,h:ctrlH,type:'exaust'});
+
+  // Ambient temperature
+  const ambX=CXH+110;
+  ctxH.font='500 9px DM Sans';ctxH.fillStyle='#6A8CA8';
+  ctxH.fillText('Temp. Ambiente',ambX,ctrlY);
+  ctxH.fillStyle='#fff';ctxH.fillRect(ambX-ctrlW/2,ctrlY+4,ctrlW,ctrlH);
+  ctxH.strokeStyle='#999';ctxH.lineWidth=.8;ctxH.strokeRect(ambX-ctrlW/2,ctrlY+4,ctrlW,ctrlH);
+  ctxH.font='700 11px DM Sans';ctxH.fillStyle='#000';
+  ctxH.fillText(ambientTemp+'°C',ambX,ctrlY+17);
+  clickR.push({x:ambX-ctrlW/2,y:ctrlY+4,w:ctrlW,h:ctrlH,type:'ambient'});
+
+  // Cooling indicator
+  const hp3=getHeatProfile();
+  // === TEMPERATURA DA PRÉ-FORMA ===
+  const tempAvg=Math.min(160,45+hp3.avg*3.1);
+  const tempRound=Math.round(tempAvg);
+  const tempIdealLow=95,tempIdealHigh=105;
+  const tempY=ctrlY+42;
+  const inIdeal=tempRound>=tempIdealLow&&tempRound<=tempIdealHigh;
+  const tooLow2=tempRound<tempIdealLow;
+  const tempColor=inIdeal?'#33DD55':tooLow2?'#5599EE':'#FF5533';
+  const statusTxt=inIdeal?'IDEAL':(tooLow2?'FRIA':'QUENTE');
+
+  // Title
+  ctxH.font='600 10px DM Sans';ctxH.textAlign='center';ctxH.fillStyle='#6A8CA8';
+  ctxH.fillText('Temperatura da Pré-forma',CXH,tempY);
+
+  // Temperature value
+  ctxH.font='700 22px DM Sans';ctxH.fillStyle=tempColor;
+  ctxH.fillText(tempRound+'°C',CXH,tempY+24);
+
+  // Status
+  ctxH.font='600 11px DM Sans';ctxH.fillStyle=tempColor;
+  ctxH.fillText(statusTxt,CXH,tempY+40);
+
+  // === AIR FLOW ANIMATION between lamps ===
+  if(hp3.airflow>0.05){
+    const t=Date.now()/1000;
+    const airAlpha=hp3.airflow*0.2;
+    const speed=hp3.airflow*2;
+    
+    // Animated air streaks between lamps and preform (both sides)
+    for(let side=-1;side<=1;side+=2){
+      for(let z=0;z<6;z++){
+        let yMidZ;
+        if(z<6)yMidZ=pfBot-z*zoneH-zoneH/2;
+        const distZ=75-(proxL[z]||50)/100*53;
+        const lampEdge=side<0?CXH-pfW-distZ:CXH+pfW+distZ+lampW;
+        const pfEdge=side<0?CXH-pfW:CXH+pfW;
+        const dir=side<0?1:-1;
+        
+        // Small dashes moving upward (hot air rising)
+        for(let d=0;d<3;d++){
+          const phase=(t*speed+d/3+z*0.2)%1;
+          const yPos=yMidZ+zoneH/2-phase*zoneH;
+          const xMid=(lampEdge+pfEdge)/2;
+          const dashAlpha=airAlpha*(1-Math.abs(phase-.5)*2);
+          
+          ctxH.strokeStyle='rgba(140,200,255,'+dashAlpha+')';
+          ctxH.lineWidth=1;
+          ctxH.beginPath();
+          ctxH.moveTo(xMid-dir*8,yPos+3);
+          ctxH.lineTo(xMid,yPos);
+          ctxH.lineTo(xMid+dir*8,yPos+3);
+          ctxH.stroke();
+        }
+      }
+    }
+  }
+}
+
+// ═══ TRANSLATIONS ═══
+let lang='pt';
+const TR={
+  pt:{title:'Simulação de Sopro - v10.2',tabHeat:'🔥 Perfil Térmico',tabBlow:'⚙ Processo de Sopro',
+    badge:'Especialista - Wesley Uelber',zona:'Zona',preForno:'Pré-Forno',forno:'Forno',perfil:'Perfil',
+    mold:'MOLDE',start:'▶ Iniciar',pause:'⏸ Pausar',resume:'▶ Continuar',reset:'↺ Reiniciar',done:'✓ Completo',
+    phases:['Posicionamento','Fechamento','Vedação do Bocal','Estiramento + Pré-Sopro','Sopro Final','Residência','Alívio de Sopro','Extração'],
+    ptPhases:'⚙ Etapas do Processo',ptTiming:'🎛 Início de Pré-Sopro',ptSpeed:'⚡ Tempo de Estiramento',
+    ptFlow:'💨 Vazão de Pré-Sopro',ptPressure:'🔵 Pressão de Pré-Sopro',ptDist:'📊 Distribuição de Material',
+    time:'Tempo',speed:'Tempo',flow:'Vazão',pressure:'Pressão',
+    hTL:'60 ms (antecipado)',hTR:'300 ms (atrasado)',hVL:'250 ms (rápida)',hVR:'500 ms (lenta)',
+    hFL:'0 (fechada)',hFR:'10 (aberta)',
+    ilWhat:'O que está acontecendo',ilParams:'Parâmetros ativos',
+    puPres:'pressão',puRod:'haste',puStroke:'curso',puPf:'pré-forma',puMold:'molde',
+    shoulder:'Ombro',center:'Centro',base:'Base',top:'TOPO',bottom:'BASE',
+    result:'Resultado:',waiting:'Aguardando...',selectOrStart:'Selecione uma etapa ou clique em "Iniciar".',
+    stepOf:'Etapa {n} de 8',
+    phDesc:[
+      'A pré-forma aquecida (~105°C) é posicionada dentro do molde refrigerado a 8°C.',
+      'A prensa fecha as duas metades do molde e o fundo petalóide sobe, encaixando por baixo.',
+      'A vedação cilíndrica desce sobre o bocal da pré-forma, selando a entrada de ar.',
+      'A haste desce esticando a pré-forma axialmente, enquanto o ar de baixa pressão inicia a expansão radial.',
+      'Ar de alta pressão (30 bar) pressiona o material contra as paredes do molde refrigerado.',
+      'A garrafa permanece pressurizada dentro do molde refrigerado para resfriamento e cristalização do PET.',
+      'A pressão interna é aliviada gradualmente. A haste de estiramento sobe de volta.',
+      'A vedação sobe, o molde abre e a garrafa é extraída com seu formato final.'
+    ]},
+  en:{title:'Blow Molding Simulation - v10.2',tabHeat:'🔥 Thermal Profile',tabBlow:'⚙ Blow Process',
+    badge:'Specialist - Wesley Uelber',zona:'Zone',preForno:'Pre-Oven',forno:'Oven',perfil:'Profile',
+    mold:'MOLD',start:'▶ Start',pause:'⏸ Pause',resume:'▶ Resume',reset:'↺ Reset',done:'✓ Done',
+    phases:['Positioning','Mold Closing','Nozzle Seal','Stretching + Pre-Blow','Final Blow','Holding','Blow Relief','Extraction'],
+    ptPhases:'⚙ Process Steps',ptTiming:'🎛 Pre-Blow Start',ptSpeed:'⚡ Stretch Time',
+    ptFlow:'💨 Pre-Blow Flow',ptPressure:'🔵 Pre-Blow Pressure',ptDist:'📊 Material Distribution',
+    time:'Time',speed:'Time',flow:'Flow',pressure:'Pressure',
+    hTL:'60 ms (early)',hTR:'300 ms (late)',hVL:'250 ms (fast)',hVR:'500 ms (slow)',
+    hFL:'0 (closed)',hFR:'10 (open)',
+    ilWhat:'What is happening',ilParams:'Active parameters',
+    puPres:'pressure',puRod:'rod',puStroke:'stroke',puPf:'preform',puMold:'mold',
+    shoulder:'Shoulder',center:'Center',base:'Base',top:'TOP',bottom:'BASE',
+    result:'Result:',waiting:'Waiting...',selectOrStart:'Select a step or click "Start".',
+    stepOf:'Step {n} of 8',
+    phDesc:[
+      'The heated preform (~105°C) is positioned inside the chilled mold at 8°C.',
+      'The press closes both mold halves and the petaloid base rises, fitting from below.',
+      'The cylindrical seal descends over the preform neck, sealing the air inlet.',
+      'The rod descends stretching the preform axially while low pressure air begins radial expansion.',
+      'High pressure air (30 bar) presses the material against the chilled mold walls.',
+      'The bottle remains pressurized inside the chilled mold for PET cooling and crystallization.',
+      'Internal pressure is gradually relieved. The stretch rod rises back.',
+      'The seal rises, the mold opens and the bottle is extracted in its final shape.'
+    ]},
+  es:{title:'Simulación de Soplado - v10.2',tabHeat:'🔥 Perfil Térmico',tabBlow:'⚙ Proceso de Soplado',
+    badge:'Especialista - Wesley Uelber',zona:'Zona',preForno:'Pre-Horno',forno:'Horno',perfil:'Perfil',
+    mold:'MOLDE',start:'▶ Iniciar',pause:'⏸ Pausar',resume:'▶ Continuar',reset:'↺ Reiniciar',done:'✓ Completo',
+    phases:['Posicionamiento','Cierre del Molde','Sellado de Boquilla','Estirado + Pre-Soplado','Soplado Final','Residencia','Alivio de Soplado','Extracción'],
+    ptPhases:'⚙ Etapas del Proceso',ptTiming:'🎛 Inicio de Pre-Soplado',ptSpeed:'⚡ Tiempo de Estirado',
+    ptFlow:'💨 Caudal de Pre-Soplado',ptPressure:'🔵 Presión de Pre-Soplado',ptDist:'📊 Distribución de Material',
+    time:'Tiempo',speed:'Tiempo',flow:'Caudal',pressure:'Presión',
+    hTL:'60 ms (anticipado)',hTR:'300 ms (retrasado)',hVL:'250 ms (rápida)',hVR:'500 ms (lenta)',
+    hFL:'0 (cerrado)',hFR:'10 (abierto)',
+    ilWhat:'Qué está pasando',ilParams:'Parámetros activos',
+    puPres:'presión',puRod:'varilla',puStroke:'carrera',puPf:'preforma',puMold:'molde',
+    shoulder:'Hombro',center:'Centro',base:'Base',top:'ARRIBA',bottom:'ABAJO',
+    result:'Resultado:',waiting:'Esperando...',selectOrStart:'Seleccione una etapa o haga clic en "Iniciar".',
+    stepOf:'Etapa {n} de 8',
+    phDesc:[
+      'La preforma calentada (~105°C) se posiciona dentro del molde refrigerado a 8°C.',
+      'La prensa cierra las dos mitades del molde y el fondo petaloide sube, encajando por debajo.',
+      'El sello cilíndrico desciende sobre la boquilla de la preforma, sellando la entrada de aire.',
+      'La varilla desciende estirando la preforma axialmente mientras el aire de baja presión inicia la expansión radial.',
+      'Aire de alta presión (30 bar) presiona el material contra las paredes del molde refrigerado.',
+      'La botella permanece presurizada dentro del molde refrigerado para enfriamiento y cristalización del PET.',
+      'La presión interna se alivia gradualmente. La varilla de estirado sube de vuelta.',
+      'El sello sube, el molde se abre y la botella se extrae con su forma final.'
+    ]}
+};
+function T(k){return TR[lang][k]||TR.pt[k]||k}
+
+function applyLang(){
+  // Title & tabs
+  document.getElementById('mainTitle').textContent=T('title');
+  document.title=T('title');
+  document.getElementById('tabHeat').textContent=T('tabHeat');
+  document.getElementById('tabBlow').textContent=T('tabBlow');
+  document.getElementById('badgeSpec').textContent=T('badge');
+  // Panel titles
+  const ptPh=document.getElementById('ptPhases');if(ptPh)ptPh.innerHTML='<span class="icon">⚙</span> '+T('ptPhases').replace('⚙ ','');
+  document.getElementById('ptTiming').innerHTML='<span class="icon">🎛</span> '+T('ptTiming').replace('🎛 ','');
+  document.getElementById('ptSpeed').innerHTML='<span class="icon">⚡</span> '+T('ptSpeed').replace('⚡ ','');
+  document.getElementById('ptFlow').innerHTML='<span class="icon">💨</span> '+T('ptFlow').replace('💨 ','');
+  document.getElementById('ptPressure').innerHTML='<span class="icon">🔵</span> '+T('ptPressure').replace('🔵 ','');
+  document.getElementById('ptDist').innerHTML='<span class="icon">📊</span> '+T('ptDist').replace('📊 ','');
+  // Phase buttons
+  document.querySelectorAll('.phase-btn').forEach((b,i)=>{
+    b.innerHTML='<span class="num">'+(i+1)+'</span>'+T('phases')[i];
+  });
+  // Buttons
+  if(S.ph<0)document.getElementById('btnPlay').textContent=T('start');
+  document.getElementById('btnReset').textContent=T('reset');
+  // Slider labels
+  document.querySelectorAll('.slbl').forEach(s=>{s.textContent=T(s.dataset.k)});
+  // Slider hints
+  const h=id=>document.getElementById(id);
+  h('hTL').textContent=T('hTL');h('hTR').textContent=T('hTR');
+  h('hVL').textContent=T('hVL');h('hVR').textContent=T('hVR');
+  h('hFL').textContent=T('hFL');h('hFR').textContent=T('hFR');
+  // Info labels
+  h('ilWhat').textContent=T('ilWhat');h('ilParams').textContent=T('ilParams');
+  // Param units
+  h('puPres').textContent=T('puPres');h('puRod').textContent=T('puRod');
+  h('puStroke').textContent=T('puStroke');h('puPf').textContent=T('puPf');h('puMold').textContent=T('puMold');
+  // Distribution labels
+  h('blOmbro').textContent=T('shoulder');h('blCentro').textContent=T('center');h('blBase').textContent=T('base');
+  // Update PD
+  for(let i=0;i<PD.length;i++){
+    PD[i].name=T('phases')[i];
+    PD[i].step=T('stepOf').replace('{n}',i+1);
+    if(T('phDesc')[i])PD[i].desc=T('phDesc')[i];
+  }
+  if(!S.pl)draw();
+  updateUI();
+}
+
+document.querySelectorAll('.flag').forEach(f=>{
+  f.addEventListener('click',()=>{
+    document.querySelectorAll('.flag').forEach(fl=>fl.classList.remove('active'));
+    f.classList.add('active');
+    lang=f.dataset.lang;
+    applyLang();
+  });
+});
+
+var heatAnim=null;
+function animateHeat(){drawHeat();heatAnim=requestAnimationFrame(animateHeat)}
+
+animateHeat();
+draw();
+
+
+
+// ═══ MERGED FROM SECOND SCRIPT ═══
+
+// ═══ SCROLL TAB CONTROLS ═══
+(function(){
+  const scroll=document.getElementById('mobScroll');
+  const tabs=document.querySelectorAll('.mob-tab');
+  if(!scroll)return;
+
+  tabs.forEach((t,i)=>{
+    t.addEventListener('click',()=>{
+      scroll.scrollTo({left:scroll.clientWidth*i,behavior:'smooth'});
+      tabs.forEach(tb=>tb.classList.remove('active'));
+      t.classList.add('active');
+    });
+  });
+
+  scroll.addEventListener('scroll',()=>{
+    const idx=Math.round(scroll.scrollLeft/scroll.clientWidth);
+    tabs.forEach((t,i)=>{t.classList.toggle('active',i===idx)});
+  });
+
+  // Phase buttons (all instances)
+  document.querySelectorAll('.mob-ph').forEach(b=>{
+    b.addEventListener('click',()=>jump(parseInt(b.dataset.phase)))});
+
+  // Sync mobile sticky buttons with main
+  const stickyBtns=document.querySelector('.mobile-sticky-btns');
+  if(stickyBtns){
+    const stickyPlay=stickyBtns.querySelector('.btn-play');
+    const stickyReset=stickyBtns.querySelector('.btn-reset');
+    if(stickyPlay)stickyPlay.addEventListener('click',()=>document.getElementById('btnPlay').click());
+    if(stickyReset)stickyReset.addEventListener('click',()=>document.getElementById('btnReset').click());
+    setInterval(()=>{
+      const main=document.getElementById('btnPlay');
+      if(main&&stickyPlay)stickyPlay.textContent=main.textContent;
+      const mobPlay=document.getElementById('mobBtnPlay');
+      if(main&&mobPlay)mobPlay.textContent=main.textContent;
+    },200);
+  }
+})();
+
+// ═══ GUIDED TOUR ═══
+const tourSteps={
+  pt:[
+    {el:null,title:'Bem-vindo ao Simulador de Sopro PET!',text:'Este simulador permite ajustar o perfil térmico e os parâmetros de sopro para entender como cada ajuste afeta a distribuição de material na garrafa. Vamos conhecer tudo?',pos:'center'},
+    {el:'#tabHeat',title:'Aba: Perfil Térmico',text:'Aqui você controla o aquecimento da pré-forma. Clique nesta aba para acessar as 9 zonas de aquecimento, ventilação, exaustão e temperatura ambiente.',pos:'bottom'},
+    {el:'#cvHeat',title:'Valores das Zonas (clicável)',text:'Clique no número ao lado de cada lâmpada para editar o valor (0-100). O editor aparece sobre o valor — digite e pressione Enter. Cada lado é independente: Pré-Forno (esquerda) e Forno (direita).',pos:'bottom',page:'aquecimento'},
+    {el:'#cvHeat',title:'Potência das Lâmpadas',text:'Z1 = 3000W (vermelho intenso), Z2 e Z9 = 2000W (laranja), Z3 a Z8 = 800W (amarelo). A mesma porcentagem gera mais calor nas lâmpadas mais potentes — observe a diferença de cor na pré-forma.',pos:'bottom',page:'aquecimento'},
+    {el:'#cvHeat',title:'Ligar/Desligar (clique na lâmpada)',text:'Clique diretamente na lâmpada (cápsula arredondada) para ligar ou desligar. Quando desligada, a zona não aquece e fica azul na pré-forma.',pos:'bottom',page:'aquecimento'},
+    {el:'#cvHeat',title:'Aproximação ◀ ▶ (distância)',text:'As setas brancas atrás do nome da zona controlam a distância. 3 níveis: perto (100), médio (50) e longe (0). Quanto mais perto, mais calor a pré-forma absorve naquela zona.',pos:'bottom',page:'aquecimento'},
+    {el:'#cvHeat',title:'Perfil — Potência Geral (clicável)',text:'Clique no valor "Perfil" no centro da pré-forma. Varia de 0 a 200 e multiplica todas as zonas proporcionalmente. Nenhuma zona ultrapassa 100 de intensidade real.',pos:'bottom',page:'aquecimento'},
+    {el:'#cvHeat',title:'Ventilação / Exaustão / Temp. Ambiente',text:'Abaixo da pré-forma — clique para editar. Ventilação (0-60 Hz) e Exaustão (0-60 Hz) resfriam o ar entre as lâmpadas. A temperatura ambiente (5-45°C) influencia: dia quente = ar não esfria, dia frio = resfriamento forte.',pos:'bottom',page:'aquecimento'},
+    {el:'#cvHeat',title:'Temperatura da Pré-forma',text:'Mostra a temperatura estimada. Ideal: 95-105°C (verde). Calibrado para zonas a 50% + ventilação 30Hz + exaustão 30Hz = 100°C. Azul = fria, vermelho = quente demais.',pos:'bottom',page:'aquecimento'},
+    {el:'#tabBlow',title:'Aba: Processo de Sopro',text:'Aqui você simula as 8 etapas do sopro e ajusta 4 parâmetros mecânicos. O perfil térmico da outra aba influencia diretamente a distribuição!',pos:'bottom',switchTo:'sopro'},
+    {el:'#btnPlay',title:'Botões: Iniciar / Reiniciar',text:'Clique em Iniciar para rodar a animação das 8 etapas. Ou clique num número (1-8) para ir direto a uma etapa específica.',pos:'bottom',page:'sopro'},
+    {el:'#mobWrap',title:'Ajuste: Início de Pré-Sopro (60-300ms)',text:'Controla quando o ar começa. Antecipado (60ms) = material vai pro ombro. Atrasado (300ms) = material fica na base. Use os presets para testar valores rápidos.',pos:'bottom',page:'sopro'},
+    {el:'#mobWrap',title:'Ajuste: Tempo de Estiramento (250-500ms)',text:'Tempo de descida da haste. Rápido (250ms) = material empurrado pra base. Lento (500ms) = material concentra no ombro.',pos:'bottom',page:'sopro'},
+    {el:'#mobWrap',title:'Ajuste: Vazão de Pré-Sopro (0-10)',text:'Fluxo de ar. Fechada (0) = sem expansão, material no fundo. Aberta (10) = expansão forte, material se distribui pro ombro.',pos:'bottom',page:'sopro'},
+    {el:'#mobWrap',title:'Ajuste: Pressão de Pré-Sopro (0-8 bar)',text:'Pressão do ar. Baixa = material na base. Alta = material no ombro. Todos os 5 fatores (4 mecânicos + perfil térmico) trabalham juntos e se compensam.',pos:'bottom',page:'sopro'},
+    {el:'#rNote',title:'Resultado — Diagnóstico Inteligente',text:'Mostra POR QUE o material está concentrado em determinada região. Lista cada fator que contribui (pré-sopro, estiramento, vazão, pressão, perfil térmico) por ordem de impacto.',pos:'top',page:'sopro'},
+    {el:'.flags',title:'Idiomas 🇧🇷 🇺🇸 🇪🇸',text:'Clique nas bandeiras para trocar o idioma. Todo o simulador traduz automaticamente — incluindo o diagnóstico.',pos:'bottom'},
+    {el:null,title:'Pronto para Explorar!',text:'Dica: vá no Perfil Térmico e coloque Z1-Z2 em 100 e Z5-Z6 em 20, depois veja o resultado na distribuição. Ou aumente o pré-sopro para 300ms e observe. Clique no botão ? para rever este tour a qualquer momento.',pos:'center'}
+  ],
+  en:[
+    {el:null,title:'Welcome to the PET Blow Molding Simulator!',text:'This simulator lets you adjust thermal profile and blow parameters to understand how each adjustment affects material distribution in the bottle.',pos:'center'},
+    {el:'#tabHeat',title:'Tab: Thermal Profile',text:'Here you control preform heating. Access the 9 heating zones, ventilation, exhaust and ambient temperature.',pos:'bottom'},
+    {el:'#cvHeat',title:'Zone Values (clickable)',text:'Click the number next to each lamp to edit (0-100). The editor appears over the value — type and press Enter. Each side is independent: Pre-Oven (left) and Oven (right).',pos:'bottom',page:'aquecimento'},
+    {el:'#cvHeat',title:'Lamp Wattage',text:'Z1 = 3000W (intense red), Z2/Z9 = 2000W (orange), Z3-Z8 = 800W (yellow). Same % generates more heat on higher wattage lamps.',pos:'bottom',page:'aquecimento'},
+    {el:'#cvHeat',title:'Toggle On/Off (click lamp)',text:'Click directly on the lamp capsule to turn on/off. When off, the zone stops heating and turns blue on the preform.',pos:'bottom',page:'aquecimento'},
+    {el:'#cvHeat',title:'Proximity ◀ ▶ (distance)',text:'White arrows behind zone names control distance. 3 levels: close (100), medium (50), far (0). Closer = more heat absorbed.',pos:'bottom',page:'aquecimento'},
+    {el:'#cvHeat',title:'Profile — General Power (clickable)',text:'Click "Profile" value in center. Range 0-200, multiplies all zones proportionally. No zone exceeds 100 actual intensity.',pos:'bottom',page:'aquecimento'},
+    {el:'#cvHeat',title:'Ventilation / Exhaust / Ambient Temp',text:'Below preform — click to edit. Ventilation and Exhaust (0-60 Hz) cool air between lamps. Ambient temp (5-45°C): hot day = no cooling, cold day = strong cooling.',pos:'bottom',page:'aquecimento'},
+    {el:'#cvHeat',title:'Preform Temperature',text:'Shows estimated temperature. Ideal: 95-105°C (green). Calibrated: zones at 50% + vent 30Hz + exhaust 30Hz = 100°C.',pos:'bottom',page:'aquecimento'},
+    {el:'#tabBlow',title:'Tab: Blow Process',text:'Simulate the 8 blow steps and adjust 4 mechanical parameters. The thermal profile directly influences distribution!',pos:'bottom',switchTo:'sopro'},
+    {el:'#btnPlay',title:'Buttons: Start / Reset',text:'Click Start to run the 8-step animation. Or click a number (1-8) to jump to a specific step.',pos:'bottom',page:'sopro'},
+    {el:'#mobWrap',title:'Adjustment: Pre-Blow Start (60-300ms)',text:'Controls when air starts. Early (60ms) = material to shoulder. Late (300ms) = material stays on base.',pos:'bottom',page:'sopro'},
+    {el:'#mobWrap',title:'Adjustment: Stretch Time (250-500ms)',text:'Rod descent time. Fast (250ms) = material pushed to base. Slow (500ms) = material concentrates on shoulder.',pos:'bottom',page:'sopro'},
+    {el:'#mobWrap',title:'Adjustment: Pre-Blow Flow (0-10)',text:'Air flow. Closed (0) = no expansion, material on base. Open (10) = strong expansion, material to shoulder.',pos:'bottom',page:'sopro'},
+    {el:'#mobWrap',title:'Adjustment: Pre-Blow Pressure (0-8 bar)',text:'Air pressure. Low = material on base. High = material on shoulder. All 5 factors (4 mechanical + thermal) work together.',pos:'bottom',page:'sopro'},
+    {el:'#rNote',title:'Result — Smart Diagnosis',text:'Shows WHY material concentrates in a region. Lists each contributing factor (pre-blow, stretch, flow, pressure, thermal) by impact order.',pos:'top',page:'sopro'},
+    {el:'.flags',title:'Languages 🇧🇷 🇺🇸 🇪🇸',text:'Click flags to switch language. Everything translates automatically — including the diagnosis.',pos:'bottom'},
+    {el:null,title:'Ready to Explore!',text:'Tip: set Z1-Z2 to 100 and Z5-Z6 to 20 in Thermal Profile, then check the distribution result. Or increase pre-blow to 300ms. Click ? to review this tour anytime.',pos:'center'}
+  ],
+  es:[
+    {el:null,title:'¡Bienvenido al Simulador de Soplado PET!',text:'Este simulador permite ajustar el perfil térmico y los parámetros de soplado para entender cómo afectan la distribución de material en la botella.',pos:'center'},
+    {el:'#tabHeat',title:'Pestaña: Perfil Térmico',text:'Aquí controla el calentamiento de la preforma. Acceda a las 9 zonas, ventilación, extracción y temperatura ambiente.',pos:'bottom'},
+    {el:'#cvHeat',title:'Valores de Zonas (clic)',text:'Haga clic en el número junto a cada lámpara para editar (0-100). El editor aparece sobre el valor. Cada lado es independiente.',pos:'bottom',page:'aquecimento'},
+    {el:'#cvHeat',title:'Potencia de Lámparas',text:'Z1 = 3000W (rojo intenso), Z2/Z9 = 2000W (naranja), Z3-Z8 = 800W (amarillo).',pos:'bottom',page:'aquecimento'},
+    {el:'#cvHeat',title:'Encender/Apagar (clic en lámpara)',text:'Haga clic en la cápsula para encender o apagar.',pos:'bottom',page:'aquecimento'},
+    {el:'#cvHeat',title:'Aproximación ◀ ▶',text:'Flechas controlan distancia. 3 niveles: cerca (100), medio (50), lejos (0).',pos:'bottom',page:'aquecimento'},
+    {el:'#cvHeat',title:'Perfil — Potencia General',text:'Haga clic en "Perfil" (0-200). Multiplica todas las zonas proporcionalmente.',pos:'bottom',page:'aquecimento'},
+    {el:'#cvHeat',title:'Ventilación / Extracción / Temp.',text:'Debajo de la preforma. Controlan el enfriamiento del aire entre lámparas.',pos:'bottom',page:'aquecimento'},
+    {el:'#cvHeat',title:'Temperatura de la Preforma',text:'Ideal: 95-105°C (verde). Calibrado: zonas 50% + vent 30Hz + ext 30Hz = 100°C.',pos:'bottom',page:'aquecimento'},
+    {el:'#tabBlow',title:'Pestaña: Proceso de Soplado',text:'Simule las 8 etapas y ajuste 4 parámetros mecánicos. ¡El perfil térmico influye directamente!',pos:'bottom',switchTo:'sopro'},
+    {el:'#btnPlay',title:'Botones: Iniciar / Reiniciar',text:'Inicie la animación o haga clic en un número (1-8) para ir a una etapa específica.',pos:'bottom',page:'sopro'},
+    {el:'#mobWrap',title:'Inicio de Pre-Soplado (60-300ms)',text:'Anticipado = material en hombro. Retrasado = material en base.',pos:'bottom',page:'sopro'},
+    {el:'#mobWrap',title:'Tiempo de Estirado (250-500ms)',text:'Rápido = material en base. Lento = material en hombro.',pos:'bottom',page:'sopro'},
+    {el:'#mobWrap',title:'Caudal de Pre-Soplado (0-10)',text:'Cerrado = material en base. Abierto = material en hombro.',pos:'bottom',page:'sopro'},
+    {el:'#mobWrap',title:'Presión de Pre-Soplado (0-8 bar)',text:'Los 5 factores (4 mecánicos + térmico) trabajan juntos y se compensan.',pos:'bottom',page:'sopro'},
+    {el:'#rNote',title:'Resultado — Diagnóstico',text:'Muestra POR QUÉ el material se concentra en una región, listando cada factor por orden de impacto.',pos:'top',page:'sopro'},
+    {el:'.flags',title:'Idiomas 🇧🇷 🇺🇸 🇪🇸',text:'Haga clic en las banderas para cambiar idioma.',pos:'bottom'},
+    {el:null,title:'¡Listo para Explorar!',text:'Pruebe: coloque Z1-Z2 en 100 y Z5-Z6 en 20, luego vea el resultado. Haga clic en ? para revisar este tour.',pos:'center'}
+  ]
+};
+
+const tourBtnLabels={
+  pt:{next:'Próximo →',skip:'Pular Tudo',done:'Finalizar',restart:'Rever Tour'},
+  en:{next:'Next →',skip:'Skip All',done:'Finish',restart:'Review Tour'},
+  es:{next:'Siguiente →',skip:'Saltar Todo',done:'Finalizar',restart:'Revisar Tour'}
+};
+
+let tourIdx=0;
+let tourActive=false;
+
+function showTour(idx){
+ try{
+  const steps=tourSteps[lang]||tourSteps.pt;
+  const lb=tourBtnLabels[lang]||tourBtnLabels.pt;
+  if(idx<0||idx>=steps.length){endTour();return}
+  tourIdx=idx;
+  const step=steps[idx];
+  const ov=document.getElementById('tourOverlay');
+  const hl=document.getElementById('tourHL');
+  const tip=document.getElementById('tourTip');
+
+  ov.style.display='block';
+  tourActive=true;
+
+  // Switch page if needed
+  if(step.switchTo){
+    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+    document.querySelectorAll('.page').forEach(p=>p.style.display='none');
+    const tabEl=step.switchTo==='sopro'?document.getElementById('tabBlow'):document.getElementById('tabHeat');
+    tabEl.classList.add('active');
+    document.getElementById('page-'+step.switchTo).style.display='block';
+    if(step.switchTo==='aquecimento'&&!heatAnim)animateHeat();
+    if(step.switchTo!=='aquecimento'&&heatAnim){cancelAnimationFrame(heatAnim);heatAnim=null}
+  }
+  if(step.page){
+    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+    document.querySelectorAll('.page').forEach(p=>p.style.display='none');
+    const tabEl=step.page==='sopro'?document.getElementById('tabBlow'):document.getElementById('tabHeat');
+    tabEl.classList.add('active');
+    document.getElementById('page-'+step.page).style.display='block';
+    if(step.page==='aquecimento'&&!heatAnim)animateHeat();
+    if(step.page!=='aquecimento'&&heatAnim){cancelAnimationFrame(heatAnim);heatAnim=null}
+  }
+
+  // Step indicator
+  document.getElementById('tourStepInd').textContent=(idx+1)+' / '+steps.length;
+  document.getElementById('tourTitle').textContent=step.title;
+  document.getElementById('tourText').textContent=step.text;
+
+  // Buttons
+  const btnsEl=document.getElementById('tourBtns');
+  btnsEl.innerHTML='';
+  if(idx<steps.length-1){
+    btnsEl.innerHTML='<button class="tour-btn tour-btn-skip" data-action="skip">'+lb.skip+'</button>'+
+      '<button class="tour-btn tour-btn-next" data-action="next" data-idx="'+(idx+1)+'">'+lb.next+'</button>';
+  } else {
+    btnsEl.innerHTML='<button class="tour-btn tour-btn-done" data-action="skip">'+lb.done+'</button>';
+  }
+  // Wire buttons without inline onclick
+  btnsEl.querySelectorAll('[data-action="skip"]').forEach(function(b){b.addEventListener('click',endTour)});
+  btnsEl.querySelectorAll('[data-action="next"]').forEach(function(b){b.addEventListener('click',function(){showTour(parseInt(b.dataset.idx))})});
+
+  // Position
+  if(!step.el||step.pos==='center'){
+    hl.style.display='none';
+    tip.className='tour-tooltip';
+    const isMob=window.innerWidth<=700;
+    if(isMob){
+      tip.style.left='12px';tip.style.right='12px';
+      tip.style.top='auto';tip.style.bottom='20px';
+      tip.style.transform='none';tip.style.width='auto';
+    } else {
+      tip.style.left='50%';tip.style.top='50%';
+      tip.style.transform='translate(-50%,-50%)';
+      tip.style.right='auto';tip.style.width='auto';tip.style.bottom='auto';
+    }
+    return;
+  }
+
+  const target=document.querySelector(step.el);
+  if(!target){showTour(idx+1);return}
+
+  // Scroll first, then position after delay
+  target.scrollIntoView({behavior:'smooth',block:'center'});
+
+  setTimeout(()=>{
+    const rect=target.getBoundingClientRect();
+    const pad=6;
+    const isMobile=window.innerWidth<=700;
+    const vw=window.innerWidth;
+    const vh=window.innerHeight;
+
+    hl.style.display='block';
+    hl.style.left=(rect.left-pad)+'px';
+    hl.style.top=(rect.top-pad)+'px';
+    hl.style.width=(rect.width+pad*2)+'px';
+    hl.style.height=Math.min(rect.height+pad*2,vh*0.6)+'px';
+
+    tip.style.transform='none';
+    tip.style.right='auto';tip.style.width='auto';
+    tip.className='tour-tooltip '+step.pos;
+
+    if(isMobile){
+      // Mobile: tooltip ALWAYS fixed at bottom of viewport
+      tip.style.left='12px';
+      tip.style.right='12px';
+      tip.style.width='auto';
+      tip.style.bottom='16px';
+      tip.style.top='auto';
+      tip.style.transform='none';
+      
+      // Limit highlight height so tooltip is visible
+      const maxHlH=vh*0.4;
+      if(rect.height>maxHlH){
+        hl.style.height=maxHlH+'px';
+      }
+    } else {
+      // Desktop positioning - clear bottom
+      tip.style.bottom='auto';
+      if(step.pos==='bottom'){
+        tip.style.left=Math.max(10,Math.min(rect.left,vw-380))+'px';
+        tip.style.top=(rect.bottom+16)+'px';
+      } else if(step.pos==='top'){
+        tip.style.left=Math.max(10,Math.min(rect.left,vw-380))+'px';
+        tip.style.top=(rect.top-tip.offsetHeight-16)+'px';
+      } else if(step.pos==='left'){
+        tip.style.left=(rect.left-tip.offsetWidth-16)+'px';
+        tip.style.top=rect.top+'px';
+      }
+    }
+  },350);
+ }catch(e){console.error('Tour error:',e)}
+}
+
+function endTour(){
+  document.getElementById('tourOverlay').style.display='none';
+  tourActive=false;
+  tourIdx=0;
+  try{localStorage.setItem('tourDone','1')}catch(e){}
+}
+window.endTour=endTour;
+
+function startTour(){
+  tourIdx=0;
+  tourActive=true;
+  document.getElementById('tourOverlay').style.display='block';
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.page').forEach(p=>p.style.display='none');
+  document.getElementById('tabHeat').classList.add('active');
+  document.getElementById('page-aquecimento').style.display='block';
+  if(!heatAnim)animateHeat();
+  showTour(0);
+}
+window.startTour=startTour;
+window.showTour=showTour;
+
+document.getElementById('helpBtn').addEventListener('click',function(e){
+  e.preventDefault();e.stopPropagation();
+  try{startTour()}catch(err){alert('Erro: '+err.message)}
+});
+
+// Mobile fixed buttons
+var mobPlayBtn=document.getElementById('mobBtnPlay');
+var mobResetBtn=document.getElementById('mobBtnReset');
+if(mobPlayBtn)mobPlayBtn.addEventListener('click',function(){document.getElementById('btnPlay').click()});
+if(mobResetBtn)mobResetBtn.addEventListener('click',function(){document.getElementById('btnReset').click()});
+
+// Sync mobile button text
+setInterval(function(){
+  var main=document.getElementById('btnPlay');
+  if(main&&mobPlayBtn)mobPlayBtn.textContent=main.textContent;
+},200);
+
+// Auto-start tour on load
+window.addEventListener('load',function(){
+  setTimeout(function(){
+    try{startTour()}catch(e){console.error(e)}
+  },1200);
+});
+
+</script>
+</body>
+</html>
