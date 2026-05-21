@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Simulação de Sopro - v10.2</title>
+<title>Simulação de Sopro - v10.3</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap');
 :root{--azul:#2E75B6;--azul-escuro:#1A4B8C;--laranja:#E87722;--verde:#2E8B57;--vermelho:#C0392B;--bg:#2A4D6E;--panel:#335A7A;--border:#3E6D8E}
@@ -239,7 +239,7 @@ canvas{border-radius:12px;background:var(--panel);box-shadow:0 4px 20px rgba(0,0
 <body>
 
 <div class="topbar">
-  <h1 id="mainTitle">Simulação de Sopro - v10.2</h1>
+  <h1 id="mainTitle">Simulação de Sopro - v10.3</h1>
   <div class="tabs">
     <button class="tab active" data-tab="aquecimento" id="tabHeat">🔥 Perfil Térmico</button>
     <button class="tab" data-tab="sopro" id="tabBlow">⚙ Processo de Sopro</button>
@@ -390,22 +390,11 @@ canvas{border-radius:12px;background:var(--panel);box-shadow:0 4px 20px rgba(0,0
 </div><!-- end page-sopro -->
 
 
-<!-- Help button -->
-<button class="help-btn" id="helpBtn">?</button>
 
-<!-- Tour overlay -->
-<div class="tour-overlay" id="tourOverlay">
-  <div class="tour-bg" id="tourBg"></div>
-  <div class="tour-highlight" id="tourHL"></div>
-  <div class="tour-tooltip" id="tourTip">
-    <div class="tour-step-ind" id="tourStepInd"></div>
-    <div class="tour-title" id="tourTitle"></div>
-    <div class="tour-text" id="tourText"></div>
-    <div class="tour-btns" id="tourBtns"></div>
-  </div>
-</div>
+
 
 <script>
+
 
 const cv=document.getElementById('cv'),ctx=cv.getContext('2d');
 
@@ -1559,7 +1548,7 @@ function drawHeat(){
 // ═══ TRANSLATIONS ═══
 let lang='pt';
 const TR={
-  pt:{title:'Simulação de Sopro - v10.2',tabHeat:'🔥 Perfil Térmico',tabBlow:'⚙ Processo de Sopro',
+  pt:{title:'Simulação de Sopro - v10.3',tabHeat:'🔥 Perfil Térmico',tabBlow:'⚙ Processo de Sopro',
     badge:'Especialista - Wesley Uelber',zona:'Zona',preForno:'Pré-Forno',forno:'Forno',perfil:'Perfil',
     mold:'MOLDE',start:'▶ Iniciar',pause:'⏸ Pausar',resume:'▶ Continuar',reset:'↺ Reiniciar',done:'✓ Completo',
     phases:['Posicionamento','Fechamento','Vedação do Bocal','Estiramento + Pré-Sopro','Sopro Final','Residência','Alívio de Sopro','Extração'],
@@ -1583,7 +1572,7 @@ const TR={
       'A pressão interna é aliviada gradualmente. A haste de estiramento sobe de volta.',
       'A vedação sobe, o molde abre e a garrafa é extraída com seu formato final.'
     ]},
-  en:{title:'Blow Molding Simulation - v10.2',tabHeat:'🔥 Thermal Profile',tabBlow:'⚙ Blow Process',
+  en:{title:'Blow Molding Simulation - v10.3',tabHeat:'🔥 Thermal Profile',tabBlow:'⚙ Blow Process',
     badge:'Specialist - Wesley Uelber',zona:'Zone',preForno:'Pre-Oven',forno:'Oven',perfil:'Profile',
     mold:'MOLD',start:'▶ Start',pause:'⏸ Pause',resume:'▶ Resume',reset:'↺ Reset',done:'✓ Done',
     phases:['Positioning','Mold Closing','Nozzle Seal','Stretching + Pre-Blow','Final Blow','Holding','Blow Relief','Extraction'],
@@ -1607,7 +1596,7 @@ const TR={
       'Internal pressure is gradually relieved. The stretch rod rises back.',
       'The seal rises, the mold opens and the bottle is extracted in its final shape.'
     ]},
-  es:{title:'Simulación de Soplado - v10.2',tabHeat:'🔥 Perfil Térmico',tabBlow:'⚙ Proceso de Soplado',
+  es:{title:'Simulación de Soplado - v10.3',tabHeat:'🔥 Perfil Térmico',tabBlow:'⚙ Proceso de Soplado',
     badge:'Especialista - Wesley Uelber',zona:'Zona',preForno:'Pre-Horno',forno:'Horno',perfil:'Perfil',
     mold:'MOLDE',start:'▶ Iniciar',pause:'⏸ Pausar',resume:'▶ Continuar',reset:'↺ Reiniciar',done:'✓ Completo',
     phases:['Posicionamiento','Cierre del Molde','Sellado de Boquilla','Estirado + Pre-Soplado','Soplado Final','Residencia','Alivio de Soplado','Extracción'],
@@ -1693,11 +1682,24 @@ function animateHeat(){drawHeat();heatAnim=requestAnimationFrame(animateHeat)}
 
 animateHeat();
 draw();
+</script>
 
+<!-- Help button -->
+<button class="help-btn" id="helpBtn">?</button>
 
+<!-- Tour overlay -->
+<div class="tour-overlay" id="tourOverlay">
+  <div class="tour-bg" id="tourBg"></div>
+  <div class="tour-highlight" id="tourHL"></div>
+  <div class="tour-tooltip" id="tourTip">
+    <div class="tour-step-ind" id="tourStepInd"></div>
+    <div class="tour-title" id="tourTitle"></div>
+    <div class="tour-text" id="tourText"></div>
+    <div class="tour-btns" id="tourBtns"></div>
+  </div>
+</div>
 
-// ═══ MERGED FROM SECOND SCRIPT ═══
-
+<script>
 // ═══ SCROLL TAB CONTROLS ═══
 (function(){
   const scroll=document.getElementById('mobScroll');
@@ -1784,202 +1786,4 @@ const tourSteps={
     {el:'#tabHeat',title:'Pestaña: Perfil Térmico',text:'Aquí controla el calentamiento de la preforma. Acceda a las 9 zonas, ventilación, extracción y temperatura ambiente.',pos:'bottom'},
     {el:'#cvHeat',title:'Valores de Zonas (clic)',text:'Haga clic en el número junto a cada lámpara para editar (0-100). El editor aparece sobre el valor. Cada lado es independiente.',pos:'bottom',page:'aquecimento'},
     {el:'#cvHeat',title:'Potencia de Lámparas',text:'Z1 = 3000W (rojo intenso), Z2/Z9 = 2000W (naranja), Z3-Z8 = 800W (amarillo).',pos:'bottom',page:'aquecimento'},
-    {el:'#cvHeat',title:'Encender/Apagar (clic en lámpara)',text:'Haga clic en la cápsula para encender o apagar.',pos:'bottom',page:'aquecimento'},
-    {el:'#cvHeat',title:'Aproximación ◀ ▶',text:'Flechas controlan distancia. 3 niveles: cerca (100), medio (50), lejos (0).',pos:'bottom',page:'aquecimento'},
-    {el:'#cvHeat',title:'Perfil — Potencia General',text:'Haga clic en "Perfil" (0-200). Multiplica todas las zonas proporcionalmente.',pos:'bottom',page:'aquecimento'},
-    {el:'#cvHeat',title:'Ventilación / Extracción / Temp.',text:'Debajo de la preforma. Controlan el enfriamiento del aire entre lámparas.',pos:'bottom',page:'aquecimento'},
-    {el:'#cvHeat',title:'Temperatura de la Preforma',text:'Ideal: 95-105°C (verde). Calibrado: zonas 50% + vent 30Hz + ext 30Hz = 100°C.',pos:'bottom',page:'aquecimento'},
-    {el:'#tabBlow',title:'Pestaña: Proceso de Soplado',text:'Simule las 8 etapas y ajuste 4 parámetros mecánicos. ¡El perfil térmico influye directamente!',pos:'bottom',switchTo:'sopro'},
-    {el:'#btnPlay',title:'Botones: Iniciar / Reiniciar',text:'Inicie la animación o haga clic en un número (1-8) para ir a una etapa específica.',pos:'bottom',page:'sopro'},
-    {el:'#mobWrap',title:'Inicio de Pre-Soplado (60-300ms)',text:'Anticipado = material en hombro. Retrasado = material en base.',pos:'bottom',page:'sopro'},
-    {el:'#mobWrap',title:'Tiempo de Estirado (250-500ms)',text:'Rápido = material en base. Lento = material en hombro.',pos:'bottom',page:'sopro'},
-    {el:'#mobWrap',title:'Caudal de Pre-Soplado (0-10)',text:'Cerrado = material en base. Abierto = material en hombro.',pos:'bottom',page:'sopro'},
-    {el:'#mobWrap',title:'Presión de Pre-Soplado (0-8 bar)',text:'Los 5 factores (4 mecánicos + térmico) trabajan juntos y se compensan.',pos:'bottom',page:'sopro'},
-    {el:'#rNote',title:'Resultado — Diagnóstico',text:'Muestra POR QUÉ el material se concentra en una región, listando cada factor por orden de impacto.',pos:'top',page:'sopro'},
-    {el:'.flags',title:'Idiomas 🇧🇷 🇺🇸 🇪🇸',text:'Haga clic en las banderas para cambiar idioma.',pos:'bottom'},
-    {el:null,title:'¡Listo para Explorar!',text:'Pruebe: coloque Z1-Z2 en 100 y Z5-Z6 en 20, luego vea el resultado. Haga clic en ? para revisar este tour.',pos:'center'}
-  ]
-};
-
-const tourBtnLabels={
-  pt:{next:'Próximo →',skip:'Pular Tudo',done:'Finalizar',restart:'Rever Tour'},
-  en:{next:'Next →',skip:'Skip All',done:'Finish',restart:'Review Tour'},
-  es:{next:'Siguiente →',skip:'Saltar Todo',done:'Finalizar',restart:'Revisar Tour'}
-};
-
-let tourIdx=0;
-let tourActive=false;
-
-function showTour(idx){
- try{
-  const steps=tourSteps[lang]||tourSteps.pt;
-  const lb=tourBtnLabels[lang]||tourBtnLabels.pt;
-  if(idx<0||idx>=steps.length){endTour();return}
-  tourIdx=idx;
-  const step=steps[idx];
-  const ov=document.getElementById('tourOverlay');
-  const hl=document.getElementById('tourHL');
-  const tip=document.getElementById('tourTip');
-
-  ov.style.display='block';
-  tourActive=true;
-
-  // Switch page if needed
-  if(step.switchTo){
-    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
-    document.querySelectorAll('.page').forEach(p=>p.style.display='none');
-    const tabEl=step.switchTo==='sopro'?document.getElementById('tabBlow'):document.getElementById('tabHeat');
-    tabEl.classList.add('active');
-    document.getElementById('page-'+step.switchTo).style.display='block';
-    if(step.switchTo==='aquecimento'&&!heatAnim)animateHeat();
-    if(step.switchTo!=='aquecimento'&&heatAnim){cancelAnimationFrame(heatAnim);heatAnim=null}
-  }
-  if(step.page){
-    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
-    document.querySelectorAll('.page').forEach(p=>p.style.display='none');
-    const tabEl=step.page==='sopro'?document.getElementById('tabBlow'):document.getElementById('tabHeat');
-    tabEl.classList.add('active');
-    document.getElementById('page-'+step.page).style.display='block';
-    if(step.page==='aquecimento'&&!heatAnim)animateHeat();
-    if(step.page!=='aquecimento'&&heatAnim){cancelAnimationFrame(heatAnim);heatAnim=null}
-  }
-
-  // Step indicator
-  document.getElementById('tourStepInd').textContent=(idx+1)+' / '+steps.length;
-  document.getElementById('tourTitle').textContent=step.title;
-  document.getElementById('tourText').textContent=step.text;
-
-  // Buttons
-  const btnsEl=document.getElementById('tourBtns');
-  btnsEl.innerHTML='';
-  if(idx<steps.length-1){
-    btnsEl.innerHTML='<button class="tour-btn tour-btn-skip" data-action="skip">'+lb.skip+'</button>'+
-      '<button class="tour-btn tour-btn-next" data-action="next" data-idx="'+(idx+1)+'">'+lb.next+'</button>';
-  } else {
-    btnsEl.innerHTML='<button class="tour-btn tour-btn-done" data-action="skip">'+lb.done+'</button>';
-  }
-  // Wire buttons without inline onclick
-  btnsEl.querySelectorAll('[data-action="skip"]').forEach(function(b){b.addEventListener('click',endTour)});
-  btnsEl.querySelectorAll('[data-action="next"]').forEach(function(b){b.addEventListener('click',function(){showTour(parseInt(b.dataset.idx))})});
-
-  // Position
-  if(!step.el||step.pos==='center'){
-    hl.style.display='none';
-    tip.className='tour-tooltip';
-    const isMob=window.innerWidth<=700;
-    if(isMob){
-      tip.style.left='12px';tip.style.right='12px';
-      tip.style.top='auto';tip.style.bottom='20px';
-      tip.style.transform='none';tip.style.width='auto';
-    } else {
-      tip.style.left='50%';tip.style.top='50%';
-      tip.style.transform='translate(-50%,-50%)';
-      tip.style.right='auto';tip.style.width='auto';tip.style.bottom='auto';
-    }
-    return;
-  }
-
-  const target=document.querySelector(step.el);
-  if(!target){showTour(idx+1);return}
-
-  // Scroll first, then position after delay
-  target.scrollIntoView({behavior:'smooth',block:'center'});
-
-  setTimeout(()=>{
-    const rect=target.getBoundingClientRect();
-    const pad=6;
-    const isMobile=window.innerWidth<=700;
-    const vw=window.innerWidth;
-    const vh=window.innerHeight;
-
-    hl.style.display='block';
-    hl.style.left=(rect.left-pad)+'px';
-    hl.style.top=(rect.top-pad)+'px';
-    hl.style.width=(rect.width+pad*2)+'px';
-    hl.style.height=Math.min(rect.height+pad*2,vh*0.6)+'px';
-
-    tip.style.transform='none';
-    tip.style.right='auto';tip.style.width='auto';
-    tip.className='tour-tooltip '+step.pos;
-
-    if(isMobile){
-      // Mobile: tooltip ALWAYS fixed at bottom of viewport
-      tip.style.left='12px';
-      tip.style.right='12px';
-      tip.style.width='auto';
-      tip.style.bottom='16px';
-      tip.style.top='auto';
-      tip.style.transform='none';
-      
-      // Limit highlight height so tooltip is visible
-      const maxHlH=vh*0.4;
-      if(rect.height>maxHlH){
-        hl.style.height=maxHlH+'px';
-      }
-    } else {
-      // Desktop positioning - clear bottom
-      tip.style.bottom='auto';
-      if(step.pos==='bottom'){
-        tip.style.left=Math.max(10,Math.min(rect.left,vw-380))+'px';
-        tip.style.top=(rect.bottom+16)+'px';
-      } else if(step.pos==='top'){
-        tip.style.left=Math.max(10,Math.min(rect.left,vw-380))+'px';
-        tip.style.top=(rect.top-tip.offsetHeight-16)+'px';
-      } else if(step.pos==='left'){
-        tip.style.left=(rect.left-tip.offsetWidth-16)+'px';
-        tip.style.top=rect.top+'px';
-      }
-    }
-  },350);
- }catch(e){console.error('Tour error:',e)}
-}
-
-function endTour(){
-  document.getElementById('tourOverlay').style.display='none';
-  tourActive=false;
-  tourIdx=0;
-  try{localStorage.setItem('tourDone','1')}catch(e){}
-}
-window.endTour=endTour;
-
-function startTour(){
-  tourIdx=0;
-  tourActive=true;
-  document.getElementById('tourOverlay').style.display='block';
-  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
-  document.querySelectorAll('.page').forEach(p=>p.style.display='none');
-  document.getElementById('tabHeat').classList.add('active');
-  document.getElementById('page-aquecimento').style.display='block';
-  if(!heatAnim)animateHeat();
-  showTour(0);
-}
-window.startTour=startTour;
-window.showTour=showTour;
-
-document.getElementById('helpBtn').addEventListener('click',function(e){
-  e.preventDefault();e.stopPropagation();
-  try{startTour()}catch(err){alert('Erro: '+err.message)}
-});
-
-// Mobile fixed buttons
-var mobPlayBtn=document.getElementById('mobBtnPlay');
-var mobResetBtn=document.getElementById('mobBtnReset');
-if(mobPlayBtn)mobPlayBtn.addEventListener('click',function(){document.getElementById('btnPlay').click()});
-if(mobResetBtn)mobResetBtn.addEventListener('click',function(){document.getElementById('btnReset').click()});
-
-// Sync mobile button text
-setInterval(function(){
-  var main=document.getElementById('btnPlay');
-  if(main&&mobPlayBtn)mobPlayBtn.textContent=main.textContent;
-},200);
-
-// Auto-start tour on load
-window.addEventListener('load',function(){
-  setTimeout(function(){
-    try{startTour()}catch(e){console.error(e)}
-  },1200);
-});
-
-</script>
-</body>
-</html>
+    {el:'#cvHeat',title:'Encender/Apa
