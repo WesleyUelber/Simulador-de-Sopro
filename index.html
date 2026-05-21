@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Simulação de Sopro - v10.0</title>
+<title>Simulação de Sopro - v10.1</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap');
 :root{--azul:#2E75B6;--azul-escuro:#1A4B8C;--laranja:#E87722;--verde:#2E8B57;--vermelho:#C0392B;--bg:#2A4D6E;--panel:#335A7A;--border:#3E6D8E}
@@ -185,7 +185,7 @@ canvas{border-radius:12px;background:var(--panel);box-shadow:0 4px 20px rgba(0,0
   .bar-track{height:18px;border-radius:4px}
   .bar-fill{border-radius:4px}
   .result-note{font-size:12px;padding:10px 12px;line-height:1.6}
-  .help-btn{width:38px;height:38px;font-size:16px;bottom:12px;right:12px}
+  .help-btn{width:48px;height:48px;font-size:20px;bottom:14px;right:14px;z-index:9500}
   .tour-overlay{overflow-y:auto}
   .tour-tooltip{position:fixed!important;max-width:none!important;min-width:0!important;padding:16px 18px;border-radius:12px;left:12px!important;right:12px!important;width:auto!important;box-sizing:border-box}
   .tour-tooltip.top,.tour-tooltip.bottom,.tour-tooltip.left{left:12px!important;right:12px!important;width:auto!important}
@@ -239,7 +239,7 @@ canvas{border-radius:12px;background:var(--panel);box-shadow:0 4px 20px rgba(0,0
 <body>
 
 <div class="topbar">
-  <h1 id="mainTitle">Simulação de Sopro - v10.0</h1>
+  <h1 id="mainTitle">Simulação de Sopro - v10.1</h1>
   <div class="tabs">
     <button class="tab active" data-tab="aquecimento" id="tabHeat">🔥 Perfil Térmico</button>
     <button class="tab" data-tab="sopro" id="tabBlow">⚙ Processo de Sopro</button>
@@ -1543,7 +1543,7 @@ function drawHeat(){
 // ═══ TRANSLATIONS ═══
 let lang='pt';
 const TR={
-  pt:{title:'Simulação de Sopro - v10.0',tabHeat:'🔥 Perfil Térmico',tabBlow:'⚙ Processo de Sopro',
+  pt:{title:'Simulação de Sopro - v10.1',tabHeat:'🔥 Perfil Térmico',tabBlow:'⚙ Processo de Sopro',
     badge:'Especialista - Wesley Uelber',zona:'Zona',preForno:'Pré-Forno',forno:'Forno',perfil:'Perfil',
     mold:'MOLDE',start:'▶ Iniciar',pause:'⏸ Pausar',resume:'▶ Continuar',reset:'↺ Reiniciar',done:'✓ Completo',
     phases:['Posicionamento','Fechamento','Vedação do Bocal','Estiramento + Pré-Sopro','Sopro Final','Residência','Alívio de Sopro','Extração'],
@@ -1567,7 +1567,7 @@ const TR={
       'A pressão interna é aliviada gradualmente. A haste de estiramento sobe de volta.',
       'A vedação sobe, o molde abre e a garrafa é extraída com seu formato final.'
     ]},
-  en:{title:'Blow Molding Simulation - v10.0',tabHeat:'🔥 Thermal Profile',tabBlow:'⚙ Blow Process',
+  en:{title:'Blow Molding Simulation - v10.1',tabHeat:'🔥 Thermal Profile',tabBlow:'⚙ Blow Process',
     badge:'Specialist - Wesley Uelber',zona:'Zone',preForno:'Pre-Oven',forno:'Oven',perfil:'Profile',
     mold:'MOLD',start:'▶ Start',pause:'⏸ Pause',resume:'▶ Resume',reset:'↺ Reset',done:'✓ Done',
     phases:['Positioning','Mold Closing','Nozzle Seal','Stretching + Pre-Blow','Final Blow','Holding','Blow Relief','Extraction'],
@@ -1591,7 +1591,7 @@ const TR={
       'Internal pressure is gradually relieved. The stretch rod rises back.',
       'The seal rises, the mold opens and the bottle is extracted in its final shape.'
     ]},
-  es:{title:'Simulación de Soplado - v10.0',tabHeat:'🔥 Perfil Térmico',tabBlow:'⚙ Proceso de Soplado',
+  es:{title:'Simulación de Soplado - v10.1',tabHeat:'🔥 Perfil Térmico',tabBlow:'⚙ Proceso de Soplado',
     badge:'Especialista - Wesley Uelber',zona:'Zona',preForno:'Pre-Horno',forno:'Horno',perfil:'Perfil',
     mold:'MOLDE',start:'▶ Iniciar',pause:'⏸ Pausar',resume:'▶ Continuar',reset:'↺ Reiniciar',done:'✓ Completo',
     phases:['Posicionamiento','Cierre del Molde','Sellado de Boquilla','Estirado + Pre-Soplado','Soplado Final','Residencia','Alivio de Soplado','Extracción'],
@@ -1749,10 +1749,10 @@ const tourSteps={
     {el:'#cvHeat',title:'Temperatura da Pré-forma',text:'Mostra a temperatura estimada. Ideal: 95-105°C (verde). Calibrado para zonas a 50% + ventilação 30Hz + exaustão 30Hz = 100°C. Azul = fria, vermelho = quente demais.',pos:'bottom',page:'aquecimento'},
     {el:'#tabBlow',title:'Aba: Processo de Sopro',text:'Aqui você simula as 8 etapas do sopro e ajusta 4 parâmetros mecânicos. O perfil térmico da outra aba influencia diretamente a distribuição!',pos:'bottom',switchTo:'sopro'},
     {el:'#btnPlay',title:'Botões: Iniciar / Reiniciar',text:'Clique em Iniciar para rodar a animação das 8 etapas. Ou clique num número (1-8) para ir direto a uma etapa específica.',pos:'bottom',page:'sopro'},
-    {el:'#tSlider',title:'Ajuste: Início de Pré-Sopro (60-300ms)',text:'Controla quando o ar começa. Antecipado (60ms) = material vai pro ombro. Atrasado (300ms) = material fica na base. Use os presets para testar valores rápidos.',pos:'bottom',page:'sopro'},
-    {el:'#vSlider',title:'Ajuste: Tempo de Estiramento (250-500ms)',text:'Tempo de descida da haste. Rápido (250ms) = material empurrado pra base. Lento (500ms) = material concentra no ombro.',pos:'bottom',page:'sopro'},
-    {el:'#fSlider',title:'Ajuste: Vazão de Pré-Sopro (0-10)',text:'Fluxo de ar. Fechada (0) = sem expansão, material no fundo. Aberta (10) = expansão forte, material se distribui pro ombro.',pos:'bottom',page:'sopro'},
-    {el:'#pPSlider',title:'Ajuste: Pressão de Pré-Sopro (0-8 bar)',text:'Pressão do ar. Baixa = material na base. Alta = material no ombro. Todos os 5 fatores (4 mecânicos + perfil térmico) trabalham juntos e se compensam.',pos:'bottom',page:'sopro'},
+    {el:'#mobWrap',title:'Ajuste: Início de Pré-Sopro (60-300ms)',text:'Controla quando o ar começa. Antecipado (60ms) = material vai pro ombro. Atrasado (300ms) = material fica na base. Use os presets para testar valores rápidos.',pos:'bottom',page:'sopro'},
+    {el:'#mobWrap',title:'Ajuste: Tempo de Estiramento (250-500ms)',text:'Tempo de descida da haste. Rápido (250ms) = material empurrado pra base. Lento (500ms) = material concentra no ombro.',pos:'bottom',page:'sopro'},
+    {el:'#mobWrap',title:'Ajuste: Vazão de Pré-Sopro (0-10)',text:'Fluxo de ar. Fechada (0) = sem expansão, material no fundo. Aberta (10) = expansão forte, material se distribui pro ombro.',pos:'bottom',page:'sopro'},
+    {el:'#mobWrap',title:'Ajuste: Pressão de Pré-Sopro (0-8 bar)',text:'Pressão do ar. Baixa = material na base. Alta = material no ombro. Todos os 5 fatores (4 mecânicos + perfil térmico) trabalham juntos e se compensam.',pos:'bottom',page:'sopro'},
     {el:'#rNote',title:'Resultado — Diagnóstico Inteligente',text:'Mostra POR QUE o material está concentrado em determinada região. Lista cada fator que contribui (pré-sopro, estiramento, vazão, pressão, perfil térmico) por ordem de impacto.',pos:'top',page:'sopro'},
     {el:'.flags',title:'Idiomas 🇧🇷 🇺🇸 🇪🇸',text:'Clique nas bandeiras para trocar o idioma. Todo o simulador traduz automaticamente — incluindo o diagnóstico.',pos:'bottom'},
     {el:null,title:'Pronto para Explorar!',text:'Dica: vá no Perfil Térmico e coloque Z1-Z2 em 100 e Z5-Z6 em 20, depois veja o resultado na distribuição. Ou aumente o pré-sopro para 300ms e observe. Clique no botão ? para rever este tour a qualquer momento.',pos:'center'}
@@ -1769,10 +1769,10 @@ const tourSteps={
     {el:'#cvHeat',title:'Preform Temperature',text:'Shows estimated temperature. Ideal: 95-105°C (green). Calibrated: zones at 50% + vent 30Hz + exhaust 30Hz = 100°C.',pos:'bottom',page:'aquecimento'},
     {el:'#tabBlow',title:'Tab: Blow Process',text:'Simulate the 8 blow steps and adjust 4 mechanical parameters. The thermal profile directly influences distribution!',pos:'bottom',switchTo:'sopro'},
     {el:'#btnPlay',title:'Buttons: Start / Reset',text:'Click Start to run the 8-step animation. Or click a number (1-8) to jump to a specific step.',pos:'bottom',page:'sopro'},
-    {el:'#tSlider',title:'Adjustment: Pre-Blow Start (60-300ms)',text:'Controls when air starts. Early (60ms) = material to shoulder. Late (300ms) = material stays on base.',pos:'bottom',page:'sopro'},
-    {el:'#vSlider',title:'Adjustment: Stretch Time (250-500ms)',text:'Rod descent time. Fast (250ms) = material pushed to base. Slow (500ms) = material concentrates on shoulder.',pos:'bottom',page:'sopro'},
-    {el:'#fSlider',title:'Adjustment: Pre-Blow Flow (0-10)',text:'Air flow. Closed (0) = no expansion, material on base. Open (10) = strong expansion, material to shoulder.',pos:'bottom',page:'sopro'},
-    {el:'#pPSlider',title:'Adjustment: Pre-Blow Pressure (0-8 bar)',text:'Air pressure. Low = material on base. High = material on shoulder. All 5 factors (4 mechanical + thermal) work together.',pos:'bottom',page:'sopro'},
+    {el:'#mobWrap',title:'Adjustment: Pre-Blow Start (60-300ms)',text:'Controls when air starts. Early (60ms) = material to shoulder. Late (300ms) = material stays on base.',pos:'bottom',page:'sopro'},
+    {el:'#mobWrap',title:'Adjustment: Stretch Time (250-500ms)',text:'Rod descent time. Fast (250ms) = material pushed to base. Slow (500ms) = material concentrates on shoulder.',pos:'bottom',page:'sopro'},
+    {el:'#mobWrap',title:'Adjustment: Pre-Blow Flow (0-10)',text:'Air flow. Closed (0) = no expansion, material on base. Open (10) = strong expansion, material to shoulder.',pos:'bottom',page:'sopro'},
+    {el:'#mobWrap',title:'Adjustment: Pre-Blow Pressure (0-8 bar)',text:'Air pressure. Low = material on base. High = material on shoulder. All 5 factors (4 mechanical + thermal) work together.',pos:'bottom',page:'sopro'},
     {el:'#rNote',title:'Result — Smart Diagnosis',text:'Shows WHY material concentrates in a region. Lists each contributing factor (pre-blow, stretch, flow, pressure, thermal) by impact order.',pos:'top',page:'sopro'},
     {el:'.flags',title:'Languages 🇧🇷 🇺🇸 🇪🇸',text:'Click flags to switch language. Everything translates automatically — including the diagnosis.',pos:'bottom'},
     {el:null,title:'Ready to Explore!',text:'Tip: set Z1-Z2 to 100 and Z5-Z6 to 20 in Thermal Profile, then check the distribution result. Or increase pre-blow to 300ms. Click ? to review this tour anytime.',pos:'center'}
@@ -1781,4 +1781,4 @@ const tourSteps={
     {el:null,title:'¡Bienvenido al Simulador de Soplado PET!',text:'Este simulador permite ajustar el perfil térmico y los parámetros de soplado para entender cómo afectan la distribución de material en la botella.',pos:'center'},
     {el:'#tabHeat',title:'Pestaña: Perfil Térmico',text:'Aquí controla el calentamiento de la preforma. Acceda a las 9 zonas, ventilación, extracción y temperatura ambiente.',pos:'bottom'},
     {el:'#cvHeat',title:'Valores de Zonas (clic)',text:'Haga clic en el número junto a cada lámpara para editar (0-100). El editor aparece sobre el valor. Cada lado es independiente.',pos:'bottom',page:'aquecimento'},
-    {el:'#cvHeat',title:'Potencia de Lámparas',text:'Z1 = 3000W (rojo intenso), Z2/Z9 = 20
+    {el:'#cvHeat',title:'Potencia de Lámparas',text:'Z1 = 3000W (rojo intenso),
