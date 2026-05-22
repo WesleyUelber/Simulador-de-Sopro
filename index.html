@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Simulação de Sopro - v10.3</title>
+<title>Simulação de Sopro - v10.4</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap');
 :root{--azul:#2E75B6;--azul-escuro:#1A4B8C;--laranja:#E87722;--verde:#2E8B57;--vermelho:#C0392B;--bg:#2A4D6E;--panel:#335A7A;--border:#3E6D8E}
@@ -239,7 +239,7 @@ canvas{border-radius:12px;background:var(--panel);box-shadow:0 4px 20px rgba(0,0
 <body>
 
 <div class="topbar">
-  <h1 id="mainTitle">Simulação de Sopro - v10.3</h1>
+  <h1 id="mainTitle">Simulação de Sopro - v10.4</h1>
   <div class="tabs">
     <button class="tab active" data-tab="aquecimento" id="tabHeat">🔥 Perfil Térmico</button>
     <button class="tab" data-tab="sopro" id="tabBlow">⚙ Processo de Sopro</button>
@@ -1548,7 +1548,7 @@ function drawHeat(){
 // ═══ TRANSLATIONS ═══
 let lang='pt';
 const TR={
-  pt:{title:'Simulação de Sopro - v10.3',tabHeat:'🔥 Perfil Térmico',tabBlow:'⚙ Processo de Sopro',
+  pt:{title:'Simulação de Sopro - v10.4',tabHeat:'🔥 Perfil Térmico',tabBlow:'⚙ Processo de Sopro',
     badge:'Especialista - Wesley Uelber',zona:'Zona',preForno:'Pré-Forno',forno:'Forno',perfil:'Perfil',
     mold:'MOLDE',start:'▶ Iniciar',pause:'⏸ Pausar',resume:'▶ Continuar',reset:'↺ Reiniciar',done:'✓ Completo',
     phases:['Posicionamento','Fechamento','Vedação do Bocal','Estiramento + Pré-Sopro','Sopro Final','Residência','Alívio de Sopro','Extração'],
@@ -1572,7 +1572,7 @@ const TR={
       'A pressão interna é aliviada gradualmente. A haste de estiramento sobe de volta.',
       'A vedação sobe, o molde abre e a garrafa é extraída com seu formato final.'
     ]},
-  en:{title:'Blow Molding Simulation - v10.3',tabHeat:'🔥 Thermal Profile',tabBlow:'⚙ Blow Process',
+  en:{title:'Blow Molding Simulation - v10.4',tabHeat:'🔥 Thermal Profile',tabBlow:'⚙ Blow Process',
     badge:'Specialist - Wesley Uelber',zona:'Zone',preForno:'Pre-Oven',forno:'Oven',perfil:'Profile',
     mold:'MOLD',start:'▶ Start',pause:'⏸ Pause',resume:'▶ Resume',reset:'↺ Reset',done:'✓ Done',
     phases:['Positioning','Mold Closing','Nozzle Seal','Stretching + Pre-Blow','Final Blow','Holding','Blow Relief','Extraction'],
@@ -1596,7 +1596,7 @@ const TR={
       'Internal pressure is gradually relieved. The stretch rod rises back.',
       'The seal rises, the mold opens and the bottle is extracted in its final shape.'
     ]},
-  es:{title:'Simulación de Soplado - v10.3',tabHeat:'🔥 Perfil Térmico',tabBlow:'⚙ Proceso de Soplado',
+  es:{title:'Simulación de Soplado - v10.4',tabHeat:'🔥 Perfil Térmico',tabBlow:'⚙ Proceso de Soplado',
     badge:'Especialista - Wesley Uelber',zona:'Zona',preForno:'Pre-Horno',forno:'Horno',perfil:'Perfil',
     mold:'MOLDE',start:'▶ Iniciar',pause:'⏸ Pausar',resume:'▶ Continuar',reset:'↺ Reiniciar',done:'✓ Completo',
     phases:['Posicionamiento','Cierre del Molde','Sellado de Boquilla','Estirado + Pre-Soplado','Soplado Final','Residencia','Alivio de Soplado','Extracción'],
@@ -1919,17 +1919,29 @@ function showTour(idx){
         hl.style.height=maxHlH+'px';
       }
     } else {
-      // Desktop positioning - clear bottom
+      // Desktop positioning - centered horizontally, clamped vertically
       tip.style.bottom='auto';
+      var tipW=360;
+      var tipLeft=Math.max(16, Math.min(rect.left+(rect.width/2)-(tipW/2), vw-tipW-16));
+      tip.style.left=tipLeft+'px';
+      
       if(step.pos==='bottom'){
-        tip.style.left=Math.max(10,Math.min(rect.left,vw-380))+'px';
-        tip.style.top=(rect.bottom+16)+'px';
+        var topPos=rect.bottom+16;
+        // If tooltip would go below viewport, put it above instead
+        if(topPos+250>vh){
+          topPos=Math.max(16, rect.top-270);
+        }
+        tip.style.top=topPos+'px';
       } else if(step.pos==='top'){
-        tip.style.left=Math.max(10,Math.min(rect.left,vw-380))+'px';
-        tip.style.top=(rect.top-tip.offsetHeight-16)+'px';
+        var topPos2=rect.top-270;
+        // If tooltip would go above viewport, put it below instead
+        if(topPos2<16){
+          topPos2=rect.bottom+16;
+        }
+        tip.style.top=Math.max(16, topPos2)+'px';
       } else if(step.pos==='left'){
-        tip.style.left=(rect.left-tip.offsetWidth-16)+'px';
-        tip.style.top=rect.top+'px';
+        tip.style.left=Math.max(16, rect.left-tipW-16)+'px';
+        tip.style.top=Math.max(16, Math.min(rect.top, vh-280))+'px';
       }
     }
   },350);
