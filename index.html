@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Simulação de Sopro - v11.5</title>
+<title>Simulação de Sopro - v11.6</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap');
 :root{--azul:#2E75B6;--azul-escuro:#1A4B8C;--laranja:#E87722;--verde:#2E8B57;--vermelho:#C0392B;--bg:#2A4D6E;--panel:#335A7A;--border:#3E6D8E}
@@ -269,7 +269,7 @@ canvas{border-radius:12px;background:var(--panel);box-shadow:0 4px 20px rgba(0,0
 <body>
 
 <div class="topbar">
-  <h1 id="mainTitle">Simulação de Sopro - v11.5</h1>
+  <h1 id="mainTitle">Simulação de Sopro - v11.6</h1>
   <div class="tabs">
     <button class="tab active" data-tab="aquecimento" id="tabHeat">🔥 Perfil Térmico</button>
     <button class="tab" data-tab="sopro" id="tabBlow">⚙ Processo de Sopro</button>
@@ -1052,21 +1052,6 @@ function draw(){
   else{dBottle()}
   dAirFlow();dPETShine();dSteam();
   dLabels();dTimingBar();dStageOverlay();
-  // Quality stamp when cycle complete
-  if(S.ph===7&&S.fr>=(PD[7].dur-5)){
-    const hasDef=(window._activeDefects||0)>0;
-    ctx.save();
-    ctx.translate(CX-150,MT+80);ctx.rotate(-0.18);
-    ctx.font='800 17px DM Sans';ctx.textAlign='center';
-    const col=hasDef?'#E05540':'#3ECC70';
-    ctx.strokeStyle=col;ctx.lineWidth=2.5;
-    ctx.globalAlpha=.9;
-    const txt=hasDef?(lang==='en'?'DEFECT':lang==='es'?'DEFECTO':'DEFEITO'):(lang==='en'?'APPROVED':lang==='es'?'APROBADA':'APROVADA');
-    const tw=ctx.measureText(txt).width;
-    ctx.strokeRect(-tw/2-12,-16,tw+24,32);
-    ctx.fillStyle=col;ctx.fillText(txt,0,6);
-    ctx.restore();
-  }
   updateUI();
 }
 
@@ -1232,16 +1217,6 @@ function gNote(){
   // Check temperature — only extreme cold blocks forming entirely (~70°C)
   if(hp.avg<8) return{t:l.coldPreform,c:'warn'};
 
-  // ═══ DEFECT DETECTION (real blow molding defects) ═══
-  const pfTemp=Math.round(Math.min(160,45+hp.avg*3.1));
-  const defects=[];
-  if(pfTemp<88)defects.push(l.defPearl.replace('{T}',pfTemp));
-  else if(pfTemp>118)defects.push(l.defCrystal.replace('{T}',pfTemp));
-  if(S.fQ===0)defects.push(l.defNoPre);
-  if(d.b>=52)defects.push(l.defHeavyBase.replace('{P}',d.b));
-  if(d.o>=52)defects.push(l.defHeavyShoulder.replace('{P}',d.o));
-  window._activeDefects=defects.length;
-
   // Collect reasons
   const reasons=[];
   const absThresh=3;
@@ -1263,9 +1238,8 @@ function gNote(){
   }
 
   const totalShift=shT+shV+shF+shP+shH;
-  const defTxt=defects.length?defects.join('\n')+'\n':'';
 
-  if(reasons.length===0&&defects.length===0){
+  if(reasons.length===0){
     return{t:l.balanced,c:'good'};
   }
 
@@ -1274,9 +1248,9 @@ function gNote(){
 
   const header=totalShift>3?l.moreBase:totalShift<-3?l.moreShoulder:l.balanced;
   const lines=reasons.map(r=>'• '+r.txt);
-  const txt=defTxt+(reasons.length?header+'\n'+lines.join('\n'):'');
+  const txt=header+'\n'+lines.join('\n');
 
-  const isGood=Math.abs(totalShift)<8&&hp.avg>=15&&defects.length===0;
+  const isGood=Math.abs(totalShift)<8;
   return{t:txt,c:isGood?'good':'warn'}}
 
 function updateUI(){
@@ -1912,10 +1886,11 @@ function drawHeat(){
 // ═══ TRANSLATIONS ═══
 let lang='pt';
 const TR={
-  pt:{title:'Simulação de Sopro - v11.5',tabHeat:'🔥 Perfil Térmico',tabBlow:'⚙ Processo de Sopro',
+  pt:{title:'Simulação de Sopro - v11.6',tabHeat:'🔥 Perfil Térmico',tabBlow:'⚙ Processo de Sopro',
     badge:'Especialista - Wesley Uelber',zona:'Zona',preForno:'Pré-Forno',forno:'Forno',perfil:'Perfil',
     bph:'gar/h',mold:'MOLDE',start:'▶ Iniciar',pause:'⏸ Pausar',resume:'▶ Continuar',reset:'↺ Reiniciar',done:'✓ Completo',pressCurve:'Curva de Pressão',cycleTime:'Ciclo',
     phases:['Posicionamento','Fechamento','Vedação do Bocal','Estiramento + Pré-Sopro','Sopro Final','Residência','Alívio de Sopro','Extração'],
+    phasesShort:['Posic.','Fecha.','Vedação','Estir.','Sopro','Resid.','Alívio','Extração'],
     ptPhases:'⚙ Etapas do Processo',ptTiming:'🎛 Início de Pré-Sopro',ptSpeed:'⚡ Tempo de Estiramento',
     ptFlow:'💨 Vazão de Pré-Sopro',ptPressure:'🔵 Pressão de Pré-Sopro',ptDist:'📊 Distribuição de Material',
     time:'Tempo',speed:'Tempo',flow:'Vazão',pressure:'Pressão',
@@ -1938,10 +1913,11 @@ const TR={
       'A pressão interna é aliviada gradualmente. A haste de estiramento sobe de volta.',
       'A vedação sobe, o molde abre e a garrafa é extraída com seu formato final.'
     ]},
-  en:{title:'Blow Molding Simulation - v11.5',tabHeat:'🔥 Thermal Profile',tabBlow:'⚙ Blow Process',
+  en:{title:'Blow Molding Simulation - v11.6',tabHeat:'🔥 Thermal Profile',tabBlow:'⚙ Blow Process',
     badge:'Specialist - Wesley Uelber',zona:'Zone',preForno:'Pre-Oven',forno:'Oven',perfil:'Profile',
     bph:'bot/h',mold:'MOLD',start:'▶ Start',pause:'⏸ Pause',resume:'▶ Resume',reset:'↺ Reset',done:'✓ Done',pressCurve:'Pressure Curve',cycleTime:'Cycle',
     phases:['Positioning','Mold Closing','Nozzle Seal','Stretching + Pre-Blow','Final Blow','Holding','Blow Relief','Extraction'],
+    phasesShort:['Posit.','Close','Seal','Stretch','Blow','Hold','Relief','Extract'],
     ptPhases:'⚙ Process Steps',ptTiming:'🎛 Pre-Blow Start',ptSpeed:'⚡ Stretch Time',
     ptFlow:'💨 Pre-Blow Flow',ptPressure:'🔵 Pre-Blow Pressure',ptDist:'📊 Material Distribution',
     time:'Time',speed:'Time',flow:'Flow',pressure:'Pressure',
@@ -1964,10 +1940,11 @@ const TR={
       'Internal pressure is gradually relieved. The stretch rod rises back.',
       'The seal rises, the mold opens and the bottle is extracted in its final shape.'
     ]},
-  es:{title:'Simulación de Soplado - v11.5',tabHeat:'🔥 Perfil Térmico',tabBlow:'⚙ Proceso de Soplado',
+  es:{title:'Simulación de Soplado - v11.6',tabHeat:'🔥 Perfil Térmico',tabBlow:'⚙ Proceso de Soplado',
     badge:'Especialista - Wesley Uelber',zona:'Zona',preForno:'Pre-Horno',forno:'Horno',perfil:'Perfil',
     bph:'bot/h',mold:'MOLDE',start:'▶ Iniciar',pause:'⏸ Pausar',resume:'▶ Continuar',reset:'↺ Reiniciar',done:'✓ Completo',pressCurve:'Curva de Presión',cycleTime:'Ciclo',
     phases:['Posicionamiento','Cierre del Molde','Sellado de Boquilla','Estirado + Pre-Soplado','Soplado Final','Residencia','Alivio de Soplado','Extracción'],
+    phasesShort:['Posic.','Cierre','Sellado','Estir.','Soplado','Resid.','Alivio','Extrac.'],
     ptPhases:'⚙ Etapas del Proceso',ptTiming:'🎛 Inicio de Pre-Soplado',ptSpeed:'⚡ Tiempo de Estirado',
     ptFlow:'💨 Caudal de Pre-Soplado',ptPressure:'🔵 Presión de Pre-Soplado',ptDist:'📊 Distribución de Material',
     time:'Tiempo',speed:'Tiempo',flow:'Caudal',pressure:'Presión',
@@ -2009,7 +1986,8 @@ function applyLang(){
   const pD=document.getElementById('ptDist');if(pD)pD.innerHTML='<span class="icon">📊</span> '+T('ptDist').replace('📊 ','');
   // Phase buttons
   document.querySelectorAll('.phase-btn').forEach((b,i)=>{
-    b.innerHTML='<span class="num">'+(i+1)+'</span>'+T('phases')[i];
+    var ph=T('phasesShort')||T('phases');
+    b.innerHTML='<span class="num">'+(i+1)+'</span>'+ph[i];
   });
   // Buttons
   // Play button: re-translate by matching current text to its key in any language
@@ -2170,7 +2148,6 @@ const tourSteps={
     {el:'#tabBlow',title:'Aba: Processo de Sopro',text:'Aqui você simula as 8 etapas do sopro e ajusta 4 parâmetros mecânicos. O perfil térmico da outra aba influencia diretamente a distribuição!',pos:'bottom',switchTo:'sopro'},
     {el:'#btnPlay',title:'Botões: Iniciar / Reiniciar',text:'Clique em Iniciar para rodar a animação das 8 etapas. Ou clique num número (1-8) para ir direto a uma etapa específica.',pos:'bottom',page:'sopro'},
     {el:'#moldSelector',title:'Moldes e Velocidade',text:'Escolha entre 3 moldes diferentes (liso, com ranhuras, com cintura) e controle a velocidade da animação (0.5x câmera lenta, 1x normal, 2x rápido).',pos:'bottom',page:'sopro'},
-    {el:'#cv',title:'Curva de Pressão (IHM)',text:'Durante a animação, o gráfico no canto superior direito mostra a curva de pressão em tempo real, como na IHM de uma máquina real: pré-sopro, sopro final 30 bar, residência e alívio. Também mostra o tempo de ciclo em segundos.',pos:'bottom',page:'sopro'},
     {el:'#mobWrap',title:'Ajuste: Início de Pré-Sopro (60-300ms)',text:'Controla quando o ar começa. Antecipado (60ms) = material vai pro ombro. Atrasado (300ms) = material fica na base. Use os presets para testar valores rápidos.',pos:'bottom',page:'sopro'},
     {el:'#mobWrap',title:'Ajuste: Tempo de Estiramento (250-500ms)',text:'Tempo de descida da haste. Rápido (250ms) = material empurrado pra base. Lento (500ms) = material concentra no ombro.',pos:'bottom',page:'sopro'},
     {el:'#mobWrap',title:'Ajuste: Vazão de Pré-Sopro (0-10)',text:'Fluxo de ar. Fechada (0) = sem expansão, material no fundo. Aberta (10) = expansão forte, material se distribui pro ombro.',pos:'bottom',page:'sopro'},
@@ -2193,7 +2170,6 @@ const tourSteps={
     {el:'#tabBlow',title:'Tab: Blow Process',text:'Simulate the 8 blow steps and adjust 4 mechanical parameters. The thermal profile directly influences distribution!',pos:'bottom',switchTo:'sopro'},
     {el:'#btnPlay',title:'Buttons: Start / Reset',text:'Click Start to run the 8-step animation. Or click a number (1-8) to jump to a specific step.',pos:'bottom',page:'sopro'},
     {el:'#moldSelector',title:'Molds & Speed',text:'Choose between 3 different molds (smooth, ribbed, waisted) and control animation speed (0.5x slow motion, 1x normal, 2x fast).',pos:'bottom',page:'sopro'},
-    {el:'#cv',title:'Pressure Curve (HMI)',text:'During animation, the graph in the top-right corner shows the real-time pressure curve, like a real machine HMI: pre-blow, 30 bar final blow, holding and relief. Also shows cycle time in seconds.',pos:'bottom',page:'sopro'},
     {el:'#mobWrap',title:'Adjustment: Pre-Blow Start (60-300ms)',text:'Controls when air starts. Early (60ms) = material to shoulder. Late (300ms) = material stays on base.',pos:'bottom',page:'sopro'},
     {el:'#mobWrap',title:'Adjustment: Stretch Time (250-500ms)',text:'Rod descent time. Fast (250ms) = material pushed to base. Slow (500ms) = material concentrates on shoulder.',pos:'bottom',page:'sopro'},
     {el:'#mobWrap',title:'Adjustment: Pre-Blow Flow (0-10)',text:'Air flow. Closed (0) = no expansion, material on base. Open (10) = strong expansion, material to shoulder.',pos:'bottom',page:'sopro'},
@@ -2216,7 +2192,6 @@ const tourSteps={
     {el:'#tabBlow',title:'Pestaña: Proceso de Soplado',text:'Simule las 8 etapas y ajuste 4 parámetros mecánicos. ¡El perfil térmico influye directamente!',pos:'bottom',switchTo:'sopro'},
     {el:'#btnPlay',title:'Botones: Iniciar / Reiniciar',text:'Inicie la animación o haga clic en un número (1-8) para ir a una etapa específica.',pos:'bottom',page:'sopro'},
     {el:'#moldSelector',title:'Moldes y Velocidad',text:'Elija entre 3 moldes diferentes (liso, con ranuras, con cintura) y controle la velocidad (0.5x, 1x, 2x).',pos:'bottom',page:'sopro'},
-    {el:'#cv',title:'Curva de Presión (HMI)',text:'Durante la animación, el gráfico muestra la curva de presión en tiempo real: pre-soplado, 30 bar, residencia y alivio. También el tiempo de ciclo.',pos:'bottom',page:'sopro'},
     {el:'#mobWrap',title:'Inicio de Pre-Soplado (60-300ms)',text:'Anticipado = material en hombro. Retrasado = material en base.',pos:'bottom',page:'sopro'},
     {el:'#mobWrap',title:'Tiempo de Estirado (250-500ms)',text:'Rápido = material en base. Lento = material en hombro.',pos:'bottom',page:'sopro'},
     {el:'#mobWrap',title:'Caudal de Pre-Soplado (0-10)',text:'Cerrado = material en base. Abierto = material en hombro.',pos:'bottom',page:'sopro'},
